@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 
 //Get Merchant info
+//GET localhost:3000/merchants/
 function getMerchant(req, res, next) {
   const id = req.merchantData.merchantId;
   Merchant.find({ _id: id })
@@ -34,6 +35,7 @@ function getMerchant(req, res, next) {
 };
 
 //Sign up
+//POST localhost:3000/merchants/signup
 function signUp(req, res, next) {
   Merchant.find({$or:[{ name: req.body.name }, { email: req.body.email }]})
     .exec()
@@ -75,6 +77,7 @@ function signUp(req, res, next) {
 };
 
 //Log in
+//POST localhost:3000/merchants/login
 function logIn(req, res, next) {
   Merchant.find({ email: req.body.email })
     .exec()
@@ -118,6 +121,7 @@ function logIn(req, res, next) {
 };
 
 //Update
+//PUT localhost:3000/merchants/update
 function update(req, res, next) {
   const id = req.merchantData.merchantId;
   Merchant.find({ _id: id })
@@ -154,6 +158,7 @@ function update(req, res, next) {
 };
 
 //Delete Merchant
+//DELETE localhost:3000/merchants/
 function deleteMerchant(req, res, next) {
   const id = req.merchantData.merchantId;
   Merchant.find({ _id: id })

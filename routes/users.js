@@ -4,7 +4,10 @@ const bController = require('../controllers/balances');
 const userAuth = require('../middleware/userAuth');
 const userExist = require('../middleware/userExist');
 
+//localhost:3000/users
 const router = express.Router();
+
+//Users
 
 //Get info
 router.get('/', userAuth, userExist, uController.getUser);
@@ -20,6 +23,19 @@ router.put('/', userAuth, userExist, uController.update)
 
 //DeleteUser
 router.delete('/', userAuth, userExist, uController.deleteUser, bController.userDelete);
+
+
+//Balances
+
+//Get Balances
+router.get('/balances', userAuth, userExist, bController.userGet);
+router.get('/balances/:balanceId', userAuth, userExist, bController.userGetOne);
+
+//Create Balance
+router.post('/balances', userAuth, userExist, bController.userCreate);
+
+//Delete Balance
+router.delete('/balances/:balanceId', userAuth, userExist, bController.userDeleteOne);
 
 
 module.exports = router;

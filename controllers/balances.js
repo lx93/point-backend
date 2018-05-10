@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-//Get
+//Users
 
 //userGet
-//GET localhost:3000/balances/users
+//GET localhost:3000/users/balances
 function userGet(req, res, next) {
   Balance.find({ phone: req.userData.phone })
     .exec()
@@ -31,37 +31,8 @@ function userGet(req, res, next) {
     });
 };
 
-//merchantGet
-//GET localhost:3000/balances/merchants
-function merchantGet(req, res, next) {
-  Balance.find({ email: req.merchantData.email })
-    .exec()
-    .then( balance => {
-      if (!balance.length) {
-        console.log('Merchant has no balances!');
-        return res.status(409).json({
-          message: "Merchant has no balances!"
-        });
-      } else {
-        console.log(balance);
-        return res.status(200).json({
-          balance
-        });
-      }
-    })
-    .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
-    });
-};
-
-
-//getOne
-
 //userGetOne
-//GET localhost:3000/balances/users/:balanceId
+//GET localhost:3000/users/balances/:balanceId
 function userGetOne(req, res, next) {
   const id = req.params.balanceId;
   Balance.find({ _id: id })
@@ -90,41 +61,8 @@ function userGetOne(req, res, next) {
     });
 };
 
-//merchantGetOne
-//GET localhost:3000/balances/merchants/:balanceId
-function merchantGetOne(req, res, next) {
-  const id = req.params.balanceId
-  Balance.find({ _id: id })
-    .exec()
-    .then( balance => {
-      if (!balance.length) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        console.log(balance);
-        return res.status(200).json({
-          _id: balance[0]._id,
-          phone: balance[0].phone,
-          email: balance[0].email,
-          balance: balance[0].balance
-        });
-      }
-    })
-    .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
-    });
-};
-
-
-//Create
-
 //userCreate
-//POST localhost:3000/balances/users
+//POST localhost:3000/users/balances
 function userCreate(req, res, next) {
   Balance.find({ phone: req.userData.phone, email: req.body.email })
     .exec()
@@ -154,6 +92,138 @@ function userCreate(req, res, next) {
         console.log('Balance exists!');
         return res.status(409).json({
           message: "Balance exists!"
+        });
+      }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
+    });
+};
+
+//userDelete
+//DELETE localhost:3000/users
+function userDelete(req, res, next) {
+  Balance.find({ phone: req.userData.phone })
+    .exec()
+    .then( balance => {
+      if (!balance.length) {
+        console.log('User has no balances!');
+        return res.status(409).json({
+          message: "User has no balances!"
+        });
+      } else {
+          Balance.remove({ phone: req.userData.phone })
+            .exec()
+            .then ( result => {
+              console.log('Balances deleted!');
+              return res.status(201).json({
+                message: "User and Balances deleted!"
+              });
+            })
+            .catch( err => {
+              console.log(err);
+              return res.status(500).json({
+                error: err
+              });
+            });
+      }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
+    });
+};
+
+//userDeleteOne
+//DELETE localhost:3000/users/balances/:balanceId
+function userDeleteOne(req, res, next) {
+  const id = req.params.balanceId;
+  Balance.find({ _id: id })
+    .exec()
+    .then( balance => {
+      if (!balance.length) {
+        console.log('Balance doesn\'t exist!');
+        return res.status(409).json({
+          message: "Balance doesn't exist!"
+        });
+      } else {
+          Balance.remove({ _id: id })
+            .exec()
+            .then ( result => {
+              console.log('Balance deleted!');
+              return res.status(201).json({
+                message: "Balance deleted!"
+              });
+            })
+            .catch( err => {
+              console.log(err);
+              return res.status(500).json({
+                error: err
+              });
+            });
+      }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
+    });
+};
+
+
+//Merchants
+
+//merchantGet
+//GET localhost:3000/balances/merchants
+function merchantGet(req, res, next) {
+  Balance.find({ email: req.merchantData.email })
+    .exec()
+    .then( balance => {
+      if (!balance.length) {
+        console.log('Merchant has no balances!');
+        return res.status(409).json({
+          message: "Merchant has no balances!"
+        });
+      } else {
+        console.log(balance);
+        return res.status(200).json({
+          balance
+        });
+      }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
+    });
+};
+
+//merchantGetOne
+//GET localhost:3000/balances/merchants/:balanceId
+function merchantGetOne(req, res, next) {
+  const id = req.params.balanceId
+  Balance.find({ _id: id })
+    .exec()
+    .then( balance => {
+      if (!balance.length) {
+        console.log('Balance doesn\'t exist!');
+        return res.status(409).json({
+          message: "Balance doesn't exist!"
+        });
+      } else {
+        console.log(balance);
+        return res.status(200).json({
+          _id: balance[0]._id,
+          phone: balance[0].phone,
+          email: balance[0].email,
+          balance: balance[0].balance
         });
       }
     })
@@ -207,45 +277,6 @@ function merchantCreate(req, res, next) {
     });
 };
 
-//Delete
-
-//userDelete
-//DELETE localhost:3000/users
-
-function userDelete(req, res, next) {
-  Balance.find({ phone: req.userData.phone })
-    .exec()
-    .then( balance => {
-      if (!balance.length) {
-        console.log('User has no balances!');
-        return res.status(409).json({
-          message: "User has no balances!"
-        });
-      } else {
-          Balance.remove({ phone: req.userData.phone })
-            .exec()
-            .then ( result => {
-              console.log('Balances deleted!');
-              return res.status(201).json({
-                message: "User and Balances deleted!"
-              });
-            })
-            .catch( err => {
-              console.log(err);
-              return res.status(500).json({
-                error: err
-              });
-            });
-      }
-    })
-    .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
-    });
-};
-
 //merchantDelete
 //DELETE localhost:3000/merchants
 function merchantDelete(req, res, next) {
@@ -264,46 +295,6 @@ function merchantDelete(req, res, next) {
               console.log('Balances deleted!');
               return res.status(201).json({
                 message: "Merchant and Balances deleted!"
-              });
-            })
-            .catch( err => {
-              console.log(err);
-              return res.status(500).json({
-                error: err
-              });
-            });
-      }
-    })
-    .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
-    });
-};
-
-
-//DeleteOne
-
-//userDeleteOne
-//DELETE localhost:3000/balances/users/:balanceId
-function userDeleteOne(req, res, next) {
-  const id = req.params.balanceId;
-  Balance.find({ _id: id })
-    .exec()
-    .then( balance => {
-      if (!balance.length) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-          Balance.remove({ _id: id })
-            .exec()
-            .then ( result => {
-              console.log('Balance deleted!');
-              return res.status(201).json({
-                message: "Balance deleted!"
               });
             })
             .catch( err => {
@@ -359,17 +350,15 @@ function merchantDeleteOne(req, res, next) {
     });
 };
 
+
 exports.userGet = userGet;
-exports.merchantGet = merchantGet;
-
 exports.userGetOne = userGetOne;
-exports.merchantGetOne = merchantGetOne;
-
 exports.userCreate = userCreate;
-exports.merchantCreate = merchantCreate;
-
 exports.userDelete = userDelete;
-exports.merchantDelete = merchantDelete;
-
 exports.userDeleteOne = userDeleteOne;
+
+exports.merchantGet = merchantGet;
+exports.merchantGetOne = merchantGetOne;
+exports.merchantCreate = merchantCreate;
+exports.merchantDelete = merchantDelete;
 exports.merchantDeleteOne = merchantDeleteOne;
