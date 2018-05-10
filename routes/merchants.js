@@ -33,6 +33,10 @@ router.get('/balances/:balanceId', merchantAuth, merchantExist, bController.merc
 
 //Create Balance
 router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate);
+router.post('/balances/:phone', merchantAuth, merchantExist, bController.merchantCreateFromURL);
+
+//Update Balance
+router.put('/balances', merchantAuth, merchantExist, bController.merchantUpdate);
 
 //Delete Balance
 router.delete('/balances/:balanceId', merchantAuth, merchantExist, bController.merchantDeleteOne);

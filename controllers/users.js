@@ -126,7 +126,7 @@ function logIn(req, res, next) {
 };
 
 //Update
-//PUT localhost:3000/users/ 
+//PUT localhost:3000/users/
 function update(req, res, next) {
   const id = req.userData.userId;
   User.find({ _id: id })
@@ -179,7 +179,7 @@ function deleteUser(req, res, next) {
           .exec()
           .then(result => {
             console.log('User deleted!');
-            Balance.find({ phone: req.userData.phone })
+            Balance.find({ id: id })
               .exec()
               .then( balance => {
                 if (!balance.length) {

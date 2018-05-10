@@ -174,7 +174,7 @@ function deleteMerchant(req, res, next) {
           .exec()
           .then(result => {
             console.log('Merchant deleted!');
-            Balance.find({ email: req.merchantData.email })
+            Balance.find({ id: id })
               .exec()
               .then( balance => {
                 if (!balance.length) {

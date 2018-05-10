@@ -48,7 +48,7 @@ function userGetOne(req, res, next) {
         return res.status(200).json({
           _id: balance[0]._id,
           phone: balance[0].phone,
-          email: balance[0].email,
+          merchantId: balance[0].merchantId,
           balance: balance[0].balance
         });
       }
@@ -61,18 +61,62 @@ function userGetOne(req, res, next) {
     });
 };
 
-//userCreate
-//POST localhost:3000/users/balances
+//userCreateFromQR
+//POST localhost:3000/users/balances/
 function userCreate(req, res, next) {
-  Balance.find({ phone: req.userData.phone, email: req.body.email })
+  const phone = req.userData.phone;
+  Balance.find({ userId: uId, merchantId: mId })
     .exec()
     .then( balance => {
       if (!balance.length) {
-        var newBalance = new Balance({
+        const newBalance = new Balance({
           _id: new mongoose.Types.ObjectId,
-          phone: req.userData.phone,
-          email: req.body.email,
-          balance: 0
+          phone: phone,
+          merchantId: req.body.merchantId,
+          balance: req.body.balance
+        });
+        newBalance
+          .save()
+          .then( result => {
+            console.log('Balance created!');
+            return res.status(201).json({
+              message: "Balance created!"
+            });
+          })
+          .catch( err => {
+            console.log(err);
+            return res.status(500).json({
+              error: err
+            });
+          });
+      } else {
+        console.log('Balance exists!');
+        return res.status(409).json({
+          message: "Balance exists!"
+        });
+      }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
+    });
+};
+
+//merchantCreate
+//POST localhost:3000/users/balances/:merchantId
+function userCreateFromURL(req, res, next) {
+  const phone = req.userData.phone;
+  Balance.find({ phone: phone, merchantId: req.params.merchantId })
+    .exec()
+    .then( balance => {
+      if (!balance.length) {
+        const newBalance = new Balance({
+          _id: new mongoose.Types.ObjectId,
+          phone: phone,
+          merchantId: req.params.merchantId,
+          balance: req.body.balance
         });
         newBalance
           .save()
@@ -180,9 +224,9 @@ function userDeleteOne(req, res, next) {
 //Merchants
 
 //merchantGet
-//GET localhost:3000/balances/merchants
+//GET localhost:3000/merchants/balances
 function merchantGet(req, res, next) {
-  Balance.find({ email: req.merchantData.email })
+  Balance.find({ merchantId: req.merchantData.merchantId })
     .exec()
     .then( balance => {
       if (!balance.length) {
@@ -206,7 +250,7 @@ function merchantGet(req, res, next) {
 };
 
 //merchantGetOne
-//GET localhost:3000/balances/merchants/:balanceId
+//GET localhost:3000/merchants/balances/:balanceId
 function merchantGetOne(req, res, next) {
   const id = req.params.balanceId
   Balance.find({ _id: id })
@@ -222,7 +266,7 @@ function merchantGetOne(req, res, next) {
         return res.status(200).json({
           _id: balance[0]._id,
           phone: balance[0].phone,
-          email: balance[0].email,
+          merchantId: balance[0].merchantId,
           balance: balance[0].balance
         });
       }
@@ -236,16 +280,17 @@ function merchantGetOne(req, res, next) {
 };
 
 //merchantCreate
-//POST localhost:3000/balances/merchants
+//POST localhost:3000/merchants/balances/
 function merchantCreate(req, res, next) {
-  Balance.find({ phone: req.body.phone, email: req.merchantData.email })
+  const id = req.merchantData.merchantId;
+  Balance.find({ phone: req.body.phone, merchantId: id })
     .exec()
     .then( balance => {
       if (!balance.length) {
-        var newBalance = new Balance({
+        const newBalance = new Balance({
           _id: new mongoose.Types.ObjectId,
           phone: req.body.phone,
-          email: req.merchantData.email,
+          merchantId: id,
           balance: req.body.balance
         });
         newBalance
@@ -277,10 +322,92 @@ function merchantCreate(req, res, next) {
     });
 };
 
+//merchantCreate
+//POST localhost:3000/merchants/balances/:phone
+function merchantCreateFromURL(req, res, next) {
+  const id = req.merchantData.merchantId;
+  Balance.find({ phone: req.body.phone, merchantId: id })
+    .exec()
+    .then( balance => {
+      if (!balance.length) {
+        const newBalance = new Balance({
+          _id: new mongoose.Types.ObjectId,
+          phone: req.params.phone,
+          merchantId: id,
+          balance: req.body.balance
+        });
+        newBalance
+          .save()
+          .then( result => {
+            console.log('Balance created!');
+            return res.status(201).json({
+              message: "Balance created!"
+            });
+          })
+          .catch( err => {
+            console.log(err);
+            return res.status(500).json({
+              error: err
+            });
+          });
+      } else {
+        console.log('Balance exists!');
+        return res.status(409).json({
+          message: "Balance exists!"
+        });
+      }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
+    });
+};
+
+//merchantUpdate
+//PUT localhost:3000/merchants/balance
+function merchantUpdate(req, res, next) {
+  const id = req.merchantData.merchantId;
+  Balance.find({ phone: req.body.phone, merchantId: id })
+    .exec()
+    .then( balance => {
+      if (!balance.length) {
+        console.log('Balance doesn\'t!');
+        return res.status(409).json({
+          message: "Balance doesn't exist!"
+        });
+      } else {
+        var newBalance = req.body.balance + req.body.value;
+        balance[0].update({ balance: newBalance })
+          .exec()
+          .then( result => {
+            console.log('Balance updated!');
+            return res.status(201).json({
+              message: "Balance updated!"
+            });
+          })
+          .catch( err => {
+            console.log(err);
+            return res.status(500).json({
+              error: err
+            });
+          });
+      }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
+    });
+};
+
 //merchantDelete
-//DELETE localhost:3000/merchants
+//DELETE localhost:3000/merchants/
 function merchantDelete(req, res, next) {
-  Balance.find({ email: req.merchantData.email })
+  const id = req.merchantData.merchantId;
+  Balance.find({ merchantId: id })
     .exec()
     .then( balance => {
       if (!balance.length) {
@@ -289,7 +416,7 @@ function merchantDelete(req, res, next) {
           message: "Merchant has no balances!"
         });
       } else {
-          Balance.remove({ email: req.merchantData.email })
+          Balance.remove({ merchantId: id })
             .exec()
             .then ( result => {
               console.log('Balances deleted!');
@@ -314,7 +441,7 @@ function merchantDelete(req, res, next) {
 };
 
 //merchantDeleteOne
-//DELETE localhost:3000/balances/merchants/:balanceId
+//DELETE localhost:3000/merchants/balances/:balanceId
 function merchantDeleteOne(req, res, next) {
   const id = req.params.balanceId;
   Balance.find({ _id: id })
@@ -354,11 +481,14 @@ function merchantDeleteOne(req, res, next) {
 exports.userGet = userGet;
 exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
+exports.userCreateFromURL = userCreateFromURL;
 exports.userDelete = userDelete;
 exports.userDeleteOne = userDeleteOne;
 
 exports.merchantGet = merchantGet;
 exports.merchantGetOne = merchantGetOne;
 exports.merchantCreate = merchantCreate;
+exports.merchantCreateFromURL = merchantCreateFromURL;
+exports.merchantUpdate = merchantUpdate;
 exports.merchantDelete = merchantDelete;
 exports.merchantDeleteOne = merchantDeleteOne;
