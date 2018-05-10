@@ -1,0 +1,7 @@
+{
+  "env": {
+    "MONGO_ATLAS_PW": "admin",
+    "JWT_USER_KEY": "users",
+    "JWT_MERCHANT_KEY": "merchants"
+  }
+}

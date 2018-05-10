@@ -1,0 +1,33 @@
+{
+  "name": "point-server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon server.js --config nodemon.json"
+  },
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "ejs": "~2.5.7",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "jsonwebtoken": "^8.2.1",
+    "mongoose": "^5.0.17",
+    "morgan": "~1.9.0",
+    "nodemon": "^1.17.4"
+  },
+  "description": "Point Payment back-end",
+  "main": "app.js",
+  "devDependencies": {},
+  "author": "Nathan Schwartz",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lx93/point-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lx93/point-server/issues"
+  },
+  "homepage": "https://github.com/lx93/point-server#readme"
+}
