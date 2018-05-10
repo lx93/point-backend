@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 
 //Get User info
+//GET localhost:3000/users/
 function getUser(req, res, next) {
   const id = req.userData.userId;
   User.find({ _id: id })
@@ -33,6 +34,7 @@ function getUser(req, res, next) {
 };
 
 //Sign up
+//POST localhost:3000/users/signup
 function signUp(req, res, next) {
   User.find({ phone: req.body.phone })
     .exec()
@@ -80,6 +82,7 @@ function signUp(req, res, next) {
 };
 
 //Log in
+//POST localhost:3000/users/login
 function logIn(req, res, next) {
   User.find({ phone: req.body.phone })
     .exec()
@@ -123,6 +126,7 @@ function logIn(req, res, next) {
 };
 
 //Update
+//PUT localhost:3000/users/ 
 function update(req, res, next) {
   const id = req.userData.userId;
   User.find({ _id: id })
@@ -159,6 +163,7 @@ function update(req, res, next) {
 };
 
 //Delete User
+//DELETE localhost:3000/users/
 function deleteUser(req, res, next) {
   const id = req.userData.userId;
   User.find({ _id: id })

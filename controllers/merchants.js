@@ -121,7 +121,7 @@ function logIn(req, res, next) {
 };
 
 //Update
-//PUT localhost:3000/merchants/update
+//PUT localhost:3000/merchants/
 function update(req, res, next) {
   const id = req.merchantData.merchantId;
   Merchant.find({ _id: id })
