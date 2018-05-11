@@ -1,4 +1,6 @@
 const Balance = require('../models/balances');
+const User = require('../models/users');
+const Merchant = require('../models/merchants');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -17,16 +19,16 @@ function userGet(req, res, next) {
           message: "User has no balances!"
         });
       } else {
-        console.log(balance);
+        console.log("\n"+balance+"\n");
         return res.status(200).json({
           balance
         });
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -35,21 +37,21 @@ function userGet(req, res, next) {
 //GET localhost:3000/users/balances/:balanceId
 function userGetOne(req, res, next) {
   const id = req.params.balanceId;
-  Balance.find({ _id: id })
+  Balance.findOne({ _id: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         console.log('Balance doesn\'t exist!');
         return res.status(409).json({
           message: "Balance doesn't exist!"
         });
       } else {
-        console.log(balance);
+        console.log('\n'+balance+'\n');
         return res.status(200).json({
-          _id: balance[0]._id,
-          phone: balance[0].phone,
-          merchantId: balance[0].merchantId,
-          balance: balance[0].balance
+          _id: balance._id,
+          phone: balance.phone,
+          merchantId: balance.merchantId,
+          balance: balance.balance
         });
       }
     })
@@ -65,28 +67,45 @@ function userGetOne(req, res, next) {
 //POST localhost:3000/users/balances/
 function userCreate(req, res, next) {
   const phone = req.userData.phone;
-  Balance.find({ userId: uId, merchantId: mId })
+  Balance.findOne({ phone: phone, merchantId: req.body.merchantId })
     .exec()
     .then( balance => {
-      if (!balance.length) {
-        const newBalance = new Balance({
-          _id: new mongoose.Types.ObjectId,
-          phone: phone,
-          merchantId: req.body.merchantId,
-          balance: req.body.balance
-        });
-        newBalance
-          .save()
-          .then( result => {
-            console.log('Balance created!');
-            return res.status(201).json({
-              message: "Balance created!"
-            });
+      if (!balance) {
+        Merchant.findOne({ _id: req.body.merchantId })
+          .exec()
+          .then( merchant => {
+            if (!merchant) {
+              console.log('Invalid input!');
+              return res.status(422).json({
+                message: "Invalid input!"
+              });
+            } else {
+              const newBalance = new Balance({
+                _id: new mongoose.Types.ObjectId,
+                phone: phone,
+                merchantId: req.body.merchantId,
+                balance: 0
+              });
+              newBalance
+                .save()
+                .then( result => {
+                  console.log('Balance created!');
+                  return res.status(201).json({
+                    message: "Balance created!"
+                  });
+                })
+                .catch( err => {
+                  console.log('Invalid input!');
+                  return res.status(422).json({
+                    message: "Invalid input!"
+                  });
+                });
+            }
           })
           .catch( err => {
-            console.log(err);
-            return res.status(500).json({
-              error: err
+            console.log('Invalid input!');
+            return res.status(422).json({
+              message: "Invalid input!"
             });
           });
       } else {
@@ -97,9 +116,9 @@ function userCreate(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -108,15 +127,15 @@ function userCreate(req, res, next) {
 //POST localhost:3000/users/balances/:merchantId
 function userCreateFromURL(req, res, next) {
   const phone = req.userData.phone;
-  Balance.find({ phone: phone, merchantId: req.params.merchantId })
+  Balance.findOne({ phone: phone, merchantId: req.params.merchantId })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         const newBalance = new Balance({
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: req.params.merchantId,
-          balance: req.body.balance
+          balance: 0
         });
         newBalance
           .save()
@@ -127,9 +146,9 @@ function userCreateFromURL(req, res, next) {
             });
           })
           .catch( err => {
-            console.log(err);
-            return res.status(500).json({
-              error: err
+            console.log('Invalid input!');
+            return res.status(422).json({
+              message: "Invalid input!"
             });
           });
       } else {
@@ -140,9 +159,9 @@ function userCreateFromURL(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -150,16 +169,17 @@ function userCreateFromURL(req, res, next) {
 //userDelete
 //DELETE localhost:3000/users
 function userDelete(req, res, next) {
-  Balance.find({ phone: req.userData.phone })
+  const phone = req.userData.phone;
+  Balance.findOne({ phone: phone })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         console.log('User has no balances!');
         return res.status(409).json({
           message: "User has no balances!"
         });
       } else {
-          Balance.remove({ phone: req.userData.phone })
+          Balance.remove({ phone: phone })
             .exec()
             .then ( result => {
               console.log('Balances deleted!');
@@ -176,9 +196,9 @@ function userDelete(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -187,10 +207,10 @@ function userDelete(req, res, next) {
 //DELETE localhost:3000/users/balances/:balanceId
 function userDeleteOne(req, res, next) {
   const id = req.params.balanceId;
-  Balance.find({ _id: id })
+  Balance.findOne({ _id: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         console.log('Balance doesn\'t exist!');
         return res.status(409).json({
           message: "Balance doesn't exist!"
@@ -198,7 +218,7 @@ function userDeleteOne(req, res, next) {
       } else {
           Balance.remove({ _id: id })
             .exec()
-            .then ( result => {
+            .then( result => {
               console.log('Balance deleted!');
               return res.status(201).json({
                 message: "Balance deleted!"
@@ -213,9 +233,9 @@ function userDeleteOne(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -226,7 +246,8 @@ function userDeleteOne(req, res, next) {
 //merchantGet
 //GET localhost:3000/merchants/balances
 function merchantGet(req, res, next) {
-  Balance.find({ merchantId: req.merchantData.merchantId })
+  const id = req.merchantData.merchantId;
+  Balance.find({ merchantId: id })
     .exec()
     .then( balance => {
       if (!balance.length) {
@@ -235,7 +256,7 @@ function merchantGet(req, res, next) {
           message: "Merchant has no balances!"
         });
       } else {
-        console.log(balance);
+        console.log('\n'+balance+'\n');
         return res.status(200).json({
           balance
         });
@@ -253,10 +274,10 @@ function merchantGet(req, res, next) {
 //GET localhost:3000/merchants/balances/:balanceId
 function merchantGetOne(req, res, next) {
   const id = req.params.balanceId
-  Balance.find({ _id: id })
+  Balance.findOne({ _id: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         console.log('Balance doesn\'t exist!');
         return res.status(409).json({
           message: "Balance doesn't exist!"
@@ -264,17 +285,17 @@ function merchantGetOne(req, res, next) {
       } else {
         console.log(balance);
         return res.status(200).json({
-          _id: balance[0]._id,
-          phone: balance[0].phone,
-          merchantId: balance[0].merchantId,
-          balance: balance[0].balance
+          _id: balance._id,
+          phone: balance.phone,
+          merchantId: balance.merchantId,
+          balance: balance.balance
         });
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Balance doesn\'t exist!');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
       });
     });
 };
@@ -283,10 +304,10 @@ function merchantGetOne(req, res, next) {
 //POST localhost:3000/merchants/balances/
 function merchantCreate(req, res, next) {
   const id = req.merchantData.merchantId;
-  Balance.find({ phone: req.body.phone, merchantId: id })
+  Balance.findOne({ phone: req.body.phone, merchantId: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         const newBalance = new Balance({
           _id: new mongoose.Types.ObjectId,
           phone: req.body.phone,
@@ -302,9 +323,9 @@ function merchantCreate(req, res, next) {
             });
           })
           .catch( err => {
-            console.log(err);
-            return res.status(500).json({
-              error: err
+            console.log('Invalid input!');
+            return res.status(422).json({
+              message: "Invalid input!"
             });
           });
       } else {
@@ -315,9 +336,9 @@ function merchantCreate(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -326,10 +347,10 @@ function merchantCreate(req, res, next) {
 //POST localhost:3000/merchants/balances/:phone
 function merchantCreateFromURL(req, res, next) {
   const id = req.merchantData.merchantId;
-  Balance.find({ phone: req.body.phone, merchantId: id })
+  Balance.findOne({ phone: req.body.phone, merchantId: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         const newBalance = new Balance({
           _id: new mongoose.Types.ObjectId,
           phone: req.params.phone,
@@ -345,9 +366,9 @@ function merchantCreateFromURL(req, res, next) {
             });
           })
           .catch( err => {
-            console.log(err);
-            return res.status(500).json({
-              error: err
+            console.log('Invalid input!');
+            return res.status(409).json({
+              message: "Invalid input!"
             });
           });
       } else {
@@ -358,28 +379,28 @@ function merchantCreateFromURL(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(409).json({
+        message: "Invalid input!"
       });
     });
 };
 
 //merchantUpdate
-//PUT localhost:3000/merchants/balance
+//PUT localhost:3000/merchants/balances/
 function merchantUpdate(req, res, next) {
   const id = req.merchantData.merchantId;
-  Balance.find({ phone: req.body.phone, merchantId: id })
+  Balance.findOne({ phone: req.body.phone, merchantId: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         console.log('Balance doesn\'t!');
         return res.status(409).json({
           message: "Balance doesn't exist!"
         });
       } else {
         var newBalance = req.body.balance + req.body.value;
-        balance[0].update({ balance: newBalance })
+        balance.update({ balance: newBalance })
           .exec()
           .then( result => {
             console.log('Balance updated!');
@@ -388,17 +409,17 @@ function merchantUpdate(req, res, next) {
             });
           })
           .catch( err => {
-            console.log(err);
-            return res.status(500).json({
-              error: err
+            console.log('Invalid input!');
+            return res.status(422).json({
+              message: "Invalid input!"
             });
           });
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -407,10 +428,10 @@ function merchantUpdate(req, res, next) {
 //DELETE localhost:3000/merchants/
 function merchantDelete(req, res, next) {
   const id = req.merchantData.merchantId;
-  Balance.find({ merchantId: id })
+  Balance.findOne({ merchantId: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         console.log('Merchant has no balances!');
         return res.status(409).json({
           message: "Merchant has no balances!"
@@ -418,7 +439,7 @@ function merchantDelete(req, res, next) {
       } else {
           Balance.remove({ merchantId: id })
             .exec()
-            .then ( result => {
+            .then( result => {
               console.log('Balances deleted!');
               return res.status(201).json({
                 message: "Merchant and Balances deleted!"
@@ -433,9 +454,9 @@ function merchantDelete(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -444,7 +465,7 @@ function merchantDelete(req, res, next) {
 //DELETE localhost:3000/merchants/balances/:balanceId
 function merchantDeleteOne(req, res, next) {
   const id = req.params.balanceId;
-  Balance.find({ _id: id })
+  Balance.findOne({ _id: id })
     .exec()
     .then( balance => {
       if (!balance.length) {
@@ -470,9 +491,9 @@ function merchantDeleteOne(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };

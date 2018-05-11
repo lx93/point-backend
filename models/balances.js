@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var balanceSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
   phone: { type: Number, required: true },
-  merchantId: { type: String, required: true },
+  merchantId: { type: mongoose.Schema.Types.ObjectId, required: true },
   balance: { type: Number, required: true }
 });
 

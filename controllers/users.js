@@ -9,21 +9,14 @@ const jwt = require('jsonwebtoken');
 //GET localhost:3000/users/
 function getUser(req, res, next) {
   const id = req.userData.userId;
-  User.find({ _id: id })
+  User.findOne({ _id: id })
     .exec()
     .then( user => {
-      if (!user.length) {
-        console.log(err);
-        return res.status(500).json({
-          error: err
-        });
-      } else {
-        console.log(user);
-        return res.status(200).json({
-          phone: user[0].phone,
-          userId: user[0]._id
-        });
-      }
+      console.log('\n'+user+'\n');
+      return res.status(200).json({
+        phone: user.phone,
+        userId: user._id
+      });
     })
     .catch( err => {
       console.log(err);
@@ -36,12 +29,13 @@ function getUser(req, res, next) {
 //Sign up
 //POST localhost:3000/users/signup
 function signUp(req, res, next) {
-  User.find({ phone: req.body.phone })
+  User.findOne({ phone: req.body.phone })
     .exec()
     .then( user => {
-      if (!user.length) {
+      if (!user) {
         bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
+            console.log(err);
             return res.status(500).json({
               error: err
             });
@@ -74,9 +68,9 @@ function signUp(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
+      console.log('Invalid input!');
+      return res.status(422).json({
+        message: "Invalid input!"
       });
     });
 };
@@ -84,16 +78,16 @@ function signUp(req, res, next) {
 //Log in
 //POST localhost:3000/users/login
 function logIn(req, res, next) {
-  User.find({ phone: req.body.phone })
+  User.findOne({ phone: req.body.phone })
     .exec()
     .then( user => {
-      if (!user.length) {
+      if (!user) {
         console.log('Auth failed');
         return res.status(401).json({
           message: 'Auth failed'
         })
       } else {
-        bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+        bcrypt.compare(req.body.password, user.password, (err, result) => {
           if (err) {
             console.log('Auth failed');
             return res.status(401).json({
@@ -103,10 +97,10 @@ function logIn(req, res, next) {
           if (result) {
             const token = jwt.sign(
               {
-                phone: user[0].phone,
-                userId: user[0]._id
+                phone: user.phone,
+                userId: user._id
               },
-              process.env.JWT_USER_KEY,
+              process.env.JWT_KEY,
               {
                   expiresIn: "1y"
               }
@@ -122,37 +116,51 @@ function logIn(req, res, next) {
           });
         });
       }
+    })
+    .catch( err => {
+      console.log('Auth failed');
+      return res.status(401).json({
+        message: "Auth failed"
+      });
     });
 };
 
 //Update
-//PUT localhost:3000/users/
-function update(req, res, next) {
+//PUT localhost:3000/users/password
+function updatePassword(req, res, next) {
   const id = req.userData.userId;
-  User.find({ _id: id })
+  User.findOne({ _id: id })
     .exec()
     .then( user => {
-      bcrypt.hash(req.body.password, 10, (err, hash) => {
-        if (err) {
-          return res.status(500).json({
-            error: err
-          });
-        }
-        User.update({ password: hash })
-          .exec()
-          .then( result => {
-            console.log('Password changed!');
-            return res.status(201).json({
-              message: "Password changed!"
-            });
-          })
-          .catch( err => {
+      if (req.body.password) {
+        bcrypt.hash(req.body.password, 10, (err, hash) => {
+          if (err) {
             console.log(err);
             return res.status(500).json({
               error: err
             });
-          });
-      });
+          }
+          User.update({ password: hash })
+            .exec()
+            .then( result => {
+              console.log('Password changed!');
+              return res.status(201).json({
+                message: "Password changed!"
+              });
+            })
+            .catch( err => {
+              console.log('Invalid input!');
+              return res.status(422).json({
+                message: "Invalid input!"
+              });
+            });
+        });
+      } else {
+        console.log('Invalid input!');
+        return res.status(422).json({
+          message: "Invalid input!"
+        });
+      }
     })
     .catch( err => {
       console.log(err);
@@ -166,10 +174,10 @@ function update(req, res, next) {
 //DELETE localhost:3000/users/
 function deleteUser(req, res, next) {
   const id = req.userData.userId;
-  User.find({ _id: id })
+  User.findOne({ _id: id })
     .exec()
     .then( user => {
-      if (!user.length) {
+      if (!user) {
         console.log('User does\'t exist!');
         return res.status(409).json({
           message: "User doesn't exist!"
@@ -179,7 +187,7 @@ function deleteUser(req, res, next) {
           .exec()
           .then(result => {
             console.log('User deleted!');
-            Balance.find({ id: id })
+            Balance.find({ phone: req.userData.phone })
               .exec()
               .then( balance => {
                 if (!balance.length) {
@@ -204,11 +212,17 @@ function deleteUser(req, res, next) {
             });
           });
       }
+    })
+    .catch( err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
+      });
     });
 };
 
 exports.getUser = getUser;
 exports.signUp = signUp;
 exports.logIn = logIn;
-exports.update = update;
+exports.updatePassword = updatePassword;
 exports.deleteUser = deleteUser;

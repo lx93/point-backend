@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 function merchantAuth(req, res, next) {
   try {
     const token = req.headers.authorization.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_MERCHANT_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_KEY);
     req.merchantData = decoded;
     next();
   } catch (error) {

@@ -19,7 +19,9 @@ router.post('/signup', mController.signUp);
 router.post('/login', mController.logIn);
 
 //Update
-router.put('/', merchantAuth, merchantExist, mController.update);
+router.put('/name', merchantAuth, merchantExist, mController.updateName);
+router.put('/image', merchantAuth, merchantExist, mController.updateImage);
+router.put('/password', merchantAuth, merchantExist, mController.updatePassword);
 
 //DeleteMerchant
 router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant, bController.merchantDelete);
