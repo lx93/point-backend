@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 
 // create a schema
 var merchantSchema = new Schema({
-  merchantId: mongoose.Schema.Types.ObjectId,
+  _id: mongoose.Schema.Types.ObjectId,
   name: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true }

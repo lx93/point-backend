@@ -1,9 +1,9 @@
 const Balance = require('../models/balances');
-const User = require('../models/users');
-const Merchant = require('../models/merchants');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('../utils/validator');
+const throwErr = require('../utils/throwErr');
 
 //Users
 
@@ -26,9 +26,9 @@ function userGet(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
+      console.log(err);
+      return res.status(500).json({
+        error: err
       });
     });
 };
@@ -56,10 +56,7 @@ function userGetOne(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Balance doesn\'t exist!');
-      return res.status(409).json({
-        message: "Balance doesn't exist!"
-      });
+      throwErr(err);
     });
 };
 
@@ -71,43 +68,23 @@ function userCreate(req, res, next) {
     .exec()
     .then( balance => {
       if (!balance) {
-        Merchant.findOne({ _id: req.body.merchantId })
-          .exec()
-          .then( merchant => {
-            if (!merchant) {
-              console.log('Invalid input!');
-              return res.status(422).json({
-                message: "Invalid input!"
-              });
-            } else {
-              const newBalance = new Balance({
-                _id: new mongoose.Types.ObjectId,
-                phone: phone,
-                merchantId: req.body.merchantId,
-                balance: 0
-              });
-              newBalance
-                .save()
-                .then( result => {
-                  console.log('Balance created!');
-                  return res.status(201).json({
-                    message: "Balance created!"
-                  });
-                })
-                .catch( err => {
-                  console.log('Invalid input!');
-                  return res.status(422).json({
-                    message: "Invalid input!"
-                  });
-                });
-            }
-          })
-          .catch( err => {
-            console.log('Invalid input!');
-            return res.status(422).json({
-              message: "Invalid input!"
-            });
+          const newBalance = new Balance({
+            _id: new mongoose.Types.ObjectId,
+            phone: phone,
+            merchantId: req.body.merchantId,
+            balance: 0
           });
+          newBalance
+            .save()
+            .then( result => {
+              console.log('Balance created!');
+              return res.status(201).json({
+                message: "Balance created!"
+              });
+            })
+            .catch( err => {
+              throwErr(err)
+            });
       } else {
         console.log('Balance exists!');
         return res.status(409).json({
@@ -116,10 +93,7 @@ function userCreate(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
@@ -146,10 +120,7 @@ function userCreateFromURL(req, res, next) {
             });
           })
           .catch( err => {
-            console.log('Invalid input!');
-            return res.status(422).json({
-              message: "Invalid input!"
-            });
+            throwErr(err);
           });
       } else {
         console.log('Balance exists!');
@@ -159,10 +130,7 @@ function userCreateFromURL(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
@@ -188,18 +156,12 @@ function userDelete(req, res, next) {
               });
             })
             .catch( err => {
-              console.log(err);
-              return res.status(500).json({
-                error: err
-              });
+              throwErr(err);
             });
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
@@ -225,18 +187,13 @@ function userDeleteOne(req, res, next) {
               });
             })
             .catch( err => {
-              console.log(err);
-              return res.status(500).json({
-                error: err
-              });
+              throwErr(err);
             });
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+
+      throwErr(err);
     });
 };
 
@@ -263,10 +220,7 @@ function merchantGet(req, res, next) {
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
     });
 };
 
@@ -293,16 +247,19 @@ function merchantGetOne(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Balance doesn\'t exist!');
-      return res.status(409).json({
-        message: "Balance doesn't exist!"
-      });
+      throwErr(err);
     });
 };
 
 //merchantCreate
 //POST localhost:3000/merchants/balances/
 function merchantCreate(req, res, next) {
+  if (!validator.phone(req.body.phone) || !validator.number(req.body.balance)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   const id = req.merchantData.merchantId;
   Balance.findOne({ phone: req.body.phone, merchantId: id })
     .exec()
@@ -323,10 +280,7 @@ function merchantCreate(req, res, next) {
             });
           })
           .catch( err => {
-            console.log('Invalid input!');
-            return res.status(422).json({
-              message: "Invalid input!"
-            });
+            throwErr(err);
           });
       } else {
         console.log('Balance exists!');
@@ -336,16 +290,19 @@ function merchantCreate(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
 //merchantCreate
 //POST localhost:3000/merchants/balances/:phone
 function merchantCreateFromURL(req, res, next) {
+  if (!validator.phone(req.body.phone) || !validator.number(req.body.balance)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   const id = req.merchantData.merchantId;
   Balance.findOne({ phone: req.body.phone, merchantId: id })
     .exec()
@@ -366,10 +323,7 @@ function merchantCreateFromURL(req, res, next) {
             });
           })
           .catch( err => {
-            console.log('Invalid input!');
-            return res.status(409).json({
-              message: "Invalid input!"
-            });
+            throwErr(err);
           });
       } else {
         console.log('Balance exists!');
@@ -379,16 +333,19 @@ function merchantCreateFromURL(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(409).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
 //merchantUpdate
 //PUT localhost:3000/merchants/balances/
 function merchantUpdate(req, res, next) {
+  if (!validator.phone(req.body.phone) || !validator.number(req.body.balance) || !validator.number(req.body.value)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   const id = req.merchantData.merchantId;
   Balance.findOne({ phone: req.body.phone, merchantId: id })
     .exec()
@@ -409,18 +366,12 @@ function merchantUpdate(req, res, next) {
             });
           })
           .catch( err => {
-            console.log('Invalid input!');
-            return res.status(422).json({
-              message: "Invalid input!"
-            });
+            throwErr(err);
           });
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
@@ -446,18 +397,12 @@ function merchantDelete(req, res, next) {
               });
             })
             .catch( err => {
-              console.log(err);
-              return res.status(500).json({
-                error: err
-              });
+              throwErr(err);
             });
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
@@ -468,7 +413,7 @@ function merchantDeleteOne(req, res, next) {
   Balance.findOne({ _id: id })
     .exec()
     .then( balance => {
-      if (!balance.length) {
+      if (!balance) {
         console.log('Balance doesn\'t exist!');
         return res.status(409).json({
           message: "Balance doesn't exist!"
@@ -483,18 +428,12 @@ function merchantDeleteOne(req, res, next) {
               });
             })
             .catch( err => {
-              console.log(err);
-              return res.status(500).json({
-                error: err
-              });
+              throwErr(err);
             });
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 

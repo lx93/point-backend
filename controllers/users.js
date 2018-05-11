@@ -3,6 +3,8 @@ const Balance = require('../models/balances');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('../utils/validator');
+const throwErr = require('../utils/throwErr');
 
 
 //Get User info
@@ -19,26 +21,26 @@ function getUser(req, res, next) {
       });
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
     });
 };
 
 //Sign up
 //POST localhost:3000/users/signup
 function signUp(req, res, next) {
+  if (!validator.phone(req.body.phone) || !validator.string(req.body.password)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   User.findOne({ phone: req.body.phone })
     .exec()
     .then( user => {
       if (!user) {
         bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
-            console.log(err);
-            return res.status(500).json({
-              error: err
-            });
+            throwErr(err);
           }
           var newUser = new User({
             _id: new mongoose.Types.ObjectId,
@@ -54,10 +56,7 @@ function signUp(req, res, next) {
               });
             })
             .catch( err => {
-              console.log(err);
-              return res.status(500).json({
-                error: err
-              });
+              throwErr(err);
             });
         });
       } else {
@@ -68,16 +67,19 @@ function signUp(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
+      throwErr(err);
     });
 };
 
 //Log in
 //POST localhost:3000/users/login
 function logIn(req, res, next) {
+  if (!validator.phone(req.body.phone) || !validator.string(req.body.password)) {
+    console.log('Auth failed');
+    return res.status(401).json({
+      message: 'Auth failed'
+    })
+  }
   User.findOne({ phone: req.body.phone })
     .exec()
     .then( user => {
@@ -89,10 +91,7 @@ function logIn(req, res, next) {
       } else {
         bcrypt.compare(req.body.password, user.password, (err, result) => {
           if (err) {
-            console.log('Auth failed');
-            return res.status(401).json({
-              message: "Auth failed"
-            });
+            throwErr(err);
           }
           if (result) {
             const token = jwt.sign(
@@ -118,27 +117,26 @@ function logIn(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Auth failed');
-      return res.status(401).json({
-        message: "Auth failed"
-      });
+      throwErr(err);
     });
 };
 
 //Update
 //PUT localhost:3000/users/password
 function updatePassword(req, res, next) {
+  if (!validator.string(req.body.password)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   const id = req.userData.userId;
   User.findOne({ _id: id })
     .exec()
     .then( user => {
-      if (req.body.password) {
         bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
-            console.log(err);
-            return res.status(500).json({
-              error: err
-            });
+            throwErr(err);
           }
           User.update({ password: hash })
             .exec()
@@ -149,24 +147,12 @@ function updatePassword(req, res, next) {
               });
             })
             .catch( err => {
-              console.log('Invalid input!');
-              return res.status(422).json({
-                message: "Invalid input!"
-              });
+              throwErr(err);
             });
         });
-      } else {
-        console.log('Invalid input!');
-        return res.status(422).json({
-          message: "Invalid input!"
-        });
-      }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
     });
 };
 
@@ -199,25 +185,16 @@ function deleteUser(req, res, next) {
                 }
               })
               .catch( err => {
-                console.log(err);
-                return res.status(500).json({
-                  error: err
-                });
+                throwErr(err);
               });
           })
           .catch(err => {
-            console.log(err);
-            return res.status(500).json({
-              error: err
-            });
+            throwErr(err);
           });
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
     });
 };
 

@@ -3,6 +3,8 @@ const Balance = require('../models/balances');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const validator = require('../utils/validator');
+const throwErr = require('../utils/throwErr');
 
 
 //Get Merchant info
@@ -20,56 +22,45 @@ function getMerchant(req, res, next) {
       });
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
     });
 };
 
 //Sign up
 //POST localhost:3000/merchants/signup
 function signUp(req, res, next) {
-
+  if (!validator.string(req.body.name) || !validator.email(req.body.email) || !validator.string(req.body.password)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   Merchant.findOne({$or:[{ name: req.body.name }, { email: req.body.email }]})
     .exec()
     .then( merchant => {
       if (!merchant) {
-        if (req.body.password) {
-          bcrypt.hash(req.body.password, 10, (err, hash) => {
-            if (err) {
-              console.log(err);
-              return res.status(500).json({
-                error: err
+        bcrypt.hash(req.body.password, 10, (err, hash) => {
+          if (err) {
+            throwErr(err);
+          }
+          var newMerchant = new Merchant({
+            _id: new mongoose.Types.ObjectId,
+            name: req.body.name,
+            email: req.body.email,
+            password: hash
+          });
+          newMerchant
+            .save()
+            .then( result => {
+              console.log('Merchant created!');
+              return res.status(201).json({
+                message: "Merchant created!"
               });
-            }
-            var newMerchant = new Merchant({
-              _id: new mongoose.Types.ObjectId,
-              name: req.body.name,
-              email: req.body.email,
-              password: hash
+            })
+            .catch( err => {
+              throwErr(err);
             });
-            newMerchant
-              .save()
-              .then( result => {
-                console.log('Merchant created!');
-                return res.status(201).json({
-                  message: "Merchant created!"
-                });
-              })
-              .catch( err => {
-                console.log('Invalid input!');
-                return res.status(422).json({
-                  message: "Invalid input!"
-                });
-              });
-          });
-        } else {
-          console.log('Invalid input!');
-          return res.status(422).json({
-            message: "Invalid input!"
-          });
-        }
+        });
       } else {
         console.log('Merchant exists!');
         return res.status(409).json({
@@ -78,16 +69,19 @@ function signUp(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
-      return res.status(422).json({
-        message: "Invalid input!"
-      });
-    })
+      throwErr(err);
+    });
 };
 
 //Log in
 //POST localhost:3000/merchants/login
 function logIn(req, res, next) {
+  if (!validator.email(req.body.email) || !validator.string(req.body.password)) {
+    console.log('Auth failed');
+    return res.status(401).json({
+      message: 'Auth failed'
+    });
+  }
   Merchant.findOne({ email: req.body.email })
     .exec()
     .then( merchant => {
@@ -95,14 +89,11 @@ function logIn(req, res, next) {
         console.log('Auth failed');
         return res.status(401).json({
           message: 'Auth failed'
-        })
+        });
       } else {
         bcrypt.compare(req.body.password, merchant.password, (err, result) => {
           if (err) {
-            console.log('Auth failed');
-            return res.status(401).json({
-              message: "Auth failed"
-            });
+            throwErr(err);
           }
           if (result) {
             const token = jwt.sign(
@@ -128,63 +119,86 @@ function logIn(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Auth failed');
-      return res.status(401).json({
-        message: "Auth failed"
-      });
+      throwErr(err);
     });
 };
 
-//Update
+//Update name
 //PUT localhost:3000/merchants/name
 function updateName(req, res, next) {
+  if (!validator.string(req.body.name)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   const id = req.merchantData.merchantId;
   Merchant.findOne({ _id: id })
     .exec()
     .then( merchant => {
-      if (req.body.name) {
-        merchant.update({ name: req.body.name })
-          .exec()
-          .then( result => {
-            console.log('Name changed!');
-            return res.status(201).json({
-              message: "Name changed!"
-            });
-          })
-          .catch( err => {
-            console.log('Invalid input!');
-            return res.status(422).json({
-              message: "Invalid input!"
-            });
+      merchant.update({ name: req.body.name })
+        .exec()
+        .then( result => {
+          console.log('Name changed!');
+          return res.status(201).json({
+            message: "Name changed!"
           });
-      } else {
-        console.log('Invalid input!');
-        return res.status(422).json({
-          message: "Invalid input!"
+        })
+        .catch( err => {
+          throwErr(err);
         });
-      }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
+    });
+};
+
+//Update image
+//PUT localhost:3000/merchants/image
+function updateImage(req, res, next) {
+  if (!validator.string(req.body.name)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
+  const id = req.merchantData.merchantId;
+  Merchant.findOne({ _id: id })
+    .exec()
+    .then( merchant => {
+      merchant.update({ name: req.body.name })
+        .exec()
+        .then( result => {
+          console.log('Image changed!');
+          return res.status(201).json({
+            message: "Image changed!"
+          });
+        })
+        .catch( err => {
+          throwErr(err);
+        });
+    })
+    .catch( err => {
+      throwErr(err);
     });
 };
 
 //Update
-//PUT localhost:3000/merchants/image
-function updateImage(req, res, next) {
+//PUT localhost:3000/merchants/password
+function updatePassword(req, res, next) {
+  if (!validator.string(req.body.password)) {
+    console.log('Invalid input!');
+    return res.status(422).json({
+      message: "Invalid input!"
+    });
+  }
   const id = req.merchantData.merchantId;
   Merchant.findOne({ _id: id })
     .exec()
     .then( merchant => {
       bcrypt.hash(req.body.password, 10, (err, hash) => {
         if (err) {
-          console.log(err);
-          return res.status(500).json({
-            error: err
-          });
+          throwErr(err);
         }
         Merchant.update({ password: hash })
           .exec()
@@ -195,63 +209,12 @@ function updateImage(req, res, next) {
             });
           })
           .catch( err => {
-            console.log('Invalid input!');
-            return res.status(422).json({
-              message: "Invalid input!"
-            });
+            throwErr(err);
           });
       });
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
-    });
-};
-
-//Update
-//PUT localhost:3000/merchants/password
-function updatePassword(req, res, next) {
-  const id = req.merchantData.merchantId;
-  Merchant.findOne({ _id: id })
-    .exec()
-    .then( merchant => {
-      if (req.body.password) {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            console.log(err);
-            return res.status(500).json({
-              error: err
-            });
-          }
-          Merchant.update({ password: hash })
-            .exec()
-            .then( result => {
-              console.log('Password changed!');
-              return res.status(201).json({
-                message: "Password changed!"
-              });
-            })
-            .catch( err => {
-              console.log('Invalid input!');
-              return res.status(422).json({
-                message: "Invalid input!"
-              });
-            });
-        });
-      } else {
-        console.log('Invalid input!');
-        return res.status(422).json({
-          message: "Invalid input!"
-        });
-      }
-    })
-    .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
     });
 };
 
@@ -270,7 +233,7 @@ function deleteMerchant(req, res, next) {
       } else {
         Merchant.remove({ _id: id })
           .exec()
-          .then(result => {
+          .then( result => {
             console.log('Merchant deleted!');
             Balance.find({ merchantId: id })
               .exec()
@@ -284,25 +247,16 @@ function deleteMerchant(req, res, next) {
                 }
               })
               .catch( err => {
-                console.log(err);
-                return res.status(500).json({
-                  error: err
-                });
+                throwErr(err);
               });
           })
-          .catch(err => {
-            console.log(err);
-            return res.status(500).json({
-              error: err
-            });
+          .catch( err => {
+            throwErr(err);
           });
       }
     })
     .catch( err => {
-      console.log(err);
-      return res.status(500).json({
-        error: err
-      });
+      throwErr(err);
     })
 };
 

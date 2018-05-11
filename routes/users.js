@@ -3,6 +3,8 @@ const uController = require('../controllers/users');
 const bController = require('../controllers/balances');
 const userAuth = require('../middleware/userAuth');
 const userExist = require('../middleware/userExist');
+const merchantValid = require('../middleware/merchantValid');
+const balanceValid = require('../middleware/balanceValid');
 
 //localhost:3000/users
 const router = express.Router();
@@ -29,14 +31,14 @@ router.delete('/', userAuth, userExist, uController.deleteUser, bController.user
 
 //Get Balances
 router.get('/balances', userAuth, userExist, bController.userGet);
-router.get('/balances/:balanceId', userAuth, userExist, bController.userGetOne);
+router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetOne);
 
 //Create Balance
-router.post('/balances', userAuth, userExist, bController.userCreate);
-router.post('/balances/:merchantId', userAuth, userExist, bController.userCreateFromURL);
+router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);
+router.post('/balances/:merchantId', userAuth, userExist, merchantValid, bController.userCreateFromURL);
 
 //Delete Balance
-router.delete('/balances/:balanceId', userAuth, userExist, bController.userDeleteOne);
+router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteOne);
 
 
 module.exports = router;
