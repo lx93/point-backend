@@ -30,6 +30,7 @@ function getMerchant(req, res, next) {
 //Sign up
 //POST localhost:3000/merchants/signup
 function signUp(req, res, next) {
+
   Merchant.findOne({$or:[{ name: req.body.name }, { email: req.body.email }]})
     .exec()
     .then( merchant => {
@@ -64,13 +65,11 @@ function signUp(req, res, next) {
               });
           });
         } else {
-          .catch( err => {
-            console.log('Invalid input!');
-            return res.status(422).json({
-              message: "Invalid input!"
-            });
+          console.log('Invalid input!');
+          return res.status(422).json({
+            message: "Invalid input!"
           });
-        }        
+        }
       } else {
         console.log('Merchant exists!');
         return res.status(409).json({
