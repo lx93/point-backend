@@ -34,34 +34,43 @@ function signUp(req, res, next) {
     .exec()
     .then( merchant => {
       if (!merchant) {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            console.log(err);
-            return res.status(500).json({
-              error: err
+        if (req.body.password) {
+          bcrypt.hash(req.body.password, 10, (err, hash) => {
+            if (err) {
+              console.log(err);
+              return res.status(500).json({
+                error: err
+              });
+            }
+            var newMerchant = new Merchant({
+              _id: new mongoose.Types.ObjectId,
+              name: req.body.name,
+              email: req.body.email,
+              password: hash
             });
-          }
-          var newMerchant = new Merchant({
-            _id: new mongoose.Types.ObjectId,
-            name: req.body.name,
-            email: req.body.email,
-            password: hash
+            newMerchant
+              .save()
+              .then( result => {
+                console.log('Merchant created!');
+                return res.status(201).json({
+                  message: "Merchant created!"
+                });
+              })
+              .catch( err => {
+                console.log('Invalid input!');
+                return res.status(422).json({
+                  message: "Invalid input!"
+                });
+              });
           });
-          newMerchant
-            .save()
-            .then( result => {
-              console.log('Merchant created!');
-              return res.status(201).json({
-                message: "Merchant created!"
-              });
-            })
-            .catch( err => {
-              console.log('Invalid input!');
-              return res.status(422).json({
-                message: "Invalid input!"
-              });
+        } else {
+          .catch( err => {
+            console.log('Invalid input!');
+            return res.status(422).json({
+              message: "Invalid input!"
             });
-        });
+          });
+        }        
       } else {
         console.log('Merchant exists!');
         return res.status(409).json({
