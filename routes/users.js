@@ -40,5 +40,7 @@ router.post('/balances/:merchantId', userAuth, userExist, merchantValid, bContro
 //Delete Balance
 router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteOne);
 
+//(Debug)
+router.delete('/balances', userAuth, userExist, bController.userDelete);
 
 module.exports = router;

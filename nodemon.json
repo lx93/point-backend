@@ -1,6 +1,8 @@
 {
   "env": {
     "MONGO_ATLAS_PW": "admin",
-    "JWT_KEY": "secret"
+    "JWT_KEY": "secret",
+    "PLIVO_AUTH_ID": "MANJZIMMVJN2RHMZE1MJ",
+    "PLIVO_AUTH_TOKEN": "Basic TUFOSlpJTU1WSk4yUkhNWkUxTUo6Wldaa1ltSTRORFkyT1RFNE9EVTVOVFpsT0RabU16ZzBZbUUwWmpVeQ=="
   }
 }

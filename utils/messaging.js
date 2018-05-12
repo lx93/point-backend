@@ -1,23 +1,36 @@
-export const sendSMS = async(dst,text) => {
-    var options = {
-      "method": "POST",
-      "headers": {
-        "authorization": "Basic TUFOSlpJTU1WSk4yUkhNWkUxTUo6Wldaa1ltSTRORFkyT1RFNE9EVTVOVFpsT0RabU16ZzBZbUUwWmpVeQ==",
-        "content-type": "application/json",
-        "cache-control": "no-cache",
-        "postman-token": "f9688780-3c31-1db8-e2e7-c76f4cbd96fa"
-      },
-      "body": JSON.stringify({ src: '19198229889', dst: dst, text: text })
-    };
+const plivo = require('plivo');
+const request = require('request');
 
-    try {
-      let response = await fetch('https://api.plivo.com/v1/Account/MANJZIMMVJN2RHMZE1MJ/Message/',options);
-      let responseJson = await response.text();
-      alert(responseJson);
-    } catch (error) {console.error(error);}
-}
+function sendSMS(dst, text) {
 
+  const url = "https://api.plivo.com/v1/Account/" + process.env.PLIVO_AUTH_ID + "/Message/";
+  const auth = process.env.PLIVO_AUTH_TOKEN;
+  const options = {
+    "url": url,
+    "method": "POST",
+    "headers": {
+      "authorization": auth,
+      "content-type": "application/json",
+      "cache-control": "no-cache",
+      "User-Agent": 'request'
+    },
+    "body": JSON.stringify({ src: '19198229889', dst: dst, text: text })
+  };
 
-export const smsGenerator = (giftValue,phoneNumber) => {
-    return ("You have just received a $" + giftValue + " giftcard from Top of the Hill Chapel Hill! Recepient: " + phoneNumber)
-}
+  function callback(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      const info = JSON.parse(body);
+      console.log(info);
+    }
+  };
+
+  request(options);
+
+};
+
+function smsGenerator(giftValue, name, phoneNumber) {
+    return "You have just received a $" + giftValue + " giftcard from " + name + "! Recepient: " + phoneNumber;
+};
+
+exports.sendSMS = sendSMS;
+exports.smsGenerator = smsGenerator;

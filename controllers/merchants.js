@@ -22,7 +22,7 @@ function getMerchant(req, res, next) {
       });
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
@@ -41,7 +41,7 @@ function signUp(req, res, next) {
       if (!merchant) {
         bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
-            throwErr(err);
+            throwErr(res, err);
           }
           var newMerchant = new Merchant({
             _id: new mongoose.Types.ObjectId,
@@ -58,7 +58,7 @@ function signUp(req, res, next) {
               });
             })
             .catch( err => {
-              throwErr(err);
+              throwErr(res, err);
             });
         });
       } else {
@@ -69,7 +69,7 @@ function signUp(req, res, next) {
       }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
@@ -93,11 +93,12 @@ function logIn(req, res, next) {
       } else {
         bcrypt.compare(req.body.password, merchant.password, (err, result) => {
           if (err) {
-            throwErr(err);
+            throwErr(res, err);
           }
           if (result) {
             const token = jwt.sign(
               {
+                name: merchant.name,
                 email: merchant.email,
                 merchantId: merchant._id
               },
@@ -119,7 +120,7 @@ function logIn(req, res, next) {
       }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
@@ -133,23 +134,30 @@ function updateName(req, res, next) {
     });
   }
   const id = req.merchantData.merchantId;
-  Merchant.findOne({ _id: id })
+  Merchant.findOne({ name: req.body.name })
     .exec()
-    .then( merchant => {
-      merchant.update({ name: req.body.name })
-        .exec()
-        .then( result => {
-          console.log('Name changed!');
-          return res.status(201).json({
-            message: "Name changed!"
+    .then ( merchant => {
+      if (!merchant) {
+        Merchant.findOneAndUpdate({ _id: id }, {$set:{ name: req.body.name }})
+          .exec()
+          .then( result => {
+            console.log('Name changed!');
+            return res.status(201).json({
+              message: "Name changed!"
+            });
+          })
+          .catch( err => {
+            throwErr(res, err);
           });
-        })
-        .catch( err => {
-          throwErr(err);
+      } else {
+        console.log('Name already taken!');
+        return res.status(201).json({
+          message: "Name already taken!"
         });
+      }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
@@ -163,23 +171,30 @@ function updateImage(req, res, next) {
     });
   }
   const id = req.merchantData.merchantId;
-  Merchant.findOne({ _id: id })
+  Merchant.findOne({ name: req.body.name })
     .exec()
-    .then( merchant => {
-      merchant.update({ name: req.body.name })
-        .exec()
-        .then( result => {
-          console.log('Image changed!');
-          return res.status(201).json({
-            message: "Image changed!"
+    .then ( merchant => {
+      if (!merchant) {
+        Merchant.findOneAndUpdate({ _id: id }, {$set:{ name: req.body.name }})
+          .exec()
+          .then( result => {
+            console.log('Name changed!');
+            return res.status(201).json({
+              message: "Name changed!"
+            });
+          })
+          .catch( err => {
+            throwErr(res, err);
           });
-        })
-        .catch( err => {
-          throwErr(err);
+      } else {
+        console.log('Name already taken!');
+        return res.status(201).json({
+          message: "Name already taken!"
         });
+      }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
@@ -193,29 +208,22 @@ function updatePassword(req, res, next) {
     });
   }
   const id = req.merchantData.merchantId;
-  Merchant.findOne({ _id: id })
-    .exec()
-    .then( merchant => {
-      bcrypt.hash(req.body.password, 10, (err, hash) => {
-        if (err) {
-          throwErr(err);
-        }
-        Merchant.update({ password: hash })
-          .exec()
-          .then( result => {
-            console.log('Password changed!');
-            return res.status(201).json({
-              message: "Password changed!"
-            });
-          })
-          .catch( err => {
-            throwErr(err);
-          });
+  bcrypt.hash(req.body.password, 10, (err, hash) => {
+    if (err) {
+      throwErr(res, err);
+    }
+    Merchant.findOneAndUpdate({ _id: id }, {$set:{ password: hash }})
+      .exec()
+      .then( merchant => {
+        console.log('Password changed!');
+        return res.status(201).json({
+          message: "Password changed!"
+        });
+      })
+      .catch( err => {
+        throwErr(res, err);
       });
-    })
-    .catch( err => {
-      throwErr(err);
-    });
+  });
 };
 
 //Delete Merchant
@@ -247,16 +255,16 @@ function deleteMerchant(req, res, next) {
                 }
               })
               .catch( err => {
-                throwErr(err);
+                throwErr(res, err);
               });
           })
           .catch( err => {
-            throwErr(err);
+            throwErr(res, err);
           });
       }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     })
 };
 

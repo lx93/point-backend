@@ -21,30 +21,31 @@ function getUser(req, res, next) {
       });
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
 //Sign up
 //POST localhost:3000/users/signup
 function signUp(req, res, next) {
-  if (!validator.phone(req.body.phone) || !validator.string(req.body.password)) {
+  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
+  if (!validator.phone(phone) || !validator.string(req.body.password)) {
     console.log('Invalid input!');
     return res.status(422).json({
       message: "Invalid input!"
     });
   }
-  User.findOne({ phone: req.body.phone })
+  User.findOne({ phone: phone })
     .exec()
     .then( user => {
       if (!user) {
         bcrypt.hash(req.body.password, 10, (err, hash) => {
           if (err) {
-            throwErr(err);
+            throwErr(res, err);
           }
           var newUser = new User({
             _id: new mongoose.Types.ObjectId,
-            phone: req.body.phone,
+            phone: phone,
             password: hash
           });
           newUser
@@ -56,7 +57,7 @@ function signUp(req, res, next) {
               });
             })
             .catch( err => {
-              throwErr(err);
+              throwErr(res, err);
             });
         });
       } else {
@@ -67,20 +68,21 @@ function signUp(req, res, next) {
       }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
 //Log in
 //POST localhost:3000/users/login
 function logIn(req, res, next) {
-  if (!validator.phone(req.body.phone) || !validator.string(req.body.password)) {
+  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
+  if (!validator.phone(phone) || !validator.string(req.body.password)) {
     console.log('Auth failed');
     return res.status(401).json({
       message: 'Auth failed'
     })
   }
-  User.findOne({ phone: req.body.phone })
+  User.findOne({ phone: phone })
     .exec()
     .then( user => {
       if (!user) {
@@ -91,7 +93,7 @@ function logIn(req, res, next) {
       } else {
         bcrypt.compare(req.body.password, user.password, (err, result) => {
           if (err) {
-            throwErr(err);
+            throwErr(res, err);
           }
           if (result) {
             const token = jwt.sign(
@@ -117,7 +119,7 @@ function logIn(req, res, next) {
       }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 
@@ -131,29 +133,22 @@ function updatePassword(req, res, next) {
     });
   }
   const id = req.userData.userId;
-  User.findOne({ _id: id })
-    .exec()
-    .then( user => {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            throwErr(err);
-          }
-          User.update({ password: hash })
-            .exec()
-            .then( result => {
-              console.log('Password changed!');
-              return res.status(201).json({
-                message: "Password changed!"
-              });
-            })
-            .catch( err => {
-              throwErr(err);
-            });
+  bcrypt.hash(req.body.password, 10, (err, hash) => {
+    if (err) {
+      throwErr(res, err);
+    }
+    user.findOneAndUpdate({ _id: id }, { $set: { password: hash } })
+      .exec()
+      .then( user => {
+        console.log('Password changed!');
+        return res.status(201).json({
+          message: "Password changed!"
         });
-    })
-    .catch( err => {
-      throwErr(err);
-    });
+      })
+      .catch( err => {
+        throwErr(res, err);
+      });
+  });
 };
 
 //Delete User
@@ -164,7 +159,7 @@ function deleteUser(req, res, next) {
     .exec()
     .then( user => {
       if (!user) {
-        console.log('User does\'t exist!');
+        console.log('User doesn\'t exist!');
         return res.status(409).json({
           message: "User doesn't exist!"
         });
@@ -185,16 +180,16 @@ function deleteUser(req, res, next) {
                 }
               })
               .catch( err => {
-                throwErr(err);
+                throwErr(res, err);
               });
           })
           .catch(err => {
-            throwErr(err);
+            throwErr(res, err);
           });
       }
     })
     .catch( err => {
-      throwErr(err);
+      throwErr(res, err);
     });
 };
 

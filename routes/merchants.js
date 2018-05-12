@@ -4,6 +4,7 @@ const bController = require('../controllers/balances');
 const merchantAuth = require('../middleware/merchantAuth');
 const merchantExist = require('../middleware/merchantExist');
 const balanceValid = require('../middleware/balanceValid');
+const sendText = require('../middleware/sendText');
 
 //localhost:3000/merchants
 const router = express.Router();
@@ -35,8 +36,8 @@ router.get('/balances', merchantAuth, merchantExist, bController.merchantGet);
 router.get('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantGetOne);
 
 //Create Balance
-router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate);
-router.post('/balances/:phone', merchantAuth, merchantExist, bController.merchantCreateFromURL);
+router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate, sendText);
+router.post('/balances/:phone', merchantAuth, merchantExist, bController.merchantCreateFromURL, sendText);
 
 //Update Balance
 router.put('/balances', merchantAuth, merchantExist, bController.merchantUpdate);
@@ -44,5 +45,7 @@ router.put('/balances', merchantAuth, merchantExist, bController.merchantUpdate)
 //Delete Balance
 router.delete('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantDeleteOne);
 
+//(Debug)
+router.delete('/balances', merchantAuth, merchantAuth, bController.merchantDelete);
 
 module.exports = router;

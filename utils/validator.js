@@ -12,6 +12,15 @@ function validateEmail(email) {
   }
 };
 
+function validatePhone(phone) {
+  if (phone) {
+    var re = /^\s*(\d{1,3})[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+    return re.test(phone);
+  } else {
+    return false;
+  }
+};
+
 function validateString(string) {
   if (string) {
     return (typeof string === 'string' || string instanceof String);
@@ -28,16 +37,7 @@ function validateNumber(number) {
   }
 };
 
-function validatePhone(phone) {
-  if (phone) {
-    var re = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
-    return re.test(phone);
-  } else {
-    return false;
-  }
-};
-
 exports.email = validateEmail;
+exports.phone = validatePhone;
 exports.string = validateString;
 exports.number = validateNumber;
-exports.phone = validatePhone;
