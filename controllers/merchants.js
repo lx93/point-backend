@@ -109,7 +109,8 @@ function logIn(req, res, next) {
             );
             console.log('Auth successful');
             return res.status(201).header('Authorization', token).json({
-              message: "Auth successful"
+              message: "Auth successful",
+              token: token
             });
           }
           console.log('Auth failed');
@@ -212,7 +213,7 @@ function updatePassword(req, res, next) {
     if (err) {
       throwErr(res, err);
     }
-    Merchant.findOneAndUpdate({ _id: id }, {$set:{ password: hash }})
+    Merchant.findOneAndUpdate({ _id: id }, { $set:{ password: hash } })
       .exec()
       .then( merchant => {
         console.log('Password changed!');

@@ -14,7 +14,7 @@ function validateEmail(email) {
 
 function validatePhone(phone) {
   if (phone) {
-    var re = /^\s*(\d{1,3})[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/;
+    var re = /^(1{1})(\d{3})(\d{3})(\d{4})$/;
     return re.test(phone);
   } else {
     return false;

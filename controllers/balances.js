@@ -144,7 +144,7 @@ function userDelete(req, res, next) {
           message: "User has no balances!"
         });
       } else {
-          Balance.remove({ _id: id })
+          Balance.remove({ phone: phone })
             .exec()
             .then ( result => {
               console.log('Balances deleted!');
@@ -273,7 +273,10 @@ function merchantCreate(req, res, next) {
           .save()
           .then( result => {
             console.log('Balance created!');
-            next();
+            //next();     //Uncomment for SMS texting
+            return res.status(201).json({   //Comment for SMS texting
+              message: "Balance created!"
+            });
           })
           .catch( err => {
             throwErr(res, err);
@@ -315,7 +318,10 @@ function merchantCreateFromURL(req, res, next) {
           .save()
           .then( result => {
             console.log('Balance created!');
-            next();
+            //next();   //Uncomment for SMS texting
+            return res.status(201).json({   //Comment for SMS texting
+              message: "Balance created!"
+            });
           })
           .catch( err => {
             throwErr(res, err);

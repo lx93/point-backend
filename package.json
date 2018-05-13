@@ -19,6 +19,12 @@
     "plivo": "^4.0.0",
     "request": "^2.85.0"
   },
+  "env": {
+    "MONGO_ATLAS_PW": "admin",
+    "JWT_KEY": "secret",
+    "PLIVO_AUTH_ID": "MANJZIMMVJN2RHMZE1MJ",
+    "PLIVO_AUTH_TOKEN": "Basic TUFOSlpJTU1WSk4yUkhNWkUxTUo6Wldaa1ltSTRORFkyT1RFNE9EVTVOVFpsT0RabU16ZzBZbUUwWmpVeQ=="
+  },
   "description": "Point Payment back-end",
   "main": "app.js",
   "devDependencies": {},

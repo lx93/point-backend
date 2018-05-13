@@ -108,7 +108,8 @@ function logIn(req, res, next) {
             );
             console.log('Auth successful');
             return res.status(201).header('Authorization', token).json({
-              message: "Auth successful"
+              message: "Auth successful",
+              token: token
             });
           }
           console.log('Auth failed');
@@ -137,7 +138,7 @@ function updatePassword(req, res, next) {
     if (err) {
       throwErr(res, err);
     }
-    user.findOneAndUpdate({ _id: id }, { $set: { password: hash } })
+    User.findOneAndUpdate({ _id: id }, { $set: { password: hash } })
       .exec()
       .then( user => {
         console.log('Password changed!');

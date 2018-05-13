@@ -24,7 +24,7 @@ function sendSMS(dst, text) {
     }
   };
 
-  request(options);
+  request(options, callback);
 
 };
 
