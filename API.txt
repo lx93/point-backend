@@ -1,0 +1,356 @@
+#point-server
+
+REQUEST
+
+	API Request
+	-----------
+	Point exposes a list of REST APIs to perform various actions. These APIs can be used in order to navigate the Point app.
+
+	The base URL for all API requests is localhost:3000/.
+
+
+		Authentication
+		--------------
+		MOST requests to Point API are authenticated using a Bearer Token. This bearer token can be obtained from logging in with the proper credentials.
+
+		Any action marked with (AUTH REQ) requires proper authentication before it can be accessed.
+
+		Headers: {
+			Authentication: Bearer Token
+		}
+
+		Content Type
+		------------
+		Point only accepts input of the type application/json.
+
+
+
+	API Response
+	------------
+	All Point APIs return a response in json format. The API returns one of the following HTTP status codes.
+
+	200 - OK, The request has succeeded. Resource has not been modified.
+	201 - Created, The request has succeeded. Resource has been modified.
+	401 - Unauthorized, The request requires authentication. The Authentication header field must contain a valid Bearer token in order to be authenticated.
+	409 - Conflict, The request could not be completed due to a conflict with the current state of the target resource.
+	413 - Entity too large, The server is refusing to process a request because the request payload is larger than the server is willing or able to process.
+	422 - Unproccessable Entity, The server understands the content type of the request entity, and the syntax of the request entity is correct but was unable to process the contained instructions.
+	500 - Internal Server Error, The server encountered an unexpected condition that prevented it from fulfilling the request.
+
+		Response Attributes
+		-------------------
+		message: Provides information regarding the request
+		error: Error received by the server
+		token: Authorization token
+
+RESOURCES
+
+	User
+	----
+	The User API lets you perform actions regarding your User Point account. When you sign up on Point, you will be given your own account. You can retrive your account details like phone number, userId, and balances using the User API. You can also modify your password here.
+
+	The following actions can be performed with the User API
+	- Get User information
+	- Sign up as a User
+	- Log in as a User
+	- Modify User password
+	- Delete User
+	
+	BaseURI: localhost:3000/users
+
+
+		Get User information (AUTH REQ)
+		--------------------
+		The following API enables you to retreive information about the user.
+
+		GET localhost:3000/users/
+	
+		Arguments: None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"phone": 19198229889,
+				"userId": "5af8813db434c9174292d91f"
+			}
+
+
+		Sign up as a User
+		-----------------
+		The following API enables you to sign up and create a User Point account.
+
+		POST localhost:3000/users/signup
+
+		Arguments:
+		---------
+		- phone (mandatory): A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- password (mandatory): A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+		
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"phone": 19198229889,
+				"password": "verygoodpassword"
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "User created!"
+			}
+
+
+		Log in as a User
+		----------------
+		The following API enables you to log intoy your User Point account. A token will be sent back in the response, enabling the user to store it for authorization.
+
+		POST localhost:3000/users/login
+
+		Arguments:
+		---------
+		- phone (mandatory): A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- password (mandatory): A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"phone": 19198229889,
+				"password": "verygoodpassword"
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Auth succeeded",
+				"token": "919Token"
+			}
+
+
+		Modify User password (AUTH REQ)
+		--------------------
+		The following API enables you to change the password to your User Point account.
+
+		PUT localhost:3000/users/password
+
+		Arguments:
+		---------
+		- password (mandatory): A valid string containing your password. Ex. verynewpassword. Hashed password will be stored.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"password": "verynewpassword"
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Password changed!"
+			}
+
+
+		Delete User (AUTH REQ)
+		-----------
+		The following API will completely delete the user from the Point database. It will also remove any and all balances with the user.
+
+		DELETE localhost:3000/users/
+
+		Arguments: None
+
+			Request
+			-------
+			Content-Type: application/json
+			Authorization: Bearer 919Token
+			{
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "User (and balances) deleted!"
+
+			}
+
+	
+	User Balance
+	------------
+	The User Balance API lets you perform actions regarding your the balances your User Point account holds. You can retrive all balances you hold and information about then here.
+
+	The following actions can be performed with the User Balance API
+	- Get all balances by this User
+	- Get information about a specific balance from URL
+	- Create a new balance with a Merchant
+	- Create a new balance with a Merchant from URL
+	- Delete all balances of this User
+	- Delete a specific balance from URL
+	
+	BaseURI: localhost:3000/users/balances
+
+
+		Get all balances by this User (AUTH REQ)
+		-----------------------------
+		The following API enables you to retreive all balances involving this User.
+
+		GET localhost:3000/users/balances
+	
+		Arguments: None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"balance": [
+					{
+						"_id": "5af8ac9bfca2252019361eb8",
+						"phone": 19198229889,
+						"merchantId": "5af8813db434c9174292d920",
+						"balance": 0,
+						"__v": 0
+					},
+					{
+						"_id": "5af8acaafca2252019361eb9",
+						"phone": 19198229889,
+						"merchantId": "5af8813db434c9174292d921",
+						"balance": 0,
+						"__v": 0
+					},
+					{
+						"_id": "5af8acb9fca2252019361eba",
+						"phone": 19198229889,
+						"merchantId": "5af8813db434c9174292d922",
+						"balance": 0,
+						"__v": 0
+					}
+				    ]
+			}
+
+
+		Get information about a specific balance (AUTH REQ)
+		----------------------------------------
+		The following API enables you to retreive information about a specific balance in the URL.
+
+		GET localhost:3000/users/balances/:balanceId
+
+		Arguments:
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"_id": "5af8ac9bfca2252019361eb8",
+				"phone": 19198229889,
+				"merchantId": "5af8813db434c9174292d920",
+				"balance": 0,
+				"__v": 0
+			}
+
+
+		Create a new balance with a Merchant (AUTH REQ)
+		------------------------------------
+		The following API enables you to create a new balance of 0 with a specified merchant.
+
+		POST localhost:3000/users/balances
+
+		Arguments:
+		---------
+		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+				"merchantId": "5af8813db434c9174292d920"
+			}
+
+			
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance created!"
+			}
+
+
+		Create a new balance with a Merchant from URL (AUTH REQ)
+		---------------------------------------------
+		The following API enables you to create a new balance of 0 with a specified merchant from the URL.
+
+		POST localhost:3000/users/balances/:merchantId
+
+		Arguments:
+		---------
+		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+			
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance created!"
+			}
+	
+
+
+
+e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
