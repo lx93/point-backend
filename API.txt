@@ -55,7 +55,7 @@ RESOURCES
 	- Log in as a User
 	- Modify User password
 	- Delete User
-	
+
 	BaseURI: localhost:3000/users
 
 
@@ -64,7 +64,7 @@ RESOURCES
 		The following API enables you to retreive information about the user.
 
 		GET localhost:3000/users/
-	
+
 		Arguments: None
 		---------
 
@@ -94,7 +94,7 @@ RESOURCES
 		---------
 		- phone (mandatory): A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- password (mandatory): A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
-		
+
 			Request
 			-------
 			Content-Type: application/json
@@ -188,7 +188,7 @@ RESOURCES
 
 			}
 
-	
+
 	User Balance
 	------------
 	The User Balance API lets you perform actions regarding your the balances your User Point account holds. You can retrive all balances you hold and information about then here.
@@ -200,7 +200,7 @@ RESOURCES
 	- Create a new balance with a Merchant from URL
 	- Delete all balances of this User
 	- Delete a specific balance from URL
-	
+
 	BaseURI: localhost:3000/users/balances
 
 
@@ -209,7 +209,7 @@ RESOURCES
 		The following API enables you to retreive all balances involving this User.
 
 		GET localhost:3000/users/balances
-	
+
 		Arguments: None
 		---------
 
@@ -296,7 +296,7 @@ RESOURCES
 				"merchantId": "5af8813db434c9174292d920"
 			}
 
-			
+
 			Response
 			--------
 			HTTP Status Code: 201
@@ -321,36 +321,15 @@ RESOURCES
 			{
 			}
 
-			
+
 			Response
 			--------
 			HTTP Status Code: 201
 			{
 				"message": "Balance created!"
 			}
-	
+
 
 
 
 e
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

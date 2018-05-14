@@ -6,6 +6,7 @@
     "start": "nodemon server.js --config nodemon.json"
   },
   "dependencies": {
+    "aws-sdk": "^2.238.1",
     "bcrypt": "^2.0.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
