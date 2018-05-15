@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 function balanceValid(req, res, next) {
   var id;
   if (!req.body.balanceId && !req.params.balanceId) {
-    console.log('Invalid input!');
+    console.log('Invalid balanceId!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid balanceId!"
     });
   }
   else if (req.params.balanceId) {
@@ -24,9 +24,9 @@ function balanceValid(req, res, next) {
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
+      console.log('Invalid balanceId!');
       return res.status(422).json({
-        message: "Invalid input!"
+        message: "Invalid balanceId!"
       });
     });
 };

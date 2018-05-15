@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 function merchantValid(req, res, next) {
   var id;
   if (!req.body.merchantId && !req.params.merchantId) {
-    console.log('Invalid input!');
+    console.log('Invalid merchantId!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid merchantId!"
     });
   }
   else if (req.params.merchantId) {
@@ -18,18 +18,18 @@ function merchantValid(req, res, next) {
     .exec()
     .then( merchant => {
       if (!merchant) {
-        console.log('Invalid input!');
+        console.log('Invalid merchantId!');
         return res.status(422).json({
-          message: "Invalid input!"
+          message: "Invalid merchantId!"
         });
       } else {
         next();
       }
     })
     .catch( err => {
-      console.log('Invalid input!');
+      console.log('Invalid merchantId!');
       return res.status(422).json({
-        message: "Invalid input!"
+        message: "Invalid merchantId!"
       });
     });
 };
