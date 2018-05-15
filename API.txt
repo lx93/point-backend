@@ -750,3 +750,41 @@ RESOURCES
 			{
 				"message": "Balance deleted!"
 			}
+
+
+	Messaging
+	---------
+	The Messaging Balance API lets you send an SMS message.
+
+	The following actions can be performed with the Messaging Balance API
+	- Send an SMS message
+
+	BaseURI: localhost:3000/messaging
+
+
+		Send an SMS message
+		-------------------
+		The following API enables you to send a customized message to a specified phone number.
+
+		POST localhost:3000/messaging
+
+		Arguments:
+		---------
+		- dst: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- text: A valid string containing the text message you wish to send. Ex. Hello world!
+
+			Request
+			-------
+			dst: 19198229889
+			text: Hello world!
+			Content-Type: application/json
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Message sent!"
+			}
