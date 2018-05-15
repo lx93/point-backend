@@ -80,7 +80,7 @@ RESOURCES
 			HTTP Status Code: 200
 			{
 				"phone": 19198229889,
-				"userId": "5af8813db434c9174292d91f"
+				"userId": "5afaffbf15833716e170fe8c"
 			}
 
 
@@ -92,8 +92,8 @@ RESOURCES
 
 		Arguments:
 		---------
-		- phone (mandatory): A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- password (mandatory): A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
 
 			Request
 			-------
@@ -120,8 +120,8 @@ RESOURCES
 
 		Arguments:
 		---------
-		- phone (mandatory): A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- password (mandatory): A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
 
 			Request
 			-------
@@ -148,7 +148,7 @@ RESOURCES
 
 		Arguments:
 		---------
-		- password (mandatory): A valid string containing your password. Ex. verynewpassword. Hashed password will be stored.
+		- password: A valid string containing your password. Ex. verynewpassword. Hashed password will be stored.
 
 			Request
 			-------
@@ -167,7 +167,7 @@ RESOURCES
 
 		Delete User (AUTH REQ)
 		-----------
-		The following API will completely delete the user from the Point database. It will also remove any and all balances with the user.
+		The following API will completely delete the User from the Point database. It will also remove any and all balances with the User.
 
 		DELETE localhost:3000/users/
 
@@ -175,8 +175,8 @@ RESOURCES
 
 			Request
 			-------
-			Content-Type: application/json
 			Authorization: Bearer 919Token
+			Content-Type: application/json
 			{
 			}
 
@@ -226,27 +226,27 @@ RESOURCES
 			{
 				"balance": [
 					{
-						"_id": "5af8ac9bfca2252019361eb8",
+						"_id": "5afafff415833716e170fe92",
 						"phone": 19198229889,
-						"merchantId": "5af8813db434c9174292d920",
+						"merchantId": "5afaffc015833716e170fe8f",
 						"balance": 0,
 						"__v": 0
 					},
 					{
-						"_id": "5af8acaafca2252019361eb9",
+						"_id": "5afb028615833716e170fe95",
 						"phone": 19198229889,
-						"merchantId": "5af8813db434c9174292d921",
+						"merchantId": "5afaffc015833716e170fe90",
 						"balance": 0,
 						"__v": 0
 					},
 					{
-						"_id": "5af8acb9fca2252019361eba",
+						"_id": "5afb02a415833716e170fe96",
 						"phone": 19198229889,
-						"merchantId": "5af8813db434c9174292d922",
+						"merchantId": "5afaffc015833716e170fe91",
 						"balance": 0,
 						"__v": 0
 					}
-				    ]
+				]
 			}
 
 
@@ -271,9 +271,9 @@ RESOURCES
 			--------
 			HTTP Status Code: 200
 			{
-				"_id": "5af8ac9bfca2252019361eb8",
+				"_id": "5afafff415833716e170fe92",
 				"phone": 19198229889,
-				"merchantId": "5af8813db434c9174292d920",
+				"merchantId": "5afaffc015833716e170fe8f",
 				"balance": 0,
 				"__v": 0
 			}
@@ -292,8 +292,9 @@ RESOURCES
 			Request
 			-------
 			Authorization: Bearer 919Token
+			Content-Type: application/json
 			{
-				"merchantId": "5af8813db434c9174292d920"
+				"merchantId": "5afaffc015833716e170fe8f"
 			}
 
 
@@ -318,6 +319,7 @@ RESOURCES
 			Request
 			-------
 			Authorization: Bearer 919Token
+			Content-Type: application/json
 			{
 			}
 
@@ -330,6 +332,421 @@ RESOURCES
 			}
 
 
+		Delete all balances of this User (AUTH REQ)
+		--------------------------------
+		The following API enables you to delete all balanced tied to the User.
+
+		DELETE localhost:3000/users/balances
+
+		Arguments: None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
 
 
-e
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balances deleted!"
+			}
+
+
+		Delete a specific balance from URL (AUTH REQ)
+		----------------------------------
+		The following API enables you to delete a specific balance in the URL.
+
+		DELETE localhost:3000/users/balances/:balanceId
+
+		Arguments:
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance deleted!"
+			}
+
+
+	Merchant
+	--------
+	The Merchant API lets you perform actions regarding your Merchant Point account. When you sign up on Point, you will be given your own account. You can retrive your account details like phone number, merchantId, and balances using the Merchant API. You can also modify your password here.
+
+	The following actions can be performed with the Merchant API
+	- Get Merchant information
+	- Sign up as a Merchant
+	- Log in as a Merchant
+	- Modify Merchant name
+	- Modify Merchant password
+	- Delete Merchant
+
+	BaseURI: localhost:3000/merchants
+
+
+		Get Merchant information (AUTH REQ)
+		--------------------
+		The following API enables you to retreive information about the Merchant.
+
+		GET localhost:3000/merchants/
+
+		Arguments: None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"name": "Merchant A",
+				"email": "merchant@a.mail",
+				"merchantId": "5afaffc015833716e170fe8f"
+			}
+
+
+		Sign up as a User
+		-----------------
+		The following API enables you to sign up and create a User Point account.
+
+		POST localhost:3000/merchants/signup
+
+		Arguments:
+		---------
+		- name: A valid string containing your name. Ex. Merchant A.
+		- email: A valid string containing your email. Ex. merchant@a.mail.
+		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"name": "Merchant A",
+				"email": "merchant@a.mail",
+				"password": "verygoodpassword"
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Merchant created!"
+			}
+
+
+		Log in as a Merchant
+		----------------
+		The following API enables you to log intoy your Merchant Point account. A token will be sent back in the response, enabling the Merchant to store it for authorization.
+
+		POST localhost:3000/merchants/login
+
+		Arguments:
+		---------
+		- email: A valid string containing your email. Ex. merchant@a.mail.
+		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"email": "merchant@a.mail",
+				"password": "verygoodpassword"
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Auth succeeded",
+				"token": "AToken"
+			}
+
+
+		Modify Merchant name (AUTH REQ)
+		--------------------
+		The following API enables you to change the name to your Merchant Point account.
+
+		PUT localhost:3000/merchants/password
+
+		Arguments:
+		---------
+		- name: A valid string containing your name. Ex. Merchant 20.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			Content-Type: application/json
+			{
+				"name": "Merchant 20"
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Name changed!"
+			}
+
+
+		Modify Merchant password (AUTH REQ)
+		------------------------
+		The following API enables you to change the password to your Merchant Point account.
+
+		PUT localhost:3000/merchants/password
+
+		Arguments:
+		---------
+		- password: A valid string containing your password. Ex. verynewpassword.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			Content-Type: application/json
+			{
+				"password": "verynewpassword"
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Password changed!"
+			}
+
+
+		Delete Merchant (AUTH REQ)
+		---------------
+		The following API will completely delete the Merchant from the Point database. It will also remove any and all balances with the Merchant.
+
+		DELETE localhost:3000/merchants/
+
+		Arguments: None
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			Content-Type: application/json
+			{
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Merchant (and balances) deleted!"
+
+			}
+
+
+	Merchant Balance
+	----------------
+	The Merchant Balance API lets you perform actions regarding your the balances your Merchant Point account holds. You can retrive all balances you hold and information about then here.
+
+	The following actions can be performed with the Merchant Balance API
+	- Get all balances by this Merchant
+	- Get information about a specific balance from URL
+	- Create a new balance with a Merchant
+	- Create a new balance with a Merchant from URL
+	- Delete all balances of this Merchant
+	- Delete a specific balance from URL
+
+	BaseURI: localhost:3000/merchants/balances
+
+
+		Get all balances by this Merchant (AUTH REQ)
+		---------------------------------
+		The following API enables you to retreive all balances involving this Merchant.
+
+		GET localhost:3000/merchants/balances
+
+		Arguments: None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"balance": [
+					{
+						"_id": "5afb04ef15833716e170fe9a",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"balance": 20,
+						"__v": 0
+					},
+					{
+						"_id": "5afb04f115833716e170fe9b",
+						"phone": 19802160745,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"balance": 25,
+						"__v": 0
+					},
+					{
+						"_id": "5afb04f715833716e170fe9c",
+						"phone": 16177635369,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"balance": 30,
+						"__v": 0
+					}
+				]
+			}
+
+
+		Get information about a specific balance (AUTH REQ)
+		----------------------------------------
+		The following API enables you to retreive information about a specific balance in the URL.
+
+		GET localhost:3000/merchants/balances/:balanceId
+
+		Arguments:
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"_id": "5afb04ef15833716e170fe9a",
+				"phone": 19198229889,
+				"merchantId": "5afaffc015833716e170fe8f",
+				"balance": 20,
+				"__v": 0
+			}
+
+
+		Create a new balance with a User (AUTH REQ)
+		--------------------------------
+		The following API enables you to create a new balance with a specified user.
+
+		POST localhost:3000/users/balances
+
+		Arguments:
+		---------
+		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- balance: A valid number containing the balance held between the Merchant and User.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			Content-Type: application/json
+			{
+				"phone": 19198229889,
+				"balance": 20
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance created!"
+			}
+
+
+		Create a new balance with a Merchant from URL (AUTH REQ)
+		---------------------------------------------
+		The following API enables you to create a new balance of 0 with a specified merchant from the URL.
+
+		POST localhost:3000/users/balances/:phone
+
+		Arguments:
+		---------
+		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- balance: A valid number containing the balance held between the Merchant and User.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			Content-Type: application/json
+			{
+				"balance": 20
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance created!"
+			}
+
+
+		Delete all balances of this Merchant (AUTH REQ)
+		------------------------------------
+		The following API enables you to delete all balanced tied to the Merchant.
+
+		DELETE localhost:3000/merchants/balances
+
+		Arguments: None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balances deleted!"
+			}
+
+
+		Delete a specific balance from URL (AUTH REQ)
+		----------------------------------
+		The following API enables you to delete a specific balance in the URL.
+
+		DELETE localhost:3000/merchants/balances/:balanceId
+
+		Arguments:
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance deleted!"
+			}

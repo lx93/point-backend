@@ -31,14 +31,14 @@ router.delete('/', userAuth, userExist, uController.deleteUser, bController.user
 
 //Get Balances
 router.get('/balances', userAuth, userExist, bController.userGet);
-router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetOne);
+router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetFromURL);
 
 //Create Balance
 router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);
 router.post('/balances/:merchantId', userAuth, userExist, merchantValid, bController.userCreateFromURL);
 
 //Delete Balance
-router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteOne);
+router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteFromURL);
 
 //(Debug)
 router.delete('/balances', userAuth, userExist, bController.userDelete);

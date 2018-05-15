@@ -33,7 +33,7 @@ router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant, bCon
 
 //Get Balances
 router.get('/balances', merchantAuth, merchantExist, bController.merchantGet);
-router.get('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantGetOne);
+router.get('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantGetFromURL);
 
 //Create Balance
 router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate, sendText);
@@ -43,7 +43,7 @@ router.post('/balances/:phone', merchantAuth, merchantExist, bController.merchan
 router.put('/balances', merchantAuth, merchantExist, bController.merchantUpdate);
 
 //Delete Balance
-router.delete('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantDeleteOne);
+router.delete('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantDeleteFromURL);
 
 //(Debug)
 router.delete('/balances', merchantAuth, merchantAuth, bController.merchantDelete);

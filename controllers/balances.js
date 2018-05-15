@@ -30,9 +30,9 @@ function userGet(req, res, next) {
     });
 };
 
-//userGetOne
+//userGetFromURL
 //GET localhost:3000/users/balances/:balanceId
-function userGetOne(req, res, next) {
+function userGetFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
     .exec()
@@ -162,9 +162,9 @@ function userDelete(req, res, next) {
     });
 };
 
-//userDeleteOne
+//userDeleteFromURL
 //DELETE localhost:3000/users/balances/:balanceId
-function userDeleteOne(req, res, next) {
+function userDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
     .exec()
@@ -221,9 +221,9 @@ function merchantGet(req, res, next) {
     });
 };
 
-//merchantGetOne
+//merchantGetFromURL
 //GET localhost:3000/merchants/balances/:balanceId
-function merchantGetOne(req, res, next) {
+function merchantGetFromURL(req, res, next) {
   const id = req.params.balanceId
   Balance.findOne({ _id: id })
     .exec()
@@ -408,9 +408,9 @@ function merchantDelete(req, res, next) {
     });
 };
 
-//merchantDeleteOne
+//merchantDeleteFromURL
 //DELETE localhost:3000/merchants/balances/:balanceId
-function merchantDeleteOne(req, res, next) {
+function merchantDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
     .exec()
@@ -441,16 +441,16 @@ function merchantDeleteOne(req, res, next) {
 
 
 exports.userGet = userGet;
-exports.userGetOne = userGetOne;
+exports.userGetFromURL = userGetFromURL;
 exports.userCreate = userCreate;
 exports.userCreateFromURL = userCreateFromURL;
 exports.userDelete = userDelete;
-exports.userDeleteOne = userDeleteOne;
+exports.userDeleteFromURL = userDeleteFromURL;
 
 exports.merchantGet = merchantGet;
-exports.merchantGetOne = merchantGetOne;
+exports.merchantGetFromURL = merchantGetFromURL;
 exports.merchantCreate = merchantCreate;
 exports.merchantCreateFromURL = merchantCreateFromURL;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantDelete = merchantDelete;
-exports.merchantDeleteOne = merchantDeleteOne;
+exports.merchantDeleteFromURL = merchantDeleteFromURL;
