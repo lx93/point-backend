@@ -29,10 +29,15 @@ function getUser(req, res, next) {
 //POST localhost:3000/users/signup
 function signUp(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone) || !validator.string(req.body.password)) {
-    console.log('Invalid input!');
+  if (!validator.phone(phone)) {
+    console.log('Invalid phone!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid phone!"
+    });
+  } else if (!validator.string(req.body.password)) {
+    console.log('Invalid password!');
+    return res.status(422).json({
+      message: "Invalid password!"
     });
   }
   User.findOne({ phone: phone })
@@ -76,11 +81,16 @@ function signUp(req, res, next) {
 //POST localhost:3000/users/login
 function logIn(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone) || !validator.string(req.body.password)) {
-    console.log('Auth failed');
-    return res.status(401).json({
-      message: 'Auth failed'
-    })
+  if (!validator.phone(phone)) {
+    console.log('Invalid phone!');
+    return res.status(422).json({
+      message: "Invalid phone!"
+    });
+  } else if (!validator.string(req.body.password)) {
+    console.log('Invalid password!');
+    return res.status(422).json({
+      message: "Invalid password!"
+    });
   }
   User.findOne({ phone: phone })
     .exec()
@@ -128,9 +138,9 @@ function logIn(req, res, next) {
 //PUT localhost:3000/users/password
 function updatePassword(req, res, next) {
   if (!validator.string(req.body.password)) {
-    console.log('Invalid input!');
+    console.log('Invalid password!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid password!"
     });
   }
   const id = req.userData.userId;

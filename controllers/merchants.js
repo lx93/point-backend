@@ -29,10 +29,20 @@ function getMerchant(req, res, next) {
 //Sign up
 //POST localhost:3000/merchants/signup
 function signUp(req, res, next) {
-  if (!validator.string(req.body.name) || !validator.email(req.body.email) || !validator.string(req.body.password)) {
-    console.log('Invalid input!');
+  if (!validator.string(req.body.name)) {
+    console.log('Invalid name!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid name!"
+    });
+  } else if (!validator.email(req.body.email)) {
+    console.log('Invalid email!');
+    return res.status(422).json({
+      message: "Invalid email!"
+    });
+  } else if (!validator.string(req.body.password)) {
+    console.log('Invalid password!');
+    return res.status(422).json({
+      message: "Invalid password!"
     });
   }
   Merchant.findOne({$or:[{ name: req.body.name }, { email: req.body.email }]})
@@ -76,10 +86,15 @@ function signUp(req, res, next) {
 //Log in
 //POST localhost:3000/merchants/login
 function logIn(req, res, next) {
-  if (!validator.email(req.body.email) || !validator.string(req.body.password)) {
-    console.log('Auth failed');
-    return res.status(401).json({
-      message: 'Auth failed'
+  if (!validator.email(req.body.email)) {
+    console.log('Invalid email!');
+    return res.status(422).json({
+      message: "Invalid email!"
+    });
+  } else if (!validator.string(req.body.password)) {
+    console.log('Invalid password!');
+    return res.status(422).json({
+      message: "Invalid password!"
     });
   }
   Merchant.findOne({ email: req.body.email })
@@ -129,9 +144,9 @@ function logIn(req, res, next) {
 //PUT localhost:3000/merchants/name
 function updateName(req, res, next) {
   if (!validator.string(req.body.name)) {
-    console.log('Invalid input!');
+    console.log('Invalid name!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid name!"
     });
   }
   const id = req.merchantData.merchantId;
@@ -203,9 +218,9 @@ function updateImage(req, res, next) {
 //PUT localhost:3000/merchants/password
 function updatePassword(req, res, next) {
   if (!validator.string(req.body.password)) {
-    console.log('Invalid input!');
+    console.log('Invalid password!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid password!"
     });
   }
   const id = req.merchantData.merchantId;

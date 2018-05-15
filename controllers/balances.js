@@ -252,10 +252,15 @@ function merchantGetFromURL(req, res, next) {
 //POST localhost:3000/merchants/balances/
 function merchantCreate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone) || !validator.number(req.body.balance)) {
-    console.log('Invalid input!');
+  if (!validator.phone(phone)) {
+    console.log('Invalid phone!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid phone!"
+    });
+  } else if(!validator.number(req.body.balance) {
+    console.log('Invalid balance!');
+    return res.status(422).json({
+      message: "Invalid balance!"
     });
   }
   const id = req.merchantData.merchantId;
@@ -297,10 +302,15 @@ function merchantCreate(req, res, next) {
 //POST localhost:3000/merchants/balances/:phone
 function merchantCreateFromURL(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone) || !validator.number(req.body.balance)) {
-    console.log('Invalid input!');
+  if (!validator.phone(phone)) {
+    console.log('Invalid phone!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid phone!"
+    });
+  } else if(!validator.number(req.body.balance) {
+    console.log('Invalid balance!');
+    return res.status(422).json({
+      message: "Invalid balance!"
     });
   }
   const id = req.merchantData.merchantId;
@@ -342,10 +352,20 @@ function merchantCreateFromURL(req, res, next) {
 //PUT localhost:3000/merchants/balances/
 function merchantUpdate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone) || !validator.number(req.body.balance) || !validator.number(req.body.value)) {
-    console.log('Invalid input!');
+  if (!validator.phone(phone)) {
+    console.log('Invalid phone!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Invalid phone!"
+    });
+  } else if(!validator.number(req.body.balance) {
+    console.log('Invalid balance!');
+    return res.status(422).json({
+      message: "Invalid balance!"
+    });
+  } else if (!validator.number(req.body.value)) {
+    console.log('Invalid value!');
+    return res.status(422).json({
+      message: "Invalid value!"
     });
   }
   const id = req.merchantData.merchantId;
