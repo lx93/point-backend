@@ -20,8 +20,11 @@ router.post('/signup', uController.signUp);
 //LogIn
 router.post('/login', uController.logIn);
 
+//Recommend
+router.post('/recommend', userAuth, userExist, uController.recommend);
+
 //Update
-router.put('/password', userAuth, userExist, uController.updatePassword)
+router.put('/password', userAuth, userExist, uController.updatePassword);
 
 //DeleteUser
 router.delete('/', userAuth, userExist, uController.deleteUser, bController.userDelete);

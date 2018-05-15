@@ -10,6 +10,7 @@ const routes = require('./routes');
 const index = require('./routes/index');
 const users = require('./routes/users');
 const merchants = require('./routes/merchants');
+const messaging = require('./routes/messaging');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(bodyParser.json());
 app.use('/', index);
 app.use('/users', users);
 app.use('/merchants', merchants);
+app.use('/messaging', messaging);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");

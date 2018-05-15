@@ -134,6 +134,36 @@ function logIn(req, res, next) {
     });
 };
 
+//Recommend
+//POST localhost:3000/users/recommend
+function recommend(req, res, next) {
+  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
+  if (!validator.phone(phone)) {
+    console.log('Invalid phone!');
+    return res.status(422).json({
+      message: "Invalid phone!"
+    });
+  }
+  User.findOne({ phone: phone })
+    .exec()
+    .then( user => {
+      if (!user) {
+        Console.log("Recommendation sent!");
+        return res.status(422).json({
+          message: "Recommendation sent!"
+        });
+      } else {
+        console.log('Phone number already registered!');
+        return res.status(422).json({
+          message: "Phone number already registered!"
+        });
+      }
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+}
+
 //Update
 //PUT localhost:3000/users/password
 function updatePassword(req, res, next) {
@@ -207,5 +237,6 @@ function deleteUser(req, res, next) {
 exports.getUser = getUser;
 exports.signUp = signUp;
 exports.logIn = logIn;
+exports.recommend = recommend
 exports.updatePassword = updatePassword;
 exports.deleteUser = deleteUser;

@@ -257,7 +257,7 @@ function merchantCreate(req, res, next) {
     return res.status(422).json({
       message: "Invalid phone!"
     });
-  } else if(!validator.number(req.body.balance) {
+  } else if(!validator.number(req.body.balance)) {
     console.log('Invalid balance!');
     return res.status(422).json({
       message: "Invalid balance!"
@@ -278,8 +278,7 @@ function merchantCreate(req, res, next) {
           .save()
           .then( result => {
             console.log('Balance created!');
-            //next();     //Uncomment for SMS texting
-            return res.status(201).json({   //Comment for SMS texting
+            return res.status(201).json({
               message: "Balance created!"
             });
           })
@@ -307,7 +306,7 @@ function merchantCreateFromURL(req, res, next) {
     return res.status(422).json({
       message: "Invalid phone!"
     });
-  } else if(!validator.number(req.body.balance) {
+  } else if(!validator.number(req.body.balance)) {
     console.log('Invalid balance!');
     return res.status(422).json({
       message: "Invalid balance!"
@@ -357,7 +356,7 @@ function merchantUpdate(req, res, next) {
     return res.status(422).json({
       message: "Invalid phone!"
     });
-  } else if(!validator.number(req.body.balance) {
+  } else if(!validator.number(req.body.balance)) {
     console.log('Invalid balance!');
     return res.status(422).json({
       message: "Invalid balance!"
