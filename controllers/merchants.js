@@ -3,6 +3,8 @@ const Balance = require('../models/balances');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const multer = require('multer');
 const validator = require('../utils/validator');
 const throwErr = require('../utils/throwErr');
 
@@ -18,6 +20,7 @@ function getMerchant(req, res, next) {
       return res.status(200).json({
         name: merchant.name,
         email: merchant.email,
+        image: merchant.image,
         merchantId: merchant._id
       });
     })
@@ -57,7 +60,8 @@ function signUp(req, res, next) {
             _id: new mongoose.Types.ObjectId,
             name: req.body.name,
             email: req.body.email,
-            password: hash
+            password: hash,
+            image: "uploads/Default.png"
           });
           newMerchant
             .save()
@@ -115,6 +119,7 @@ function logIn(req, res, next) {
               {
                 name: merchant.name,
                 email: merchant.email,
+                image: merchant.image,
                 merchantId: merchant._id
               },
               process.env.JWT_KEY,
@@ -180,34 +185,36 @@ function updateName(req, res, next) {
 //Update image
 //PUT localhost:3000/merchants/image
 function updateImage(req, res, next) {
-  if (!validator.string(req.body.name)) {
-    console.log('Invalid input!');
+  if (!req.file) {
+    console.log('Image invalid!');
     return res.status(422).json({
-      message: "Invalid input!"
+      message: "Image invalid!"
     });
   }
   const id = req.merchantData.merchantId;
-  Merchant.findOne({ name: req.body.name })
+  Merchant.findOne({ _id: id })
     .exec()
-    .then ( merchant => {
-      if (!merchant) {
-        Merchant.findOneAndUpdate({ _id: id }, {$set:{ name: req.body.name }})
-          .exec()
-          .then( result => {
-            console.log('Name changed!');
-            return res.status(201).json({
-              message: "Name changed!"
+    .then( merchant => {
+      fs.stat(merchant.image, (err, stat) => {
+        if (!err && merchant.image != 'uploads/Default.png') {
+            fs.unlink(merchant.image, (err) => {
+              if (err) {
+                throwErr(res, err);
+              }
             });
-          })
-          .catch( err => {
-            throwErr(res, err);
+        }
+      });
+      merchant.update({$set:{ image: req.file.path }})
+        .exec()
+        .then( result => {
+          console.log('Image changed!');
+          return res.status(201).json({
+          message: "Image changed!"
           });
-      } else {
-        console.log('Name already taken!');
-        return res.status(201).json({
-          message: "Name already taken!"
-        });
-      }
+        })
+        .catch( err => {
+          throwErr(res, err);
+        })
     })
     .catch( err => {
       throwErr(res, err);
@@ -255,6 +262,15 @@ function deleteMerchant(req, res, next) {
           message: "Merchant doesn't exist!"
         });
       } else {
+        fs.stat(merchant.image, (err, stat) => {
+          if (!err && merchant.image != 'uploads/Default.png') {
+              fs.unlink(merchant.image, (err) => {
+                if (err) {
+                  throwErr(res, err);
+                }
+              });
+          }
+        });
         Merchant.remove({ _id: id })
           .exec()
           .then( result => {

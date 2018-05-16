@@ -4,6 +4,7 @@ const bController = require('../controllers/balances');
 const merchantAuth = require('../middleware/merchantAuth');
 const merchantExist = require('../middleware/merchantExist');
 const balanceValid = require('../middleware/balanceValid');
+const imageValid = require('../middleware/imageValid');
 
 //localhost:3000/merchants
 const router = express.Router();
@@ -21,7 +22,21 @@ router.post('/login', mController.logIn);
 
 //Update
 router.put('/name', merchantAuth, merchantExist, mController.updateName);
-router.put('/image', merchantAuth, merchantExist, mController.updateImage);
+router.put('/image', merchantAuth, merchantExist, imageValid.single('image'), /*(req, res, next) => {
+  console.log(req.file);
+  const id = req.merchantData.merchantId;
+  Merchant.findOneAndUpdate({ _id: id }, {$set:{ image: 'wtf' }})
+    .exec()
+    .then( result => {
+      console.log('Image changed!');
+      return res.status(201).json({
+        message: "Image changed!"
+      });
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+});//*/mController.updateImage);
 router.put('/password', merchantAuth, merchantExist, mController.updatePassword);
 
 //DeleteMerchant

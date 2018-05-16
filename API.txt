@@ -78,7 +78,7 @@ RESOURCES
 			Response
 			--------
 			HTTP Status Code: 200
-			{
+			{,
 				"phone": 19198229889,
 				"userId": "5afaffbf15833716e170fe8c"
 			}
@@ -415,9 +415,10 @@ RESOURCES
 			Response
 			--------
 			HTTP Status Code: 200
-			{
+			{,
 				"name": "Merchant A",
 				"email": "merchant@a.mail",
+				"image": "uploads/Default.png",
 				"merchantId": "5afaffc015833716e170fe8f"
 			}
 
@@ -503,6 +504,32 @@ RESOURCES
 			HTTP Status Code: 201
 			{
 				"message": "Name changed!"
+			}
+
+
+		Modify Merchant image (AUTH REQ)
+		------------------------
+		The following API enables you to change the image to your Merchant Point account.
+
+		PUT localhost:3000/merchants/image
+
+		Arguments:
+		---------
+		- password: A valid image in .jpeg or .png format. Max file size <= 5.24MB.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			Content-Type: application/json
+			image: Default.png
+			{
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Image changed!"
 			}
 
 
