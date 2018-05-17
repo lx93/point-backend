@@ -730,6 +730,68 @@ RESOURCES
 			}
 
 
+		Update a balance with a User (AUTH REQ)
+		-----------------------------
+		The following API enables you to create a new balance with a specified user.
+
+		PUT localhost:3000/merchants/balances
+
+		Arguments:
+		---------
+		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
+		- balance: A valid number containing the balance held between the Merchant and User.
+		- value: A valid number containing the change in balance.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			Content-Type: application/json
+			{
+				"phone": 19198229889,
+				"merchantId": "5afaffc015833716e170fe8f",
+				"balance": 20,
+				"value": -5
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance changed!"
+			}
+
+
+		Update a balance with a User from URL (AUTH REQ)
+		-------------------------------------
+		The following API enables you to create a new balance with a specified user.
+
+		PUT localhost:3000/merchants/balances/:balanceId
+
+		Arguments:
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+		- value: A valid number containing the change in balance.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			Content-Type: application/json
+			{
+				"balanceId": "5afb04ef15833716e170fe9a",
+				"value": -5
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance changed!"
+			}
+
+
 		Delete all balances of this Merchant (AUTH REQ)
 		------------------------------------
 		The following API enables you to delete all balanced tied to the Merchant.

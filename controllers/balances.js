@@ -396,6 +396,44 @@ function merchantUpdate(req, res, next) {
     });
 };
 
+//merchantUpdateFromURL
+//PUT localhost:3000/merchants/balances/:balanceId
+function merchantUpdateFromURL(req, res, next) {
+  if (!validator.number(req.body.value)) {
+    console.log('Invalid value!');
+    return res.status(422).json({
+      message: "Invalid value!"
+    });
+  }
+  const id = req.merchantData.merchantId;
+  Balance.findOne({ phone: phone, merchantId: id, balance: req.body.balance })
+    .exec()
+    .then( balance => {
+      if (!balance) {
+        console.log('Balance doesn\'t! exist');
+        return res.status(409).json({
+          message: "Balance doesn't exist!"
+        });
+      } else {
+        var newBalance = balance.balance + req.body.value;
+        balance.update({ $set: { balance: newBalance } })
+          .exec()
+          .then( result => {
+            console.log('Balance updated!');
+            return res.status(201).json({
+              message: "Balance updated!"
+            });
+          })
+          .catch( err => {
+            throwErr(res, err);
+          });
+      }
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+};
+
 //merchantDelete
 //DELETE localhost:3000/merchants/
 function merchantDelete(req, res, next) {
@@ -471,5 +509,6 @@ exports.merchantGetFromURL = merchantGetFromURL;
 exports.merchantCreate = merchantCreate;
 exports.merchantCreateFromURL = merchantCreateFromURL;
 exports.merchantUpdate = merchantUpdate;
+exports.merchantUpdateFromURL = merchantUpdateFromURL;
 exports.merchantDelete = merchantDelete;
 exports.merchantDeleteFromURL = merchantDeleteFromURL;
