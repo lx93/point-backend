@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('../utils/validator');
 const throwErr = require('../utils/throwErr');
+var QRCode = require('qrcode');
 
 //Users
 
@@ -44,11 +45,18 @@ function userGetFromURL(req, res, next) {
         });
       } else {
         console.log('\n'+balance+'\n');
-        return res.status(200).json({
-          _id: balance._id,
+        var text = {
+          _id: balance.id,
           phone: balance.phone,
           merchantId: balance.merchantId,
           balance: balance.balance
+        };
+        text = JSON.stringify(text);
+        QRCode.toDataURL(text, (err, url) => {
+          if (err) throw err;
+          return res.status(200).json({
+            "qrcode": url
+          });
         });
       }
     })
@@ -234,12 +242,19 @@ function merchantGetFromURL(req, res, next) {
           message: "Balance doesn't exist!"
         });
       } else {
-        console.log(balance);
-        return res.status(200).json({
-          _id: balance._id,
+        console.log('\n'+balance+'\n');
+        var text = {
+          _id: balance.id,
           phone: balance.phone,
           merchantId: balance.merchantId,
           balance: balance.balance
+        };
+        text = JSON.stringify(text);
+        QRCode.toDataURL(text, (err, url) => {
+          if (err) throw err;
+          return res.status(200).json({
+            "qrcode": url
+          });
         });
       }
     })
