@@ -34,7 +34,7 @@ REQUEST
 	401 - Unauthorized, The request requires authentication. The Authentication header field must contain a valid Bearer token in order to be authenticated.
 	409 - Conflict, The request could not be completed due to a conflict with the current state of the target resource.
 	413 - Entity too large, The server is refusing to process a request because the request payload is larger than the server is willing or able to process.
-	422 - Unproccessable Entity, The server understands the content type of the request entity, and the syntax of the request entity is correct but was unable to process the contained instructions.
+	422 - Unprocessable Entity, The server understands the content type of the request entity, and the syntax of the request entity is correct but was unable to process the contained instructions.
 	500 - Internal Server Error, The server encountered an unexpected condition that prevented it from fulfilling the request.
 
 		Response Attributes
@@ -61,7 +61,7 @@ RESOURCES
 
 		Get User information (AUTH REQ)
 		--------------------
-		The following API enables you to retreive information about the user.
+		The following API enables you to retrieve information about the user.
 
 		GET localhost:3000/users/
 
@@ -206,7 +206,7 @@ RESOURCES
 
 		Get all balances by this User (AUTH REQ)
 		-----------------------------
-		The following API enables you to retreive all balances involving this User.
+		The following API enables you to retrieve all balances involving this User.
 
 		GET localhost:3000/users/balances
 
@@ -252,7 +252,7 @@ RESOURCES
 
 		Get information about a specific balance (AUTH REQ)
 		----------------------------------------
-		The following API enables you to retreive information about a specific balance in the URL.
+		The following API enables you to retrieve a QRCode containing a specific balance in the URL.
 
 		GET localhost:3000/users/balances/:balanceId
 
@@ -271,11 +271,7 @@ RESOURCES
 			--------
 			HTTP Status Code: 200
 			{
-				"_id": "5afafff415833716e170fe92",
-				"phone": 19198229889,
-				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": 0,
-				"__v": 0
+				"qrcode": "data:image/png;base64,QRCODE"
 			}
 
 
@@ -398,7 +394,7 @@ RESOURCES
 
 		Get Merchant information (AUTH REQ)
 		--------------------
-		The following API enables you to retreive information about the Merchant.
+		The following API enables you to retrieve information about the Merchant.
 
 		GET localhost:3000/merchants/
 
@@ -600,7 +596,7 @@ RESOURCES
 
 		Get all balances by this Merchant (AUTH REQ)
 		---------------------------------
-		The following API enables you to retreive all balances involving this Merchant.
+		The following API enables you to retrieve all balances involving this Merchant.
 
 		GET localhost:3000/merchants/balances
 
@@ -646,7 +642,7 @@ RESOURCES
 
 		Get information about a specific balance (AUTH REQ)
 		----------------------------------------
-		The following API enables you to retreive information about a specific balance in the URL.
+		The following API enables you to retrieve a QR code containing a specific balance in the URL.
 
 		GET localhost:3000/merchants/balances/:balanceId
 
@@ -665,11 +661,7 @@ RESOURCES
 			--------
 			HTTP Status Code: 200
 			{
-				"_id": "5afb04ef15833716e170fe9a",
-				"phone": 19198229889,
-				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": 20,
-				"__v": 0
+				"qrcode": "data:image/png;base64,QRCODE"
 			}
 
 
