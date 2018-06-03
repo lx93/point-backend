@@ -34,7 +34,7 @@ router.delete('/', userAuth, userExist, uController.deleteUser, bController.user
 
 //Get Balances
 router.get('/balances', userAuth, userExist, bController.userGet);
-router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetFromURL);
+//router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetFromURL);
 
 //Create Balance
 router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);

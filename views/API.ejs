@@ -1,12 +1,21 @@
-#point-server
+<!DOCTYPE HTML>
+	<head>
+		<meta charset='utf-8'>
+		<title>Point Payment API</title>
+		<link href='/stylesheets/style.css' rel='stylesheet' type='text/css' />
+	</head>
+		<h1>Welcome to the Point Payment API!</h1>
+		<br>
+	<body>
 
-REQUEST
+<pre>
+<h2>REQUEST</h2>
 
-	API Request
+	<b>API Request</b>
 	-----------
 	Point exposes a list of REST APIs to perform various actions. These APIs can be used in order to navigate the Point app.
 
-	The base URL for all API requests is localhost:3000/.
+	The base URL for all API requests is pointup.io/.
 
 
 		Authentication
@@ -25,7 +34,7 @@ REQUEST
 
 
 
-	API Response
+	<b>API Response</b>
 	------------
 	All Point APIs return a response in json format. The API returns one of the following HTTP status codes.
 
@@ -43,9 +52,9 @@ REQUEST
 		error: Error received by the server
 		token: Authorization token
 
-RESOURCES
+<h2>RESOURCES</h2>
 
-	User
+	<b>User</b>
 	----
 	The User API lets you perform actions regarding your User Point account. When you sign up on Point, you will be given your own account. You can retrive your account details like phone number, userId, and balances using the User API. You can also modify your password here.
 
@@ -56,16 +65,16 @@ RESOURCES
 	- Modify User password
 	- Delete User
 
-	BaseURI: localhost:3000/users
+	<i>BaseURI:</i> pointup.io/users
 
 
-		Get User information (AUTH REQ)
+		<b>Get User information</b> (AUTH REQ)
 		--------------------
 		The following API enables you to retrieve information about the user.
 
-		GET localhost:3000/users/
+		GET pointup.io/users/
 
-		Arguments: None
+		<i>Arguments:</i> None
 		---------
 
 			Request
@@ -84,13 +93,13 @@ RESOURCES
 			}
 
 
-		Sign up as a User
+		<b>Sign up as a User</b>
 		-----------------
 		The following API enables you to sign up and create a User Point account.
 
-		POST localhost:3000/users/signup
+		POST pointup.io/users/signup
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
@@ -112,13 +121,13 @@ RESOURCES
 			}
 
 
-		Log in as a User
+		<b>Log in as a User</b>
 		----------------
 		The following API enables you to log intoy your User Point account. A token will be sent back in the response, enabling the user to store it for authorization.
 
-		POST localhost:3000/users/login
+		POST pointup.io/users/login
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
@@ -140,13 +149,13 @@ RESOURCES
 			}
 
 
-		Modify User password (AUTH REQ)
+		<b>Modify User password</b> (AUTH REQ)
 		--------------------
 		The following API enables you to change the password to your User Point account.
 
-		PUT localhost:3000/users/password
+		PUT pointup.io/users/password
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- password: A valid string containing your password. Ex. verynewpassword. Hashed password will be stored.
 
@@ -165,13 +174,13 @@ RESOURCES
 			}
 
 
-		Delete User (AUTH REQ)
+		<b>Delete User</b> (AUTH REQ)
 		-----------
 		The following API will completely delete the User from the Point database. It will also remove any and all balances with the User.
 
-		DELETE localhost:3000/users/
+		DELETE pointup.io/users/
 
-		Arguments: None
+		<i>Arguments:</i> None
 
 			Request
 			-------
@@ -189,7 +198,7 @@ RESOURCES
 			}
 
 
-	User Balance
+	<b>User Balance</b>
 	------------
 	The User Balance API lets you perform actions regarding your the balances your User Point account holds. You can retrive all balances you hold and information about then here.
 
@@ -201,16 +210,16 @@ RESOURCES
 	- Delete all balances of this User
 	- Delete a specific balance from URL
 
-	BaseURI: localhost:3000/users/balances
+	<i>BaseURI:</i> pointup.io/users/balances
 
 
-		Get all balances by this User (AUTH REQ)
+		<b>Get all balances by this User</b> (AUTH REQ)
 		-----------------------------
 		The following API enables you to retrieve all balances involving this User.
 
-		GET localhost:3000/users/balances
+		GET pointup.io/users/balances
 
-		Arguments: None
+		<i>Arguments:</i> None
 		---------
 
 			Request
@@ -250,13 +259,13 @@ RESOURCES
 			}
 
 
-		Get information about a specific balance (AUTH REQ)
+		<b>Get information about a specific balance</b> (AUTH REQ)
 		----------------------------------------
 		The following API enables you to retrieve a QRCode containing a specific balance in the URL.
 
-		GET localhost:3000/users/balances/:balanceId
+		GET pointup.io/users/balances/:balanceId
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
 
@@ -275,13 +284,13 @@ RESOURCES
 			}
 
 
-		Create a new balance with a Merchant (AUTH REQ)
+		<b>Create a new balance with a Merchant</b> (AUTH REQ)
 		------------------------------------
 		The following API enables you to create a new balance of 0 with a specified merchant.
 
-		POST localhost:3000/users/balances
+		POST pointup.io/users/balances
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
 
@@ -302,13 +311,13 @@ RESOURCES
 			}
 
 
-		Create a new balance with a Merchant from URL (AUTH REQ)
+		<b>Create a new balance with a Merchant from URL</b> (AUTH REQ)
 		---------------------------------------------
 		The following API enables you to create a new balance of 0 with a specified merchant from the URL.
 
-		POST localhost:3000/users/balances/:merchantId
+		POST pointup.io/users/balances/:merchantId
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
 
@@ -328,13 +337,13 @@ RESOURCES
 			}
 
 
-		Delete all balances of this User (AUTH REQ)
+		<b>Delete all balances of this User</b> (AUTH REQ)
 		--------------------------------
 		The following API enables you to delete all balanced tied to the User.
 
-		DELETE localhost:3000/users/balances
+		DELETE pointup.io/users/balances
 
-		Arguments: None
+		<i>Arguments:</i> None
 		---------
 
 			Request
@@ -352,13 +361,13 @@ RESOURCES
 			}
 
 
-		Delete a specific balance from URL (AUTH REQ)
+		<b>Delete a specific balance from URL</b> (AUTH REQ)
 		----------------------------------
 		The following API enables you to delete a specific balance in the URL.
 
-		DELETE localhost:3000/users/balances/:balanceId
+		DELETE pointup.io/users/balances/:balanceId
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
 
@@ -377,7 +386,7 @@ RESOURCES
 			}
 
 
-	Merchant
+	<b>Merchant</b>
 	--------
 	The Merchant API lets you perform actions regarding your Merchant Point account. When you sign up on Point, you will be given your own account. You can retrive your account details like phone number, merchantId, and balances using the Merchant API. You can also modify your password here.
 
@@ -389,16 +398,16 @@ RESOURCES
 	- Modify Merchant password
 	- Delete Merchant
 
-	BaseURI: localhost:3000/merchants
+	<i>BaseURI:</i> pointup.io/merchants
 
 
-		Get Merchant information (AUTH REQ)
-		--------------------
+		<b>Get Merchant information</b> (AUTH REQ)
+		------------------------
 		The following API enables you to retrieve information about the Merchant.
 
-		GET localhost:3000/merchants/
+		GET pointup.io/merchants/
 
-		Arguments: None
+		<i>Arguments:</i> None
 		---------
 
 			Request
@@ -419,13 +428,13 @@ RESOURCES
 			}
 
 
-		Sign up as a User
-		-----------------
-		The following API enables you to sign up and create a User Point account.
+		<b>Sign up as a Merchant</b>
+		---------------------
+		The following API enables you to sign up and create a Merchant Point account.
 
-		POST localhost:3000/merchants/signup
+		POST pointup.io/merchants/signup
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- name: A valid string containing your name. Ex. Merchant A.
 		- email: A valid string containing your email. Ex. merchant@a.mail.
@@ -449,13 +458,13 @@ RESOURCES
 			}
 
 
-		Log in as a Merchant
-		----------------
+		<b>Log in as a Merchant</b>
+		--------------------
 		The following API enables you to log intoy your Merchant Point account. A token will be sent back in the response, enabling the Merchant to store it for authorization.
 
-		POST localhost:3000/merchants/login
+		POST pointup.io/merchants/login
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- email: A valid string containing your email. Ex. merchant@a.mail.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
@@ -477,13 +486,13 @@ RESOURCES
 			}
 
 
-		Modify Merchant name (AUTH REQ)
+		<b>Modify Merchant name</b> (AUTH REQ)
 		--------------------
 		The following API enables you to change the name to your Merchant Point account.
 
-		PUT localhost:3000/merchants/password
+		PUT pointup.io/merchants/password
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- name: A valid string containing your name. Ex. Merchant 20.
 
@@ -503,15 +512,15 @@ RESOURCES
 			}
 
 
-		Modify Merchant image (AUTH REQ)
-		------------------------
+		<b>Modify Merchant image</b> (AUTH REQ)
+		---------------------
 		The following API enables you to change the image to your Merchant Point account.
 
-		PUT localhost:3000/merchants/image
+		PUT pointup.io/merchants/image
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
-		- password: A valid image in .jpeg or .png format. Max file size <= 5.24MB.
+		- password: A valid image in .jpeg or .png format. Max file size &lt= 5.24MB.
 
 			Request
 			-------
@@ -529,13 +538,13 @@ RESOURCES
 			}
 
 
-		Modify Merchant password (AUTH REQ)
+		<b>Modify Merchant password</b> (AUTH REQ)
 		------------------------
 		The following API enables you to change the password to your Merchant Point account.
 
-		PUT localhost:3000/merchants/password
+		PUT pointup.io/merchants/password
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- password: A valid string containing your password. Ex. verynewpassword.
 
@@ -555,13 +564,13 @@ RESOURCES
 			}
 
 
-		Delete Merchant (AUTH REQ)
+		<b>Delete Merchant</b> (AUTH REQ)
 		---------------
 		The following API will completely delete the Merchant from the Point database. It will also remove any and all balances with the Merchant.
 
-		DELETE localhost:3000/merchants/
+		DELETE pointup.io/merchants/
 
-		Arguments: None
+		<i>Arguments:</i> None
 
 			Request
 			-------
@@ -579,7 +588,7 @@ RESOURCES
 			}
 
 
-	Merchant Balance
+	<b>Merchant Balance</b>
 	----------------
 	The Merchant Balance API lets you perform actions regarding your the balances your Merchant Point account holds. You can retrive all balances you hold and information about then here.
 
@@ -591,16 +600,16 @@ RESOURCES
 	- Delete all balances of this Merchant
 	- Delete a specific balance from URL
 
-	BaseURI: localhost:3000/merchants/balances
+	<i>BaseURI:</i> pointup.io/merchants/balances
 
 
-		Get all balances by this Merchant (AUTH REQ)
+		<b>Get all balances by this Merchant</b> (AUTH REQ)
 		---------------------------------
 		The following API enables you to retrieve all balances involving this Merchant.
 
-		GET localhost:3000/merchants/balances
+		GET pointup.io/merchants/balances
 
-		Arguments: None
+		<i>Arguments:</i> None
 		---------
 
 			Request
@@ -640,38 +649,13 @@ RESOURCES
 			}
 
 
-		Get information about a specific balance (AUTH REQ)
-		----------------------------------------
-		The following API enables you to retrieve a QR code containing a specific balance in the URL.
-
-		GET localhost:3000/merchants/balances/:balanceId
-
-		Arguments:
-		---------
-		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
-
-			Request
-			-------
-			Authorization: Bearer AToken
-			{
-			}
-
-
-			Response
-			--------
-			HTTP Status Code: 200
-			{
-				"qrcode": "data:image/png;base64,QRCODE"
-			}
-
-
-		Create a new balance with a User (AUTH REQ)
+		<b>Create a new balance with a User</b> (AUTH REQ)
 		--------------------------------
 		The following API enables you to create a new balance with a specified user.
 
-		POST localhost:3000/users/balances
+		POST pointup.io/users/balances
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- balance: A valid number containing the balance held between the Merchant and User.
@@ -694,13 +678,13 @@ RESOURCES
 			}
 
 
-		Create a new balance with a Merchant from URL (AUTH REQ)
+		<b>Create a new balance with a Merchant from URL</b> (AUTH REQ)
 		---------------------------------------------
 		The following API enables you to create a new balance of 0 with a specified merchant from the URL.
 
-		POST localhost:3000/users/balances/:phone
+		POST pointup.io/users/balances/:phone
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- balance: A valid number containing the balance held between the Merchant and User.
@@ -722,13 +706,13 @@ RESOURCES
 			}
 
 
-		Update a balance with a User (AUTH REQ)
-		-----------------------------
+		<b>Update a balance with a User</b> (AUTH REQ)
+		----------------------------
 		The following API enables you to create a new balance with a specified user.
 
-		PUT localhost:3000/merchants/balances
+		PUT pointup.io/merchants/balances
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
@@ -755,13 +739,13 @@ RESOURCES
 			}
 
 
-		Update a balance with a User from URL (AUTH REQ)
+		<b>Update a balance with a User from URL</b> (AUTH REQ)
 		-------------------------------------
 		The following API enables you to create a new balance with a specified user.
 
-		PUT localhost:3000/merchants/balances/:balanceId
+		PUT pointup.io/merchants/balances/:balanceId
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
 		- value: A valid number containing the change in balance.
@@ -784,13 +768,13 @@ RESOURCES
 			}
 
 
-		Delete all balances of this Merchant (AUTH REQ)
+		<b>Delete all balances of this Merchant</b> (AUTH REQ)
 		------------------------------------
 		The following API enables you to delete all balanced tied to the Merchant.
 
-		DELETE localhost:3000/merchants/balances
+		DELETE pointup.io/merchants/balances
 
-		Arguments: None
+		<i>Arguments:</i> None
 		---------
 
 			Request
@@ -808,13 +792,13 @@ RESOURCES
 			}
 
 
-		Delete a specific balance from URL (AUTH REQ)
+		<b>Delete a specific balance from URL</b> (AUTH REQ)
 		----------------------------------
 		The following API enables you to delete a specific balance in the URL.
 
-		DELETE localhost:3000/merchants/balances/:balanceId
+		DELETE pointup.io/merchants/balances/:balanceId
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
 
@@ -833,23 +817,23 @@ RESOURCES
 			}
 
 
-	Messaging
+	<b>Messaging</b>
 	---------
-	The Messaging Balance API lets you send an SMS message.
+	The Messaging API lets you send an SMS message.
 
-	The following actions can be performed with the Messaging Balance API
+	The following actions can be performed with the Messaging API
 	- Send an SMS message
 
-	BaseURI: localhost:3000/messaging
+	<i>BaseURI:</i> pointup.io/messaging
 
 
-		Send an SMS message
+		<b>Send an SMS message</b>
 		-------------------
 		The following API enables you to send a customized message to a specified phone number.
 
-		POST localhost:3000/messaging
+		POST pointup.io/messaging
 
-		Arguments:
+		<i>Arguments:</i>
 		---------
 		- dst: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- text: A valid string containing the text message you wish to send. Ex. Hello world!
@@ -869,3 +853,100 @@ RESOURCES
 			{
 				"message": "Message sent!"
 			}
+
+
+	<b>QR</b>
+	---------
+	The QR API lets you retrieve a QR code.
+
+	The following actions can be performed with the QR API
+	- Display QR code
+	- Create QR code
+
+	<i>BaseURI:</i> pointup.io/qr
+
+
+		<b>Display QR code</b> (AUTH REQ)
+			----------------------------------------
+			The following API enables you view a generated QR code
+
+			GET pointup.io/qr/:balanceId
+
+			<i>Arguments:</i>
+			---------
+			- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+				Request
+				-------
+				{
+				}
+
+
+				Response
+				--------
+				HTTP Status Code: 200
+				{
+					QRCODE
+				}
+
+
+			<b>Create QR code</b>
+			--------------
+			The following API enables you to generate a QR code of a balanceId.
+
+			GET pointup.io/qr/
+
+			<i>Arguments:</i>
+			---------
+			- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+				Request
+				-------
+				Content-Type: application/json
+				{
+					"balanceId": "5afb04ef15833716e170fe9a"
+				}
+
+				Response
+				--------
+				HTTP Status Code: 200
+				{
+					"qrcode": "data:image/png;base64,QRCODE"
+				}
+
+
+	<b>Uploads</b>
+	-------
+	The Uploads API allows you to view an uploaded image.
+
+	The following actions can be performed with the Uploads API
+	- View an uploaded image
+
+	<i>BaseURI:</i> pointup.io/uploads
+
+
+		<b>View an uploaded image</b>
+		----------------------
+		The following API enables you view an uploaded image
+
+		GET pointup.io/uploads/:image
+
+		<i>Arguments:</i>
+		---------
+		image: A valid image name
+
+			Request
+			-------
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				image
+			}
+</pre>
+</body>
+</html>

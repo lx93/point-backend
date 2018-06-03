@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('../utils/validator');
 const throwErr = require('../utils/throwErr');
-var QRCode = require('qrcode');
+const QRCode = require('qrcode');
 
 //Users
 
@@ -23,40 +23,6 @@ function userGet(req, res, next) {
         console.log("\n"+balance+"\n");
         return res.status(200).json({
           balance
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
-
-//userGetFromURL
-//GET localhost:3000/users/balances/:balanceId
-function userGetFromURL(req, res, next) {
-  const id = req.params.balanceId;
-  Balance.findOne({ _id: id })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        console.log('\n'+balance+'\n');
-        var text = {
-          _id: balance.id,
-          phone: balance.phone,
-          merchantId: balance.merchantId,
-          balance: balance.balance
-        };
-        text = JSON.stringify(text);
-        QRCode.toDataURL(text, (err, url) => {
-          if (err) throw err;
-          return res.status(200).json({
-            "qrcode": url
-          });
         });
       }
     })
@@ -221,40 +187,6 @@ function merchantGet(req, res, next) {
         console.log('\n'+balance+'\n');
         return res.status(200).json({
           balance
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
-
-//merchantGetFromURL
-//GET localhost:3000/merchants/balances/:balanceId
-function merchantGetFromURL(req, res, next) {
-  const id = req.params.balanceId
-  Balance.findOne({ _id: id })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        console.log('\n'+balance+'\n');
-        var text = {
-          _id: balance.id,
-          phone: balance.phone,
-          merchantId: balance.merchantId,
-          balance: balance.balance
-        };
-        text = JSON.stringify(text);
-        QRCode.toDataURL(text, (err, url) => {
-          if (err) throw err;
-          return res.status(200).json({
-            "qrcode": url
-          });
         });
       }
     })
@@ -511,19 +443,49 @@ function merchantDeleteFromURL(req, res, next) {
     });
 };
 
+//getQRCode
+//GET localhost:3000/qr
+function getQRCode(req, res, next) {
+  const id = req.body.balanceId
+  Balance.findOne({ _id: id })
+    .exec()
+    .then( balance => {
+      if (!balance) {
+        console.log('Balance doesn\'t exist!');
+        return res.status(409).json({
+          message: "Balance doesn't exist!"
+        });
+      } else {
+        console.log('\n'+balance+'\n');
+        var text = {
+          balanceId: balance.id,
+        };
+        text = JSON.stringify(text);
+        QRCode.toDataURL(text, (err, qrcode) => {
+          if (err) throw err;
+          return res.status(200).json({
+            qrcode
+          });
+        });
+      }
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+};
 
 exports.userGet = userGet;
-exports.userGetFromURL = userGetFromURL;
 exports.userCreate = userCreate;
 exports.userCreateFromURL = userCreateFromURL;
 exports.userDelete = userDelete;
 exports.userDeleteFromURL = userDeleteFromURL;
 
 exports.merchantGet = merchantGet;
-exports.merchantGetFromURL = merchantGetFromURL;
 exports.merchantCreate = merchantCreate;
 exports.merchantCreateFromURL = merchantCreateFromURL;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantUpdateFromURL = merchantUpdateFromURL;
 exports.merchantDelete = merchantDelete;
 exports.merchantDeleteFromURL = merchantDeleteFromURL;
+
+exports.getQRCode = getQRCode;
