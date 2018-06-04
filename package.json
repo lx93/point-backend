@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p && nodemon server.js --config nodemon.json"
+    "start": "nodemon server.js --config nodemon.json"
   },
   "dependencies": {
     "aws-sdk": "^2.250.1",
