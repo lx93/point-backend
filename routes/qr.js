@@ -2,7 +2,7 @@ const express = require('express');
 const bController = require('../controllers/balances');
 const balanceValid = require('../middleware/balanceValid');
 
-//pointup.io/qr
+//api.pointup.io/qr
 const router = express.Router();
 
 //QR

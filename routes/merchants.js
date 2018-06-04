@@ -6,7 +6,7 @@ const merchantExist = require('../middleware/merchantExist');
 const balanceValid = require('../middleware/balanceValid');
 const imageValid = require('../middleware/imageValid');
 
-//pointup.io/merchants
+//api.pointup.io/merchants
 const router = express.Router();
 
 //Merchants

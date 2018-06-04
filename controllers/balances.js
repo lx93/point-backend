@@ -9,7 +9,7 @@ const QRCode = require('qrcode');
 //Users
 
 //userGet
-//GET pointup.io/users/balances
+//GET api.pointup.io/users/balances
 function userGet(req, res, next) {
   Balance.find({ phone: req.userData.phone })
     .exec()
@@ -32,7 +32,7 @@ function userGet(req, res, next) {
 };
 
 //userCreateFromQR
-//POST pointup.io/users/balances/
+//POST api.pointup.io/users/balances/
 function userCreate(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone, merchantId: req.body.merchantId })
@@ -69,7 +69,7 @@ function userCreate(req, res, next) {
 };
 
 //merchantCreate
-//POST pointup.io/users/balances/:merchantId
+//POST api.pointup.io/users/balances/:merchantId
 function userCreateFromURL(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone, merchantId: req.params.merchantId })
@@ -106,7 +106,7 @@ function userCreateFromURL(req, res, next) {
 };
 
 //userDelete
-//DELETE pointup.io/users
+//DELETE api.pointup.io/users
 function userDelete(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone })
@@ -137,7 +137,7 @@ function userDelete(req, res, next) {
 };
 
 //userDeleteFromURL
-//DELETE pointup.io/users/balances/:balanceId
+//DELETE api.pointup.io/users/balances/:balanceId
 function userDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
@@ -172,7 +172,7 @@ function userDeleteFromURL(req, res, next) {
 //Merchants
 
 //merchantGet
-//GET pointup.io/merchants/balances
+//GET api.pointup.io/merchants/balances
 function merchantGet(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.find({ merchantId: id })
@@ -196,7 +196,7 @@ function merchantGet(req, res, next) {
 };
 
 //merchantCreate
-//POST pointup.io/merchants/balances/
+//POST api.pointup.io/merchants/balances/
 function merchantCreate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -245,7 +245,7 @@ function merchantCreate(req, res, next) {
 };
 
 //merchantCreate
-//POST pointup.io/merchants/balances/:phone
+//POST api.pointup.io/merchants/balances/:phone
 function merchantCreateFromURL(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -295,7 +295,7 @@ function merchantCreateFromURL(req, res, next) {
 };
 
 //merchantUpdate
-//PUT pointup.io/merchants/balances/
+//PUT api.pointup.io/merchants/balances/
 function merchantUpdate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -344,7 +344,7 @@ function merchantUpdate(req, res, next) {
 };
 
 //merchantUpdateFromURL
-//PUT pointup.io/merchants/balances/:balanceId
+//PUT api.pointup.io/merchants/balances/:balanceId
 function merchantUpdateFromURL(req, res, next) {
   if (!validator.number(req.body.value)) {
     console.log('Invalid value!');
@@ -382,7 +382,7 @@ function merchantUpdateFromURL(req, res, next) {
 };
 
 //merchantDelete
-//DELETE pointup.io/merchants/
+//DELETE api.pointup.io/merchants/
 function merchantDelete(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.findOne({ merchantId: id })
@@ -413,7 +413,7 @@ function merchantDelete(req, res, next) {
 };
 
 //merchantDeleteFromURL
-//DELETE pointup.io/merchants/balances/:balanceId
+//DELETE api.pointup.io/merchants/balances/:balanceId
 function merchantDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
@@ -444,7 +444,7 @@ function merchantDeleteFromURL(req, res, next) {
 };
 
 //getQRCode
-//GET pointup.io/qr
+//GET api.pointup.io/qr
 function getQRCode(req, res, next) {
   const id = req.body.balanceId
   Balance.findOne({ _id: id })
@@ -464,7 +464,9 @@ function getQRCode(req, res, next) {
         QRCode.toDataURL(text, (err, qrcode) => {
           if (err) throw err;
           return res.status(200).json({
-            qrcode
+            "qrcode": qrcode,
+            "phone": balance.phone,
+            "balance": balance.balance
           });
         });
       }
