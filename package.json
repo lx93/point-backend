@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon server.js --config nodemon.json"
+    "start": "echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p && nodemon server.js --config nodemon.json"
   },
   "dependencies": {
     "aws-sdk": "^2.250.1",
@@ -20,12 +20,6 @@
     "plivo": "^4.0.0",
     "qrcode": "^1.2.0",
     "request": "^2.87.0"
-  },
-  "env": {
-    "MONGO_ATLAS_PW": "admin",
-    "JWT_KEY": "secret",
-    "PLIVO_AUTH_ID": "MANJZIMMVJN2RHMZE1MJ",
-    "PLIVO_AUTH_TOKEN": "Basic TUFOSlpJTU1WSk4yUkhNWkUxTUo6Wldaa1ltSTRORFkyT1RFNE9EVTVOVFpsT0RabU16ZzBZbUUwWmpVeQ=="
   },
   "description": "Point Payment back-end",
   "main": "app.js",

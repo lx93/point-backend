@@ -9,7 +9,7 @@ const QRCode = require('qrcode');
 //Users
 
 //userGet
-//GET localhost:3000/users/balances
+//GET pointup.io/users/balances
 function userGet(req, res, next) {
   Balance.find({ phone: req.userData.phone })
     .exec()
@@ -32,7 +32,7 @@ function userGet(req, res, next) {
 };
 
 //userCreateFromQR
-//POST localhost:3000/users/balances/
+//POST pointup.io/users/balances/
 function userCreate(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone, merchantId: req.body.merchantId })
@@ -69,7 +69,7 @@ function userCreate(req, res, next) {
 };
 
 //merchantCreate
-//POST localhost:3000/users/balances/:merchantId
+//POST pointup.io/users/balances/:merchantId
 function userCreateFromURL(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone, merchantId: req.params.merchantId })
@@ -106,7 +106,7 @@ function userCreateFromURL(req, res, next) {
 };
 
 //userDelete
-//DELETE localhost:3000/users
+//DELETE pointup.io/users
 function userDelete(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone })
@@ -137,7 +137,7 @@ function userDelete(req, res, next) {
 };
 
 //userDeleteFromURL
-//DELETE localhost:3000/users/balances/:balanceId
+//DELETE pointup.io/users/balances/:balanceId
 function userDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
@@ -172,7 +172,7 @@ function userDeleteFromURL(req, res, next) {
 //Merchants
 
 //merchantGet
-//GET localhost:3000/merchants/balances
+//GET pointup.io/merchants/balances
 function merchantGet(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.find({ merchantId: id })
@@ -196,7 +196,7 @@ function merchantGet(req, res, next) {
 };
 
 //merchantCreate
-//POST localhost:3000/merchants/balances/
+//POST pointup.io/merchants/balances/
 function merchantCreate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -245,7 +245,7 @@ function merchantCreate(req, res, next) {
 };
 
 //merchantCreate
-//POST localhost:3000/merchants/balances/:phone
+//POST pointup.io/merchants/balances/:phone
 function merchantCreateFromURL(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -295,7 +295,7 @@ function merchantCreateFromURL(req, res, next) {
 };
 
 //merchantUpdate
-//PUT localhost:3000/merchants/balances/
+//PUT pointup.io/merchants/balances/
 function merchantUpdate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -344,7 +344,7 @@ function merchantUpdate(req, res, next) {
 };
 
 //merchantUpdateFromURL
-//PUT localhost:3000/merchants/balances/:balanceId
+//PUT pointup.io/merchants/balances/:balanceId
 function merchantUpdateFromURL(req, res, next) {
   if (!validator.number(req.body.value)) {
     console.log('Invalid value!');
@@ -382,7 +382,7 @@ function merchantUpdateFromURL(req, res, next) {
 };
 
 //merchantDelete
-//DELETE localhost:3000/merchants/
+//DELETE pointup.io/merchants/
 function merchantDelete(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.findOne({ merchantId: id })
@@ -413,7 +413,7 @@ function merchantDelete(req, res, next) {
 };
 
 //merchantDeleteFromURL
-//DELETE localhost:3000/merchants/balances/:balanceId
+//DELETE pointup.io/merchants/balances/:balanceId
 function merchantDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
@@ -444,7 +444,7 @@ function merchantDeleteFromURL(req, res, next) {
 };
 
 //getQRCode
-//GET localhost:3000/qr
+//GET pointup.io/qr
 function getQRCode(req, res, next) {
   const id = req.body.balanceId
   Balance.findOne({ _id: id })

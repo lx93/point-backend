@@ -6,7 +6,7 @@ const userExist = require('../middleware/userExist');
 const merchantValid = require('../middleware/merchantValid');
 const balanceValid = require('../middleware/balanceValid');
 
-//localhost:3000/users
+//pointup.io/users
 const router = express.Router();
 
 //Users

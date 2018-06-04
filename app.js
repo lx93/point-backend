@@ -15,7 +15,6 @@ const qr = require('./routes/qr');
 
 const app = express();
 
-
 //Set up mongoose connection
 const mongoose = require('mongoose');
 const mongoDB = 'mongodb://admin:' + process.env.MONGO_ATLAS_PW + '@ds257589.mlab.com:57589/pointdb';
