@@ -4,11 +4,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('../utils/validator');
 const throwErr = require('../utils/throwErr');
+const QRCode = require('qrcode');
 
 //Users
 
 //userGet
-//GET localhost:3000/users/balances
+//GET pointup.io/users/balances
 function userGet(req, res, next) {
   Balance.find({ phone: req.userData.phone })
     .exec()
@@ -30,35 +31,8 @@ function userGet(req, res, next) {
     });
 };
 
-//userGetFromURL
-//GET localhost:3000/users/balances/:balanceId
-function userGetFromURL(req, res, next) {
-  const id = req.params.balanceId;
-  Balance.findOne({ _id: id })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        console.log('\n'+balance+'\n');
-        return res.status(200).json({
-          _id: balance._id,
-          phone: balance.phone,
-          merchantId: balance.merchantId,
-          balance: balance.balance
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
-
 //userCreateFromQR
-//POST localhost:3000/users/balances/
+//POST pointup.io/users/balances/
 function userCreate(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone, merchantId: req.body.merchantId })
@@ -95,7 +69,7 @@ function userCreate(req, res, next) {
 };
 
 //merchantCreate
-//POST localhost:3000/users/balances/:merchantId
+//POST pointup.io/users/balances/:merchantId
 function userCreateFromURL(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone, merchantId: req.params.merchantId })
@@ -132,7 +106,7 @@ function userCreateFromURL(req, res, next) {
 };
 
 //userDelete
-//DELETE localhost:3000/users
+//DELETE pointup.io/users
 function userDelete(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone })
@@ -163,7 +137,7 @@ function userDelete(req, res, next) {
 };
 
 //userDeleteFromURL
-//DELETE localhost:3000/users/balances/:balanceId
+//DELETE pointup.io/users/balances/:balanceId
 function userDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
@@ -198,7 +172,7 @@ function userDeleteFromURL(req, res, next) {
 //Merchants
 
 //merchantGet
-//GET localhost:3000/merchants/balances
+//GET pointup.io/merchants/balances
 function merchantGet(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.find({ merchantId: id })
@@ -221,35 +195,8 @@ function merchantGet(req, res, next) {
     });
 };
 
-//merchantGetFromURL
-//GET localhost:3000/merchants/balances/:balanceId
-function merchantGetFromURL(req, res, next) {
-  const id = req.params.balanceId
-  Balance.findOne({ _id: id })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        console.log(balance);
-        return res.status(200).json({
-          _id: balance._id,
-          phone: balance.phone,
-          merchantId: balance.merchantId,
-          balance: balance.balance
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
-
 //merchantCreate
-//POST localhost:3000/merchants/balances/
+//POST pointup.io/merchants/balances/
 function merchantCreate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -298,7 +245,7 @@ function merchantCreate(req, res, next) {
 };
 
 //merchantCreate
-//POST localhost:3000/merchants/balances/:phone
+//POST pointup.io/merchants/balances/:phone
 function merchantCreateFromURL(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -348,7 +295,7 @@ function merchantCreateFromURL(req, res, next) {
 };
 
 //merchantUpdate
-//PUT localhost:3000/merchants/balances/
+//PUT pointup.io/merchants/balances/
 function merchantUpdate(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -397,7 +344,7 @@ function merchantUpdate(req, res, next) {
 };
 
 //merchantUpdateFromURL
-//PUT localhost:3000/merchants/balances/:balanceId
+//PUT pointup.io/merchants/balances/:balanceId
 function merchantUpdateFromURL(req, res, next) {
   if (!validator.number(req.body.value)) {
     console.log('Invalid value!');
@@ -435,7 +382,7 @@ function merchantUpdateFromURL(req, res, next) {
 };
 
 //merchantDelete
-//DELETE localhost:3000/merchants/
+//DELETE pointup.io/merchants/
 function merchantDelete(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.findOne({ merchantId: id })
@@ -466,7 +413,7 @@ function merchantDelete(req, res, next) {
 };
 
 //merchantDeleteFromURL
-//DELETE localhost:3000/merchants/balances/:balanceId
+//DELETE pointup.io/merchants/balances/:balanceId
 function merchantDeleteFromURL(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
@@ -496,19 +443,49 @@ function merchantDeleteFromURL(req, res, next) {
     });
 };
 
+//getQRCode
+//GET pointup.io/qr
+function getQRCode(req, res, next) {
+  const id = req.body.balanceId
+  Balance.findOne({ _id: id })
+    .exec()
+    .then( balance => {
+      if (!balance) {
+        console.log('Balance doesn\'t exist!');
+        return res.status(409).json({
+          message: "Balance doesn't exist!"
+        });
+      } else {
+        console.log('\n'+balance+'\n');
+        var text = {
+          balanceId: balance.id,
+        };
+        text = JSON.stringify(text);
+        QRCode.toDataURL(text, (err, qrcode) => {
+          if (err) throw err;
+          return res.status(200).json({
+            qrcode
+          });
+        });
+      }
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+};
 
 exports.userGet = userGet;
-exports.userGetFromURL = userGetFromURL;
 exports.userCreate = userCreate;
 exports.userCreateFromURL = userCreateFromURL;
 exports.userDelete = userDelete;
 exports.userDeleteFromURL = userDeleteFromURL;
 
 exports.merchantGet = merchantGet;
-exports.merchantGetFromURL = merchantGetFromURL;
 exports.merchantCreate = merchantCreate;
 exports.merchantCreateFromURL = merchantCreateFromURL;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantUpdateFromURL = merchantUpdateFromURL;
 exports.merchantDelete = merchantDelete;
 exports.merchantDeleteFromURL = merchantDeleteFromURL;
+
+exports.getQRCode = getQRCode;

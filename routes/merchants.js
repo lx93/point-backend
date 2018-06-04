@@ -6,7 +6,7 @@ const merchantExist = require('../middleware/merchantExist');
 const balanceValid = require('../middleware/balanceValid');
 const imageValid = require('../middleware/imageValid');
 
-//localhost:3000/merchants
+//pointup.io/merchants
 const router = express.Router();
 
 //Merchants
@@ -22,21 +22,7 @@ router.post('/login', mController.logIn);
 
 //Update
 router.put('/name', merchantAuth, merchantExist, mController.updateName);
-router.put('/image', merchantAuth, merchantExist, imageValid.single('image'), /*(req, res, next) => {
-  console.log(req.file);
-  const id = req.merchantData.merchantId;
-  Merchant.findOneAndUpdate({ _id: id }, {$set:{ image: 'wtf' }})
-    .exec()
-    .then( result => {
-      console.log('Image changed!');
-      return res.status(201).json({
-        message: "Image changed!"
-      });
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-});//*/mController.updateImage);
+router.put('/image', merchantAuth, merchantExist, imageValid.single('image'), mController.updateImage);
 router.put('/password', merchantAuth, merchantExist, mController.updatePassword);
 
 //DeleteMerchant
@@ -47,7 +33,7 @@ router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant, bCon
 
 //Get Balances
 router.get('/balances', merchantAuth, merchantExist, bController.merchantGet);
-router.get('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantGetFromURL);
+//router.get('/balances/:balanceId', balanceValid, bController.merchantGetFromURL);
 
 //Create Balance
 router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate);
