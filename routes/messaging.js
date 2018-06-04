@@ -18,7 +18,7 @@ router.post('/', function (req, res, next) {
       "cache-control": "no-cache",
       "User-Agent": 'request'
     },
-    "body": JSON.stringify({ src: '19198229889', dst: req.headers.dst, text: req.headers.text })
+    "body": JSON.stringify({ src: '19198229889', dst: req.body.dst, text: req.body.text })
   };
 
   function callback(error, response, body) {
