@@ -2,7 +2,7 @@ const express = require('express');
 const plivo = require('plivo');
 const request = require('request');
 
-//pointup.io/messaging
+//api.pointup.io/messaging
 const router = express.Router();
 
 router.post('/', function (req, res, next) {

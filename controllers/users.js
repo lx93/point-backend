@@ -8,7 +8,7 @@ const throwErr = require('../utils/throwErr');
 
 
 //Get User info
-//GET pointup.io/users/
+//GET api.pointup.io/users/
 function getUser(req, res, next) {
   const id = req.userData.userId;
   User.findOne({ _id: id })
@@ -26,7 +26,7 @@ function getUser(req, res, next) {
 };
 
 //Sign up
-//POST pointup.io/users/signup
+//POST api.pointup.io/users/signup
 function signUp(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -78,7 +78,7 @@ function signUp(req, res, next) {
 };
 
 //Log in
-//POST pointup.io/users/login
+//POST api.pointup.io/users/login
 function logIn(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -135,7 +135,7 @@ function logIn(req, res, next) {
 };
 
 //Recommend
-//POST pointup.io/users/recommend
+//POST api.pointup.io/users/recommend
 function recommend(req, res, next) {
   const phone = String(req.body.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
@@ -165,7 +165,7 @@ function recommend(req, res, next) {
 }
 
 //Update
-//PUT pointup.io/users/password
+//PUT api.pointup.io/users/password
 function updatePassword(req, res, next) {
   if (!validator.string(req.body.password)) {
     console.log('Invalid password!');
@@ -193,7 +193,7 @@ function updatePassword(req, res, next) {
 };
 
 //Delete User
-//DELETE pointup.io/users/
+//DELETE api.pointup.io/users/
 function deleteUser(req, res, next) {
   const id = req.userData.userId;
   User.findOne({ _id: id })

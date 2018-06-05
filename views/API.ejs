@@ -15,7 +15,7 @@
 	-----------
 	Point exposes a list of REST APIs to perform various actions. These APIs can be used in order to navigate the Point app.
 
-	The base URL for all API requests is pointup.io/.
+	The base URL for all API requests is api.pointup.io/.
 
 
 		Authentication
@@ -65,14 +65,14 @@
 	- Modify User password
 	- Delete User
 
-	<i>BaseURI:</i> pointup.io/users
+	<i>BaseURI:</i> api.pointup.io/users
 
 
 		<b>Get User information</b> (AUTH REQ)
 		--------------------
 		The following API enables you to retrieve information about the user.
 
-		GET pointup.io/users/
+		GET api.pointup.io/users/
 
 		<i>Arguments:</i> None
 		---------
@@ -87,7 +87,7 @@
 			Response
 			--------
 			HTTP Status Code: 200
-			{,
+			{
 				"phone": 19198229889,
 				"userId": "5afaffbf15833716e170fe8c"
 			}
@@ -97,7 +97,7 @@
 		-----------------
 		The following API enables you to sign up and create a User Point account.
 
-		POST pointup.io/users/signup
+		POST api.pointup.io/users/signup
 
 		<i>Arguments:</i>
 		---------
@@ -125,7 +125,7 @@
 		----------------
 		The following API enables you to log intoy your User Point account. A token will be sent back in the response, enabling the user to store it for authorization.
 
-		POST pointup.io/users/login
+		POST api.pointup.io/users/login
 
 		<i>Arguments:</i>
 		---------
@@ -153,7 +153,7 @@
 		--------------------
 		The following API enables you to change the password to your User Point account.
 
-		PUT pointup.io/users/password
+		PUT api.pointup.io/users/password
 
 		<i>Arguments:</i>
 		---------
@@ -161,6 +161,7 @@
 
 			Request
 			-------
+			Authorization: Bearer 919Token
 			Content-Type: application/json
 			{
 				"password": "verynewpassword"
@@ -178,7 +179,7 @@
 		-----------
 		The following API will completely delete the User from the Point database. It will also remove any and all balances with the User.
 
-		DELETE pointup.io/users/
+		DELETE api.pointup.io/users/
 
 		<i>Arguments:</i> None
 
@@ -210,14 +211,14 @@
 	- Delete all balances of this User
 	- Delete a specific balance from URL
 
-	<i>BaseURI:</i> pointup.io/users/balances
+	<i>BaseURI:</i> api.pointup.io/users/balances
 
 
 		<b>Get all balances by this User</b> (AUTH REQ)
 		-----------------------------
 		The following API enables you to retrieve all balances involving this User.
 
-		GET pointup.io/users/balances
+		GET api.pointup.io/users/balances
 
 		<i>Arguments:</i> None
 		---------
@@ -263,7 +264,7 @@
 		----------------------------------------
 		The following API enables you to retrieve a QRCode containing a specific balance in the URL.
 
-		GET pointup.io/users/balances/:balanceId
+		GET api.pointup.io/users/balances/:balanceId
 
 		<i>Arguments:</i>
 		---------
@@ -288,7 +289,7 @@
 		------------------------------------
 		The following API enables you to create a new balance of 0 with a specified merchant.
 
-		POST pointup.io/users/balances
+		POST api.pointup.io/users/balances
 
 		<i>Arguments:</i>
 		---------
@@ -315,7 +316,7 @@
 		---------------------------------------------
 		The following API enables you to create a new balance of 0 with a specified merchant from the URL.
 
-		POST pointup.io/users/balances/:merchantId
+		POST api.pointup.io/users/balances/:merchantId
 
 		<i>Arguments:</i>
 		---------
@@ -341,7 +342,7 @@
 		--------------------------------
 		The following API enables you to delete all balanced tied to the User.
 
-		DELETE pointup.io/users/balances
+		DELETE api.pointup.io/users/balances
 
 		<i>Arguments:</i> None
 		---------
@@ -365,7 +366,7 @@
 		----------------------------------
 		The following API enables you to delete a specific balance in the URL.
 
-		DELETE pointup.io/users/balances/:balanceId
+		DELETE api.pointup.io/users/balances/:balanceId
 
 		<i>Arguments:</i>
 		---------
@@ -398,14 +399,14 @@
 	- Modify Merchant password
 	- Delete Merchant
 
-	<i>BaseURI:</i> pointup.io/merchants
+	<i>BaseURI:</i> api.pointup.io/merchants
 
 
 		<b>Get Merchant information</b> (AUTH REQ)
 		------------------------
 		The following API enables you to retrieve information about the Merchant.
 
-		GET pointup.io/merchants/
+		GET api.pointup.io/merchants/
 
 		<i>Arguments:</i> None
 		---------
@@ -432,7 +433,7 @@
 		---------------------
 		The following API enables you to sign up and create a Merchant Point account.
 
-		POST pointup.io/merchants/signup
+		POST api.pointup.io/merchants/signup
 
 		<i>Arguments:</i>
 		---------
@@ -462,7 +463,7 @@
 		--------------------
 		The following API enables you to log intoy your Merchant Point account. A token will be sent back in the response, enabling the Merchant to store it for authorization.
 
-		POST pointup.io/merchants/login
+		POST api.pointup.io/merchants/login
 
 		<i>Arguments:</i>
 		---------
@@ -490,7 +491,7 @@
 		--------------------
 		The following API enables you to change the name to your Merchant Point account.
 
-		PUT pointup.io/merchants/password
+		PUT api.pointup.io/merchants/password
 
 		<i>Arguments:</i>
 		---------
@@ -516,7 +517,7 @@
 		---------------------
 		The following API enables you to change the image to your Merchant Point account.
 
-		PUT pointup.io/merchants/image
+		PUT api.pointup.io/merchants/image
 
 		<i>Arguments:</i>
 		---------
@@ -542,7 +543,7 @@
 		------------------------
 		The following API enables you to change the password to your Merchant Point account.
 
-		PUT pointup.io/merchants/password
+		PUT api.pointup.io/merchants/password
 
 		<i>Arguments:</i>
 		---------
@@ -568,7 +569,7 @@
 		---------------
 		The following API will completely delete the Merchant from the Point database. It will also remove any and all balances with the Merchant.
 
-		DELETE pointup.io/merchants/
+		DELETE api.pointup.io/merchants/
 
 		<i>Arguments:</i> None
 
@@ -600,14 +601,14 @@
 	- Delete all balances of this Merchant
 	- Delete a specific balance from URL
 
-	<i>BaseURI:</i> pointup.io/merchants/balances
+	<i>BaseURI:</i> api.pointup.io/merchants/balances
 
 
 		<b>Get all balances by this Merchant</b> (AUTH REQ)
 		---------------------------------
 		The following API enables you to retrieve all balances involving this Merchant.
 
-		GET pointup.io/merchants/balances
+		GET api.pointup.io/merchants/balances
 
 		<i>Arguments:</i> None
 		---------
@@ -653,7 +654,7 @@
 		--------------------------------
 		The following API enables you to create a new balance with a specified user.
 
-		POST pointup.io/users/balances
+		POST api.pointup.io/users/balances
 
 		<i>Arguments:</i>
 		---------
@@ -678,11 +679,11 @@
 			}
 
 
-		<b>Create a new balance with a Merchant from URL</b> (AUTH REQ)
-		---------------------------------------------
-		The following API enables you to create a new balance of 0 with a specified merchant from the URL.
+		<b>Create a new balance with a User from URL</b> (AUTH REQ)
+		-----------------------------------------
+		The following API enables you to create a new balance with a specified merchant from the URL.
 
-		POST pointup.io/users/balances/:phone
+		POST api.pointup.io/users/balances/:phone
 
 		<i>Arguments:</i>
 		---------
@@ -710,7 +711,7 @@
 		----------------------------
 		The following API enables you to create a new balance with a specified user.
 
-		PUT pointup.io/merchants/balances
+		PUT api.pointup.io/merchants/balances
 
 		<i>Arguments:</i>
 		---------
@@ -743,7 +744,7 @@
 		-------------------------------------
 		The following API enables you to create a new balance with a specified user.
 
-		PUT pointup.io/merchants/balances/:balanceId
+		PUT api.pointup.io/merchants/balances/:balanceId
 
 		<i>Arguments:</i>
 		---------
@@ -772,7 +773,7 @@
 		------------------------------------
 		The following API enables you to delete all balanced tied to the Merchant.
 
-		DELETE pointup.io/merchants/balances
+		DELETE api.pointup.io/merchants/balances
 
 		<i>Arguments:</i> None
 		---------
@@ -796,7 +797,7 @@
 		----------------------------------
 		The following API enables you to delete a specific balance in the URL.
 
-		DELETE pointup.io/merchants/balances/:balanceId
+		DELETE api.pointup.io/merchants/balances/:balanceId
 
 		<i>Arguments:</i>
 		---------
@@ -824,14 +825,14 @@
 	The following actions can be performed with the Messaging API
 	- Send an SMS message
 
-	<i>BaseURI:</i> pointup.io/messaging
+	<i>BaseURI:</i> api.pointup.io/messaging
 
 
 		<b>Send an SMS message</b>
 		-------------------
 		The following API enables you to send a customized message to a specified phone number.
 
-		POST pointup.io/messaging
+		POST api.pointup.io/messaging
 
 		<i>Arguments:</i>
 		---------
@@ -842,8 +843,8 @@
 			-------
 			Content-Type: application/json
 			{
-				dst: 19198229889
-				text: "Hello world!"
+				"dst": 19198229889,
+				"text": "Hello world!"
 			}
 
 
@@ -856,21 +857,21 @@
 
 
 	<b>QR</b>
-	---------
+	--
 	The QR API lets you retrieve a QR code.
 
 	The following actions can be performed with the QR API
 	- Display QR code
 	- Create QR code
 
-	<i>BaseURI:</i> pointup.io/qr
+	<i>BaseURI:</i> api.pointup.io/qr
 
 
 		<b>Display QR code</b> (AUTH REQ)
-			----------------------------------------
+		---------------
 			The following API enables you view a generated QR code
 
-			GET pointup.io/qr/:balanceId
+			GET api.pointup.io/qr?id=:balanceId
 
 			<i>Arguments:</i>
 			---------
@@ -884,9 +885,9 @@
 
 				Response
 				--------
-				HTTP Status Code: 200
+				HTTP Status Code: 304
 				{
-					QRCODE
+					<!DOCTYPE HTML>
 				}
 
 
@@ -894,7 +895,7 @@
 			--------------
 			The following API enables you to generate a QR code of a balanceId.
 
-			GET pointup.io/qr/
+			GET api.pointup.io/qr/:balanceId
 
 			<i>Arguments:</i>
 			---------
@@ -911,7 +912,9 @@
 				--------
 				HTTP Status Code: 200
 				{
-					"qrcode": "data:image/png;base64,QRCODE"
+					"qrcode": "data:image/png;base64,QRCODE",
+					"phone": 19198229889,
+					"balance": 20
 				}
 
 
@@ -922,14 +925,14 @@
 	The following actions can be performed with the Uploads API
 	- View an uploaded image
 
-	<i>BaseURI:</i> pointup.io/uploads
+	<i>BaseURI:</i> api.pointup.io/uploads
 
 
 		<b>View an uploaded image</b>
 		----------------------
 		The following API enables you view an uploaded image
 
-		GET pointup.io/uploads/:image
+		GET api.pointup.io/uploads/:image
 
 		<i>Arguments:</i>
 		---------

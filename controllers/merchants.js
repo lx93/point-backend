@@ -10,7 +10,7 @@ const throwErr = require('../utils/throwErr');
 
 
 //Get Merchant info
-//GET pointup.io/merchants/
+//GET api.pointup.io/merchants/
 function getMerchant(req, res, next) {
   const id = req.merchantData.merchantId;
   Merchant.findOne({ _id: id })
@@ -30,7 +30,7 @@ function getMerchant(req, res, next) {
 };
 
 //Sign up
-//POST pointup.io/merchants/signup
+//POST api.pointup.io/merchants/signup
 function signUp(req, res, next) {
   if (!validator.string(req.body.name)) {
     console.log('Invalid name!');
@@ -88,7 +88,7 @@ function signUp(req, res, next) {
 };
 
 //Log in
-//POST pointup.io/merchants/login
+//POST api.pointup.io/merchants/login
 function logIn(req, res, next) {
   if (!validator.email(req.body.email)) {
     console.log('Invalid email!');
@@ -146,7 +146,7 @@ function logIn(req, res, next) {
 };
 
 //Update name
-//PUT pointup.io/merchants/name
+//PUT api.pointup.io/merchants/name
 function updateName(req, res, next) {
   if (!validator.string(req.body.name)) {
     console.log('Invalid name!');
@@ -183,7 +183,7 @@ function updateName(req, res, next) {
 };
 
 //Update image
-//PUT pointup.io/merchants/image
+//PUT api.pointup.io/merchants/image
 function updateImage(req, res, next) {
   if (!req.file) {
     console.log('Image invalid!');
@@ -222,7 +222,7 @@ function updateImage(req, res, next) {
 };
 
 //Update
-//PUT pointup.io/merchants/password
+//PUT api.pointup.io/merchants/password
 function updatePassword(req, res, next) {
   if (!validator.string(req.body.password)) {
     console.log('Invalid password!');
@@ -250,7 +250,7 @@ function updatePassword(req, res, next) {
 };
 
 //Delete Merchant
-//DELETE pointup.io/merchants/
+//DELETE api.pointup.io/merchants/
 function deleteMerchant(req, res, next) {
   const id = req.merchantData.merchantId;
   Merchant.findOne({ _id: id })

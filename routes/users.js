@@ -6,7 +6,7 @@ const userExist = require('../middleware/userExist');
 const merchantValid = require('../middleware/merchantValid');
 const balanceValid = require('../middleware/balanceValid');
 
-//pointup.io/users
+//api.pointup.io/users
 const router = express.Router();
 
 //Users
@@ -34,7 +34,7 @@ router.delete('/', userAuth, userExist, uController.deleteUser, bController.user
 
 //Get Balances
 router.get('/balances', userAuth, userExist, bController.userGet);
-//router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetFromURL);
+router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetFromURL);
 
 //Create Balance
 router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);

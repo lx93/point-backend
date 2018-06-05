@@ -6,7 +6,7 @@ const merchantExist = require('../middleware/merchantExist');
 const balanceValid = require('../middleware/balanceValid');
 const imageValid = require('../middleware/imageValid');
 
-//pointup.io/merchants
+//api.pointup.io/merchants
 const router = express.Router();
 
 //Merchants
@@ -33,7 +33,7 @@ router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant, bCon
 
 //Get Balances
 router.get('/balances', merchantAuth, merchantExist, bController.merchantGet);
-//router.get('/balances/:balanceId', balanceValid, bController.merchantGetFromURL);
+router.get('/balances/:balanceId', balanceValid, bController.merchantGetFromURL);
 
 //Create Balance
 router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate);
