@@ -8,11 +8,11 @@ const router = express.Router();
 //QR
 
 //Display QR
-router.get('/', (req, res, next) => {
+router.get('/:balanceId', (req, res, next) => {
   res.render('qr', { title: 'QR Code' });
 });
 
 //Get QRCode
-router.get('/:balanceId', balanceValid, bController.getQRCode);
+router.get('/r/:balanceId', balanceValid, bController.getQRCode);
 
 module.exports = router;

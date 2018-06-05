@@ -5,13 +5,11 @@
 		<link href='/stylesheets/style.css' rel='stylesheet' type='text/css' />
 		<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js' type='text/javascript'></script>
 	</head>
-		<center><h3>Here is your Pointup giftcard!</h3></center>
+		<center><h1>Here is your Pointup giftcard!</h1></center>
 		<br>
     <script type="text/javascript">
       function getBalanceId() {
-        var url_string = window.location.href;
-        var url = new URL(url_string);
-        var id = url.searchParams.get("id");
+        var id = window.location.href.substr(window.location.href.lastIndexOf('/')+1);
         return id;
       }
     </script>
@@ -26,7 +24,7 @@
     </script>
     <script type="text/javascript">
       function getQRCode() {
-        var link = "/qr/"+getBalanceId();
+        var link = "/qr/r/"+getBalanceId();
         var xhttp = new XMLHttpRequest(),
           method = "GET",
           url = link;

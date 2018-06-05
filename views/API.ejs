@@ -40,6 +40,7 @@
 
 	200 - OK, The request has succeeded. Resource has not been modified.
 	201 - Created, The request has succeeded. Resource has been modified.
+	304 - Not Modified, The request has succeeded. A conditional GET or HEAD request has been received and would have resulted in a 200 OK response if it were not for the fact that the condition evaluated to false.
 	401 - Unauthorized, The request requires authentication. The Authentication header field must contain a valid Bearer token in order to be authenticated.
 	409 - Conflict, The request could not be completed due to a conflict with the current state of the target resource.
 	413 - Entity too large, The server is refusing to process a request because the request payload is larger than the server is willing or able to process.
@@ -260,11 +261,11 @@
 			}
 
 
-		<b>Get information about a specific balance</b> (AUTH REQ)
-		----------------------------------------
-		The following API enables you to retrieve a QRCode containing a specific balance in the URL.
+		<b>Get a specific balance with this User</b> (AUTH REQ)
+		-------------------------------------
+		The following API enables you to retrieve a specific balance involving this User.
 
-		GET api.pointup.io/users/balances/:balanceId
+		GET api.pointup.io/merchants/balances/:balanceId
 
 		<i>Arguments:</i>
 		---------
@@ -281,7 +282,10 @@
 			--------
 			HTTP Status Code: 200
 			{
-				"qrcode": "data:image/png;base64,QRCODE"
+					"_id": "5afb04ef15833716e170fe9a",
+					"phone": 19198229889,
+					"merchantId": "5afaffc015833716e170fe8f",
+					"balance": 20
 			}
 
 
@@ -650,6 +654,34 @@
 			}
 
 
+		<b>Get a specific balance with this Merchant</b> (AUTH REQ)
+		-----------------------------------------
+		The following API enables you to retrieve a specific balance involving this Merchant.
+
+		GET api.pointup.io/merchants/balances/:balanceId
+
+		<i>Arguments:</i>
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+					"_id": "5afb04ef15833716e170fe9a",
+					"phone": 19198229889,
+					"merchantId": "5afaffc015833716e170fe8f",
+					"balance": 20
+			}
+
+
 		<b>Create a new balance with a User</b> (AUTH REQ)
 		--------------------------------
 		The following API enables you to create a new balance with a specified user.
@@ -871,7 +903,7 @@
 		---------------
 			The following API enables you view a generated QR code
 
-			GET api.pointup.io/qr?id=:balanceId
+			GET api.pointup.io/qr/:balanceId
 
 			<i>Arguments:</i>
 			---------
@@ -895,7 +927,7 @@
 			--------------
 			The following API enables you to generate a QR code of a balanceId.
 
-			GET api.pointup.io/qr/:balanceId
+			GET api.pointup.io/qr/r/:balanceId
 
 			<i>Arguments:</i>
 			---------
@@ -905,7 +937,6 @@
 				-------
 				Content-Type: application/json
 				{
-					"balanceId": "5afb04ef15833716e170fe9a"
 				}
 
 				Response
