@@ -41,6 +41,7 @@ router.post('/balances/:phone', merchantAuth, merchantExist, bController.merchan
 
 //Update Balance
 router.put('/balances', merchantAuth, merchantExist, bController.merchantUpdate);
+router.put('/balances/:balanceId', merchantAuth, merchantExist, balanceValid bController.merchantUpdateFromURL);
 
 //Delete Balance
 router.delete('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantDeleteFromURL);

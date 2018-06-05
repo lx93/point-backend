@@ -391,7 +391,7 @@ function merchantUpdateFromURL(req, res, next) {
     });
   }
   const id = req.merchantData.merchantId;
-  Balance.findOne({ phone: phone, merchantId: id, balance: req.body.balance })
+  Balance.findOne({ _id: req.params.balanceId, merchantId: id })
     .exec()
     .then( balance => {
       if (!balance) {
