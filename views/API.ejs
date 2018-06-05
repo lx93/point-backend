@@ -903,7 +903,7 @@
 		---------------
 			The following API enables you view a generated QR code
 
-			GET api.pointup.io/qr?id=:balanceId
+			GET api.pointup.io/qr/:balanceId
 
 			<i>Arguments:</i>
 			---------
@@ -927,7 +927,7 @@
 			--------------
 			The following API enables you to generate a QR code of a balanceId.
 
-			GET api.pointup.io/qr/:balanceId
+			GET api.pointup.io/qr/r/:balanceId
 
 			<i>Arguments:</i>
 			---------
@@ -937,7 +937,6 @@
 				-------
 				Content-Type: application/json
 				{
-					"balanceId": "5afb04ef15833716e170fe9a"
 				}
 
 				Response

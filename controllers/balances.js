@@ -482,7 +482,7 @@ function merchantDeleteFromURL(req, res, next) {
 };
 
 //getQRCode
-//GET api.pointup.io/qr/:balanceId
+//GET api.pointup.io/qr/r/:balanceId
 function getQRCode(req, res, next) {
   const id = req.params.balanceId
   Balance.findOne({ _id: id })
