@@ -31,6 +31,25 @@ function userGet(req, res, next) {
     });
 };
 
+//userGetFromURL
+//GET api.pointup.io/users/balances/:balanceId
+function userGetFromURL(req, res, next) {
+  Balance.findOne({ _id: req.params.balanceId })
+    .exec()
+    .then( balance => {
+      console.log(balance);
+      return res.status(200).json({
+        balanceId: balance._id,
+        phone: balance.phone,
+        merchantId: balance.merchantId,
+        balance: balance.balance
+      });
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+};
+
 //userCreateFromQR
 //POST api.pointup.io/users/balances/
 function userCreate(req, res, next) {
@@ -189,6 +208,25 @@ function merchantGet(req, res, next) {
           balance
         });
       }
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+};
+
+//merchantGetFromURL
+//GET api.pointup.io/merchants/balances/:balanceId
+function merchantGetFromURL(req, res, next) {
+  Balance.findOne({ _id: req.params.balanceId })
+    .exec()
+    .then( balance => {
+      console.log(balance);
+      return res.status(200).json({
+        balanceId: balance._id,
+        phone: balance.phone,
+        merchantId: balance.merchantId,
+        balance: balance.balance
+      });
     })
     .catch( err => {
       throwErr(res, err);
@@ -444,13 +482,14 @@ function merchantDeleteFromURL(req, res, next) {
 };
 
 //getQRCode
-//GET api.pointup.io/qr
+//GET api.pointup.io/qr/:balanceId
 function getQRCode(req, res, next) {
-  const id = req.body.balanceId
+  const id = req.params.balanceId
   Balance.findOne({ _id: id })
     .exec()
     .then( balance => {
       if (!balance) {
+        console.log(balance);
         console.log('Balance doesn\'t exist!');
         return res.status(409).json({
           message: "Balance doesn't exist!"
@@ -477,12 +516,14 @@ function getQRCode(req, res, next) {
 };
 
 exports.userGet = userGet;
+exports.userGetFromURL = userGetFromURL;
 exports.userCreate = userCreate;
 exports.userCreateFromURL = userCreateFromURL;
 exports.userDelete = userDelete;
 exports.userDeleteFromURL = userDeleteFromURL;
 
 exports.merchantGet = merchantGet;
+exports.merchantGetFromURL = merchantGetFromURL;
 exports.merchantCreate = merchantCreate;
 exports.merchantCreateFromURL = merchantCreateFromURL;
 exports.merchantUpdate = merchantUpdate;

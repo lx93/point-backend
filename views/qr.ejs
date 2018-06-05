@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+	<head>
+		<meta charset='utf-8'>
+		<title>Point Payment API</title>
+		<link href='/stylesheets/style.css' rel='stylesheet' type='text/css' />
+		<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js' type='text/javascript'></script>
+	</head>
+		<center><h3>Here is your Pointup giftcard!</h3></center>
+		<br>
+    <script type="text/javascript">
+      function getBalanceId() {
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var id = url.searchParams.get("id");
+        return id;
+      }
+    </script>
+    <script>
+      function formatPhoneNumber(input) {
+        var phone = String(input);
+        let match = phone.match(/(1{1})?(\d{3})?(\d{3})?(\d{4})/);
+        var output = "";
+        output = "+" + match[1] + " (" + match[2] + ") " + match[3] + "-" + match[4];
+        return output;
+      }
+    </script>
+    <script type="text/javascript">
+      function getQRCode() {
+        var link = "/qr/"+getBalanceId();
+        var xhttp = new XMLHttpRequest(),
+          method = "GET",
+          url = link;
+        xhttp.open(method, url, true);
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4) {
+            if (this.status == 200) {
+              var response = JSON.parse(this.responseText);
+              var image = response.qrcode;
+              var phone = formatPhoneNumber(response.phone);
+              var balance = response.balance;
+              document.getElementById("phone").innerHTML = phone;
+              document.getElementById("image").src = image;
+              document.getElementById("balance").innerHTML = "Balance: $" + balance;
+            } else {
+              document.getElementById("image").src = "../uploads/Default.png";
+              document.getElementById("balance").innerHTML = "Balance doesn't exist!";
+            }
+          }
+        }
+        xhttp.send();
+      }
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        getQRCode();
+      });
+    </script>
+	<body>
+    <center>
+		<div id='app'>
+      <span id="phone"></span><br>
+      <img id="image" src="" width="400", height="400"><br><br>
+      <span id="balance"></span>
+		</div>
+    </center>
+  </body>
+</html>
