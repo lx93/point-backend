@@ -398,7 +398,7 @@ function merchantUpdate(req, res, next) {
     return res.status(422).json({
       message: "Invalid balance!"
     });
-  } else if (!validator.number(req.body.value)) {
+  } else if (!validator.number(req.body.value) || (req.body.value > req.body.balance)) {
     console.log('Invalid value!');
     return res.status(422).json({
       message: "Invalid value!"
@@ -463,6 +463,11 @@ function merchantUpdateFromURL(req, res, next) {
         console.log('Balance doesn\'t! exist');
         return res.status(409).json({
           message: "Balance doesn't exist!"
+        });
+      } else if (req.body.balue > balance.balance) {
+        console.log('Invalid value!');
+        return res.status(422).json({
+          message: "Invalid value!"
         });
       } else {
         const newTransaction = new Transaction({
