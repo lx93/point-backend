@@ -325,7 +325,7 @@ function merchantCreate(req, res, next) {
 //merchantCreate
 //POST api.pointup.io/merchants/balances/:phone
 function merchantCreateFromURL(req, res, next) {
-  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
+  const phone = String(req.params.phone).replace(/[^0-9]/g, "");
   if (!validator.phone(phone)) {
     console.log('Invalid phone!');
     return res.status(422).json({
