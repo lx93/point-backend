@@ -8,7 +8,7 @@ var transactionSchema = new Schema({
   phone: { type: Number, required: true },
   merchantId: { type: mongoose.Schema.Types.ObjectId, required: true },
   transaction: { type: Number, required: true },
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now() }
 });
 
 // the schema is useless so far
