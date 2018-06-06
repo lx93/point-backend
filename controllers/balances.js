@@ -1,4 +1,5 @@
 const Balance = require('../models/balances');
+const Transaction = require('../models/transactions');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -58,23 +59,36 @@ function userCreate(req, res, next) {
     .exec()
     .then( balance => {
       if (!balance) {
-          const newBalance = new Balance({
-            _id: new mongoose.Types.ObjectId,
-            phone: phone,
-            merchantId: req.body.merchantId,
-            balance: 0
-          });
-          newBalance
-            .save()
-            .then( result => {
-              console.log('Balance created!');
-              return res.status(201).json({
-                message: "Balance created!"
-              });
-            })
-            .catch( err => {
-              throwErr(err)
+        const newTransaction = new Transaction({
+          _id: new mongoose.Types.ObjectId,
+          phone: phone,
+          merchantId: req.body.merchantId,
+          transaction: 0
+        });
+        newTransaction
+          .save()
+          .then( result => {
+            const newBalance = new Balance({
+              _id: new mongoose.Types.ObjectId,
+              phone: phone,
+              merchantId: req.body.merchantId,
+              balance: 0
             });
+            newBalance
+              .save()
+              .then( result => {
+                console.log('Balance created!');
+                return res.status(201).json({
+                  message: "Balance created!"
+                });
+              })
+              .catch( err => {
+                throwErr(err)
+              });
+          })
+          .catch( err => {
+            throwErr(err);
+          });
       } else {
         console.log('Balance exists!');
         return res.status(409).json({
@@ -95,19 +109,32 @@ function userCreateFromURL(req, res, next) {
     .exec()
     .then( balance => {
       if (!balance) {
-        const newBalance = new Balance({
+        const newTransaction = new Transaction({
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: req.params.merchantId,
-          balance: 0
+          transaction: 0
         });
-        newBalance
+        newTransaction
           .save()
-          .then( result => {
-            console.log('Balance created!');
-            return res.status(201).json({
-              message: "Balance created!"
+          .then (result => {
+            const newBalance = new Balance({
+              _id: new mongoose.Types.ObjectId,
+              phone: phone,
+              merchantId: req.params.merchantId,
+              balance: 0
             });
+            newBalance
+              .save()
+              .then( result => {
+                console.log('Balance created!');
+                return res.status(201).json({
+                  message: "Balance created!"
+                });
+              })
+              .catch( err => {
+                throwErr(res, err);
+              });
           })
           .catch( err => {
             throwErr(res, err);
@@ -253,19 +280,32 @@ function merchantCreate(req, res, next) {
     .exec()
     .then( balance => {
       if (!balance) {
-        const newBalance = new Balance({
+        const newTransaction = new Transaction({
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: id,
-          balance: req.body.balance
+          transaction: req.body.balance
         });
-        newBalance
+        newTransaction
           .save()
           .then( result => {
-            console.log('Balance created!');
-            return res.status(201).json({
-              message: "Balance created!"
+            const newBalance = new Balance({
+              _id: new mongoose.Types.ObjectId,
+              phone: phone,
+              merchantId: id,
+              balance: req.body.balance
             });
+            newBalance
+              .save()
+              .then( result => {
+                console.log('Balance created!');
+                return res.status(201).json({
+                  message: "Balance created!"
+                });
+              })
+              .catch( err => {
+                throwErr(res, err);
+              });
           })
           .catch( err => {
             throwErr(res, err);
@@ -302,20 +342,32 @@ function merchantCreateFromURL(req, res, next) {
     .exec()
     .then( balance => {
       if (!balance) {
-        const newBalance = new Balance({
+        const newTransaction = new Transaction({
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: id,
-          balance: req.body.balance
+          transaction: req.body.balance
         });
-        newBalance
+        newTransaction
           .save()
           .then( result => {
-            console.log('Balance created!');
-            //next();   //Uncomment for SMS texting
-            return res.status(201).json({   //Comment for SMS texting
-              message: "Balance created!"
+            const newBalance = new Balance({
+              _id: new mongoose.Types.ObjectId,
+              phone: phone,
+              merchantId: id,
+              balance: req.body.balance
             });
+            newBalance
+              .save()
+              .then( result => {
+                console.log('Balance created!');
+                return res.status(201).json({
+                  message: "Balance created!"
+                });
+              })
+              .catch( err => {
+                throwErr(res, err);
+              });
           })
           .catch( err => {
             throwErr(res, err);
@@ -362,14 +414,27 @@ function merchantUpdate(req, res, next) {
           message: "Balance doesn't exist!"
         });
       } else {
-        var newBalance = balance.balance + req.body.value;
-        balance.update({ $set: { balance: newBalance } })
-          .exec()
+        const newTransaction = new Transaction({
+          _id: new mongoose.Types.ObjectId,
+          phone: phone,
+          merchantId: id,
+          transaction: req.body.value
+        });
+        newTransaction
+          .save()
           .then( result => {
-            console.log('Balance updated!');
-            return res.status(201).json({
-              message: "Balance updated!"
-            });
+            var newBalance = balance.balance + req.body.value;
+            balance.update({ $set: { balance: newBalance } })
+              .exec()
+              .then( result => {
+                console.log('Balance updated!');
+                return res.status(201).json({
+                  message: "Balance updated!"
+                });
+              })
+              .catch( err => {
+                throwErr(res, err);
+              });
           })
           .catch( err => {
             throwErr(res, err);
@@ -400,14 +465,27 @@ function merchantUpdateFromURL(req, res, next) {
           message: "Balance doesn't exist!"
         });
       } else {
-        var newBalance = balance.balance + req.body.value;
-        balance.update({ $set: { balance: newBalance } })
-          .exec()
+        const newTransaction = new Transaction({
+          _id: new mongoose.Types.ObjectId,
+          phone: balance.phone,
+          merchantId: id,
+          transaction: req.body.value
+        });
+        newTransaction
+          .save()
           .then( result => {
-            console.log('Balance updated!');
-            return res.status(201).json({
-              message: "Balance updated!"
-            });
+            var newBalance = balance.balance + req.body.value;
+            balance.update({ $set: { balance: newBalance } })
+              .exec()
+              .then( result => {
+                console.log('Balance updated!');
+                return res.status(201).json({
+                  message: "Balance updated!"
+                });
+              })
+              .catch( err => {
+                throwErr(res, err);
+              });
           })
           .catch( err => {
             throwErr(res, err);
@@ -489,7 +567,6 @@ function getQRCode(req, res, next) {
     .exec()
     .then( balance => {
       if (!balance) {
-        console.log(balance);
         console.log('Balance doesn\'t exist!');
         return res.status(409).json({
           message: "Balance doesn't exist!"

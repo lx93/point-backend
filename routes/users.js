@@ -27,7 +27,7 @@ router.post('/recommend', userAuth, userExist, uController.recommend);
 router.put('/password', userAuth, userExist, uController.updatePassword);
 
 //DeleteUser
-router.delete('/', userAuth, userExist, uController.deleteUser, bController.userDelete);
+router.delete('/', userAuth, userExist, uController.deleteUser/*, bController.userDelete*/);
 
 
 //Balances

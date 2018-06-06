@@ -275,7 +275,7 @@ function deleteMerchant(req, res, next) {
           .exec()
           .then( result => {
             console.log('Merchant deleted!');
-            Balance.find({ merchantId: id })
+            /*Balance.find({ merchantId: id })
               .exec()
               .then( balance => {
                 if (!balance.length) {
@@ -288,7 +288,10 @@ function deleteMerchant(req, res, next) {
               })
               .catch( err => {
                 throwErr(res, err);
-              });
+              });*/
+            return res.status(201).json({
+              message: "Merchant deleted!"
+            });
           })
           .catch( err => {
             throwErr(res, err);

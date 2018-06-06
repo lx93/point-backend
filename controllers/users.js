@@ -209,7 +209,7 @@ function deleteUser(req, res, next) {
           .exec()
           .then(result => {
             console.log('User deleted!');
-            Balance.find({ phone: req.userData.phone })
+            /*Balance.find({ phone: req.userData.phone })
               .exec()
               .then( balance => {
                 if (!balance.length) {
@@ -222,7 +222,10 @@ function deleteUser(req, res, next) {
               })
               .catch( err => {
                 throwErr(res, err);
-              });
+              });*/
+            return res.status(201).json({
+              message: "User deleted!"
+            });
           })
           .catch(err => {
             throwErr(res, err);
