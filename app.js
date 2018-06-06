@@ -2,9 +2,9 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const logger = require('morgan');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
+const logger = require('morgan');
 
 const routes = require('./routes');
 const index = require('./routes/index');
@@ -27,6 +27,12 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+const mongoMorgan = require('mongo-morgan');
+
+app.use(mongoMorgan(mongoDB, 'combined', {
+  collection: 'logs'
+}));
 
 app.use(logger('dev'));
 app.use(express.json());

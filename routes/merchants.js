@@ -26,7 +26,7 @@ router.put('/image', merchantAuth, merchantExist, imageValid.single('image'), mC
 router.put('/password', merchantAuth, merchantExist, mController.updatePassword);
 
 //DeleteMerchant
-router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant, bController.merchantDelete);
+router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant/*, bController.merchantDelete*/);
 
 
 //Balances
