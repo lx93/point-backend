@@ -93,7 +93,8 @@ function userCreate(req, res, next) {
       } else {
         console.log('Balance exists!');
         return res.status(409).json({
-          message: "Balance exists!"
+          message: "Balance exists!",
+          balanceId: balance._id
         });
       }
     })
@@ -265,7 +266,8 @@ function merchantCreate(req, res, next) {
       } else {
         console.log('Balance exists!');
         return res.status(409).json({
-          message: "Balance exists!"
+          message: "Balance exists!",
+          balanceId: balance._id
         });
       }
     })
