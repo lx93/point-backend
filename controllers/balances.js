@@ -63,7 +63,8 @@ function userCreate(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: req.body.merchantId,
-          transaction: 0
+          transaction: 0,
+          timestamp: new Date
         });
         newTransaction
           .save()
@@ -166,6 +167,30 @@ function userDeleteOne(req, res, next) {
     });
 };
 
+//userGetTransactions
+//GET api.pointup.io/users/transactions
+function userGetTransactions(req, res, next) {
+  const phone = req.userData.phone;
+  Transaction.find({ phone: phone })
+    .exec()
+    .then( transaction => {
+      if (!transaction.length) {
+        console.log('User has no transactions!');
+        return res.status(409).json({
+          message: "User has no transactions!"
+        });
+      } else {
+        console.log("\n"+transaction+"\n");
+        return res.status(200).json({
+          transaction
+        });
+      }
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+}
+
 
 //Merchants
 
@@ -221,7 +246,7 @@ function merchantCreate(req, res, next) {
     return res.status(422).json({
       message: "Invalid phone!"
     });
-  } else if(!validator.number(req.body.balance)) {
+  } else if(!validator.number(req.body.balance) || (req.body.balance < 0) ) {
     console.log('Invalid balance!');
     return res.status(422).json({
       message: "Invalid balance!"
@@ -236,7 +261,8 @@ function merchantCreate(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: id,
-          transaction: req.body.balance
+          transaction: req.body.balance,
+          timestamp: new Date
         });
         newTransaction
           .save()
@@ -294,7 +320,7 @@ function merchantUpdate(req, res, next) {
         return res.status(409).json({
           message: "Balance doesn't exist!"
         });
-      } else if (req.body.balue > balance.balance) {
+      } else if (req.body.value > balance.balance) {
         console.log('Invalid value!');
         return res.status(422).json({
           message: "Invalid value!"
@@ -304,7 +330,8 @@ function merchantUpdate(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: balance.phone,
           merchantId: id,
-          transaction: req.body.value
+          transaction: req.body.value,
+          timestamp: new Date
         });
         newTransaction
           .save()
@@ -378,7 +405,7 @@ function merchantDeleteOne(req, res, next) {
       } else {
           Balance.remove({ _id: id })
             .exec()
-            .then ( result => {
+            .then( result => {
               console.log('Balance deleted!');
               return res.status(201).json({
                 message: "Balance deleted!"
@@ -393,6 +420,30 @@ function merchantDeleteOne(req, res, next) {
       throwErr(res, err);
     });
 };
+
+//merchantGetTransactions
+//GET api.pointup.io/merchants/transactions
+function merchantGetTransactions(req, res, next) {
+  const id = req.merchantData.merchantId;
+  Transaction.find({ merchantId: id })
+    .exec()
+    .then( transaction => {
+      if (!transaction.length) {
+        console.log('Merchant has no transactions!');
+        return res.status(409).json({
+          message: "Merchant has no transactions!"
+        });
+      } else {
+        console.log("\n"+transaction+"\n");
+        return res.status(200).json({
+          transaction
+        });
+      }
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
+}
 
 //getQRCode
 //GET api.pointup.io/qr/r/:balanceId
@@ -432,6 +483,7 @@ exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
 exports.userDeleteAll = userDeleteAll;
 exports.userDeleteOne = userDeleteOne;
+exports.userGetTransactions = userGetTransactions;
 
 exports.merchantGetAll = merchantGetAll;
 exports.merchantGetOne = merchantGetOne;
@@ -439,5 +491,6 @@ exports.merchantCreate = merchantCreate;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantDeleteAll = merchantDeleteAll;
 exports.merchantDeleteOne = merchantDeleteOne;
+exports.merchantGetTransactions = merchantGetTransactions;
 
 exports.getQRCode = getQRCode;
