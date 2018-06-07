@@ -9,9 +9,9 @@ const QRCode = require('qrcode');
 
 //Users
 
-//userGet
+//userGetAll
 //GET api.pointup.io/users/balances
-function userGet(req, res, next) {
+function userGetAll(req, res, next) {
   Balance.find({ phone: req.userData.phone })
     .exec()
     .then( balance => {
@@ -32,9 +32,9 @@ function userGet(req, res, next) {
     });
 };
 
-//userGetFromURL
+//userGetOne
 //GET api.pointup.io/users/balances/:balanceId
-function userGetFromURL(req, res, next) {
+function userGetOne(req, res, next) {
   Balance.findOne({ _id: req.params.balanceId })
     .exec()
     .then( balance => {
@@ -51,7 +51,7 @@ function userGetFromURL(req, res, next) {
     });
 };
 
-//userCreateFromQR
+//userCreate
 //POST api.pointup.io/users/balances/
 function userCreate(req, res, next) {
   const phone = req.userData.phone;
@@ -79,7 +79,8 @@ function userCreate(req, res, next) {
               .then( result => {
                 console.log('Balance created!');
                 return res.status(201).json({
-                  message: "Balance created!"
+                  message: "Balance created!",
+                  balanceId: newBalance._id
                 });
               })
               .catch( err => {
@@ -101,59 +102,9 @@ function userCreate(req, res, next) {
     });
 };
 
-//merchantCreate
-//POST api.pointup.io/users/balances/:merchantId
-function userCreateFromURL(req, res, next) {
-  const phone = req.userData.phone;
-  Balance.findOne({ phone: phone, merchantId: req.params.merchantId })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        const newTransaction = new Transaction({
-          _id: new mongoose.Types.ObjectId,
-          phone: phone,
-          merchantId: req.params.merchantId,
-          transaction: 0
-        });
-        newTransaction
-          .save()
-          .then (result => {
-            const newBalance = new Balance({
-              _id: new mongoose.Types.ObjectId,
-              phone: phone,
-              merchantId: req.params.merchantId,
-              balance: 0
-            });
-            newBalance
-              .save()
-              .then( result => {
-                console.log('Balance created!');
-                return res.status(201).json({
-                  message: "Balance created!"
-                });
-              })
-              .catch( err => {
-                throwErr(res, err);
-              });
-          })
-          .catch( err => {
-            throwErr(res, err);
-          });
-      } else {
-        console.log('Balance exists!');
-        return res.status(409).json({
-          message: "Balance exists!"
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
-
-//userDelete
+//userDeleteAll
 //DELETE api.pointup.io/users
-function userDelete(req, res, next) {
+function userDeleteAll(req, res, next) {
   const phone = req.userData.phone;
   Balance.findOne({ phone: phone })
     .exec()
@@ -169,7 +120,7 @@ function userDelete(req, res, next) {
             .then ( result => {
               console.log('Balances deleted!');
               return res.status(201).json({
-                message: "User and Balances deleted!"
+                message: "Balances deleted!"
               });
             })
             .catch( err => {
@@ -182,9 +133,9 @@ function userDelete(req, res, next) {
     });
 };
 
-//userDeleteFromURL
+//userDeleteOne
 //DELETE api.pointup.io/users/balances/:balanceId
-function userDeleteFromURL(req, res, next) {
+function userDeleteOne(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
     .exec()
@@ -217,9 +168,9 @@ function userDeleteFromURL(req, res, next) {
 
 //Merchants
 
-//merchantGet
+//merchantGetOne
 //GET api.pointup.io/merchants/balances
-function merchantGet(req, res, next) {
+function merchantGetAll(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.find({ merchantId: id })
     .exec()
@@ -243,7 +194,7 @@ function merchantGet(req, res, next) {
 
 //merchantGetFromURL
 //GET api.pointup.io/merchants/balances/:balanceId
-function merchantGetFromURL(req, res, next) {
+function merchantGetOne(req, res, next) {
   Balance.findOne({ _id: req.params.balanceId })
     .exec()
     .then( balance => {
@@ -300,69 +251,8 @@ function merchantCreate(req, res, next) {
               .then( result => {
                 console.log('Balance created!');
                 return res.status(201).json({
-                  message: "Balance created!"
-                });
-              })
-              .catch( err => {
-                throwErr(res, err);
-              });
-          })
-          .catch( err => {
-            throwErr(res, err);
-          });
-      } else {
-        console.log('Balance exists!');
-        return res.status(409).json({
-          message: "Balance exists!"
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
-
-//merchantCreate
-//POST api.pointup.io/merchants/balances/:phone
-function merchantCreateFromURL(req, res, next) {
-  const phone = String(req.params.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone)) {
-    console.log('Invalid phone!');
-    return res.status(422).json({
-      message: "Invalid phone!"
-    });
-  } else if(!validator.number(req.body.balance)) {
-    console.log('Invalid balance!');
-    return res.status(422).json({
-      message: "Invalid balance!"
-    });
-  }
-  const id = req.merchantData.merchantId;
-  Balance.findOne({ phone: phone, merchantId: id })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        const newTransaction = new Transaction({
-          _id: new mongoose.Types.ObjectId,
-          phone: phone,
-          merchantId: id,
-          transaction: req.body.balance
-        });
-        newTransaction
-          .save()
-          .then( result => {
-            const newBalance = new Balance({
-              _id: new mongoose.Types.ObjectId,
-              phone: phone,
-              merchantId: id,
-              balance: req.body.balance
-            });
-            newBalance
-              .save()
-              .then( result => {
-                console.log('Balance created!');
-                return res.status(201).json({
-                  message: "Balance created!"
+                  message: "Balance created!",
+                  balanceId: newBalance._id
                 });
               })
               .catch( err => {
@@ -387,68 +277,6 @@ function merchantCreateFromURL(req, res, next) {
 //merchantUpdate
 //PUT api.pointup.io/merchants/balances/
 function merchantUpdate(req, res, next) {
-  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone)) {
-    console.log('Invalid phone!');
-    return res.status(422).json({
-      message: "Invalid phone!"
-    });
-  } else if(!validator.number(req.body.balance)) {
-    console.log('Invalid balance!');
-    return res.status(422).json({
-      message: "Invalid balance!"
-    });
-  } else if (!validator.number(req.body.value) || (req.body.value > req.body.balance)) {
-    console.log('Invalid value!');
-    return res.status(422).json({
-      message: "Invalid value!"
-    });
-  }
-  const id = req.merchantData.merchantId;
-  Balance.findOne({ phone: phone, merchantId: id, balance: req.body.balance })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t! exist');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        const newTransaction = new Transaction({
-          _id: new mongoose.Types.ObjectId,
-          phone: phone,
-          merchantId: id,
-          transaction: req.body.value
-        });
-        newTransaction
-          .save()
-          .then( result => {
-            var newBalance = balance.balance + req.body.value;
-            balance.update({ $set: { balance: newBalance } })
-              .exec()
-              .then( result => {
-                console.log('Balance updated!');
-                return res.status(201).json({
-                  message: "Balance updated!"
-                });
-              })
-              .catch( err => {
-                throwErr(res, err);
-              });
-          })
-          .catch( err => {
-            throwErr(res, err);
-          });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
-
-//merchantUpdateFromURL
-//PUT api.pointup.io/merchants/balances/:balanceId
-function merchantUpdateFromURL(req, res, next) {
   if (!validator.number(req.body.value)) {
     console.log('Invalid value!');
     return res.status(422).json({
@@ -456,7 +284,7 @@ function merchantUpdateFromURL(req, res, next) {
     });
   }
   const id = req.merchantData.merchantId;
-  Balance.findOne({ _id: req.params.balanceId, merchantId: id })
+  Balance.findOne({ _id: req.body.balanceId, merchantId: id })
     .exec()
     .then( balance => {
       if (!balance) {
@@ -502,9 +330,9 @@ function merchantUpdateFromURL(req, res, next) {
     });
 };
 
-//merchantDelete
+//merchantDeleteAll
 //DELETE api.pointup.io/merchants/
-function merchantDelete(req, res, next) {
+function merchantDeleteAll(req, res, next) {
   const id = req.merchantData.merchantId;
   Balance.findOne({ merchantId: id })
     .exec()
@@ -520,7 +348,7 @@ function merchantDelete(req, res, next) {
             .then( result => {
               console.log('Balances deleted!');
               return res.status(201).json({
-                message: "Merchant and Balances deleted!"
+                message: "Balances deleted!"
               });
             })
             .catch( err => {
@@ -533,9 +361,9 @@ function merchantDelete(req, res, next) {
     });
 };
 
-//merchantDeleteFromURL
+//merchantDeleteOne
 //DELETE api.pointup.io/merchants/balances/:balanceId
-function merchantDeleteFromURL(req, res, next) {
+function merchantDeleteOne(req, res, next) {
   const id = req.params.balanceId;
   Balance.findOne({ _id: id })
     .exec()
@@ -597,20 +425,17 @@ function getQRCode(req, res, next) {
     });
 };
 
-exports.userGet = userGet;
-exports.userGetFromURL = userGetFromURL;
+exports.userGetAll = userGetAll;
+exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
-exports.userCreateFromURL = userCreateFromURL;
-exports.userDelete = userDelete;
-exports.userDeleteFromURL = userDeleteFromURL;
+exports.userDeleteAll = userDeleteAll;
+exports.userDeleteOne = userDeleteOne;
 
-exports.merchantGet = merchantGet;
-exports.merchantGetFromURL = merchantGetFromURL;
+exports.merchantGetAll = merchantGetAll;
+exports.merchantGetOne = merchantGetOne;
 exports.merchantCreate = merchantCreate;
-exports.merchantCreateFromURL = merchantCreateFromURL;
 exports.merchantUpdate = merchantUpdate;
-exports.merchantUpdateFromURL = merchantUpdateFromURL;
-exports.merchantDelete = merchantDelete;
-exports.merchantDeleteFromURL = merchantDeleteFromURL;
+exports.merchantDeleteAll = merchantDeleteAll;
+exports.merchantDeleteOne = merchantDeleteOne;
 
 exports.getQRCode = getQRCode;

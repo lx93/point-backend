@@ -71,7 +71,7 @@
 
 		<b>Get User information</b> (AUTH REQ)
 		--------------------
-		The following API enables you to retrieve information about the user.
+		The following API enables you to retrieve information about your User Point account.
 
 		GET api.pointup.io/users/
 
@@ -124,7 +124,7 @@
 
 		<b>Log in as a User</b>
 		----------------
-		The following API enables you to log intoy your User Point account. A token will be sent back in the response, enabling the user to store it for authorization.
+		The following API enables you to log into your User Point account. A token will be sent back in the response, enabling the User to store it for authorization.
 
 		POST api.pointup.io/users/login
 
@@ -178,7 +178,7 @@
 
 		<b>Delete User</b> (AUTH REQ)
 		-----------
-		The following API will completely delete the User from the Point database. It will also remove any and all balances with the User.
+		The following API will completely delete the User from the Point database.
 
 		DELETE api.pointup.io/users/
 
@@ -195,14 +195,14 @@
 			--------
 			HTTP Status Code: 201
 			{
-				"message": "User (and balances) deleted!"
+				"message": "User deleted!"
 
 			}
 
 
 	<b>User Balance</b>
 	------------
-	The User Balance API lets you perform actions regarding your the balances your User Point account holds. You can retrive all balances you hold and information about then here.
+	The User Balance API lets you perform actions regarding your the balances your User Point account holds. You can retrive all balances you hold and information about them here.
 
 	The following actions can be performed with the User Balance API
 	- Get all balances by this User
@@ -215,8 +215,8 @@
 	<i>BaseURI:</i> api.pointup.io/users/balances
 
 
-		<b>Get all balances by this User</b> (AUTH REQ)
-		-----------------------------
+		<b>Get all balances with this User</b> (AUTH REQ)
+		-------------------------------
 		The following API enables you to retrieve all balances involving this User.
 
 		GET api.pointup.io/users/balances
@@ -291,7 +291,7 @@
 
 		<b>Create a new balance with a Merchant</b> (AUTH REQ)
 		------------------------------------
-		The following API enables you to create a new balance of 0 with a specified merchant.
+		The following API enables you to create a new balance of 0 with a specified Merchant.
 
 		POST api.pointup.io/users/balances
 
@@ -312,39 +312,14 @@
 			--------
 			HTTP Status Code: 201
 			{
-				"message": "Balance created!"
+				"message": "Balance created!",
+				"balanceId": "5afb04ef15833716e170fe9a"
 			}
 
 
-		<b>Create a new balance with a Merchant from URL</b> (AUTH REQ)
-		---------------------------------------------
-		The following API enables you to create a new balance of 0 with a specified merchant from the URL.
-
-		POST api.pointup.io/users/balances/:merchantId
-
-		<i>Arguments:</i>
-		---------
-		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
-
-			Request
-			-------
-			Authorization: Bearer 919Token
-			Content-Type: application/json
-			{
-			}
-
-
-			Response
-			--------
-			HTTP Status Code: 201
-			{
-				"message": "Balance created!"
-			}
-
-
-		<b>Delete all balances of this User</b> (AUTH REQ)
-		--------------------------------
-		The following API enables you to delete all balanced tied to the User.
+		<b>Delete all balances with this User</b> (AUTH REQ)
+		----------------------------------
+		The following API enables you to delete all balances involving this User.
 
 		DELETE api.pointup.io/users/balances
 
@@ -366,9 +341,9 @@
 			}
 
 
-		<b>Delete a specific balance from URL</b> (AUTH REQ)
-		----------------------------------
-		The following API enables you to delete a specific balance in the URL.
+		<b>Delete a specific balance with this User</b> (AUTH REQ)
+		----------------------------------------
+		The following API enables you to delete a specific balance involving this User.
 
 		DELETE api.pointup.io/users/balances/:balanceId
 
@@ -408,7 +383,7 @@
 
 		<b>Get Merchant information</b> (AUTH REQ)
 		------------------------
-		The following API enables you to retrieve information about the Merchant.
+		The following API enables you to retrieve information about your Merchant Point account.
 
 		GET api.pointup.io/merchants/
 
@@ -465,7 +440,7 @@
 
 		<b>Log in as a Merchant</b>
 		--------------------
-		The following API enables you to log intoy your Merchant Point account. A token will be sent back in the response, enabling the Merchant to store it for authorization.
+		The following API enables you to log into your Merchant Point account. A token will be sent back in the response, enabling the Merchant to store it for authorization.
 
 		POST api.pointup.io/merchants/login
 
@@ -571,7 +546,7 @@
 
 		<b>Delete Merchant</b> (AUTH REQ)
 		---------------
-		The following API will completely delete the Merchant from the Point database. It will also remove any and all balances with the Merchant.
+		The following API will completely delete the Merchant from the Point database.
 
 		DELETE api.pointup.io/merchants/
 
@@ -588,14 +563,14 @@
 			--------
 			HTTP Status Code: 201
 			{
-				"message": "Merchant (and balances) deleted!"
+				"message": "Merchant deleted!"
 
 			}
 
 
 	<b>Merchant Balance</b>
 	----------------
-	The Merchant Balance API lets you perform actions regarding your the balances your Merchant Point account holds. You can retrive all balances you hold and information about then here.
+	The Merchant Balance API lets you perform actions regarding your the balances your Merchant Point account holds. You can retrive all balances you hold and information about them here.
 
 	The following actions can be performed with the Merchant Balance API
 	- Get all balances by this Merchant
@@ -608,8 +583,8 @@
 	<i>BaseURI:</i> api.pointup.io/merchants/balances
 
 
-		<b>Get all balances by this Merchant</b> (AUTH REQ)
-		---------------------------------
+		<b>Get all balances with this Merchant</b> (AUTH REQ)
+		-----------------------------------
 		The following API enables you to retrieve all balances involving this Merchant.
 
 		GET api.pointup.io/merchants/balances
@@ -684,7 +659,7 @@
 
 		<b>Create a new balance with a User</b> (AUTH REQ)
 		--------------------------------
-		The following API enables you to create a new balance with a specified user.
+		The following API enables you to create a new balance with a specified User.
 
 		POST api.pointup.io/merchants/balances
 
@@ -707,87 +682,27 @@
 			--------
 			HTTP Status Code: 201
 			{
-				"message": "Balance created!"
-			}
-
-
-		<b>Create a new balance with a User from URL</b> (AUTH REQ)
-		-----------------------------------------
-		The following API enables you to create a new balance with a specified merchant from the URL.
-
-		POST api.pointup.io/merchants/balances/:phone
-
-		<i>Arguments:</i>
-		---------
-		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- balance: A valid number containing the balance held between the Merchant and User.
-
-			Request
-			-------
-			Authorization: Bearer 919Token
-			Content-Type: application/json
-			{
-				"balance": 20
-			}
-
-
-			Response
-			--------
-			HTTP Status Code: 201
-			{
-				"message": "Balance created!"
+				"message": "Balance created!",
+				"balanceId": "5afb04ef15833716e170fe9a"
 			}
 
 
 		<b>Update a balance with a User</b> (AUTH REQ)
 		----------------------------
-		The following API enables you to create a new balance with a specified user.
+		The following API enables you to update an existing balance.
 
 		PUT api.pointup.io/merchants/balances
 
 		<i>Arguments:</i>
 		---------
-		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
-		- balance: A valid number containing the balance held between the Merchant and User.
-		- value: A valid number containing the change in balance.
-
-			Request
-			-------
-			Authorization: Bearer AToken
-			Content-Type: application/json
-			{
-				"phone": 19198229889,
-				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": 20,
-				"value": -5
-			}
-
-
-			Response
-			--------
-			HTTP Status Code: 201
-			{
-				"message": "Balance changed!"
-			}
-
-
-		<b>Update a balance with a User from URL</b> (AUTH REQ)
-		-------------------------------------
-		The following API enables you to create a new balance with a specified user.
-
-		PUT api.pointup.io/merchants/balances/:balanceId
-
-		<i>Arguments:</i>
-		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
-		- value: A valid number containing the change in balance.
 
 			Request
 			-------
 			Authorization: Bearer AToken
 			Content-Type: application/json
 			{
+				"balanceId": "5afb04ef15833716e170fe9a",
 				"value": -5
 			}
 
@@ -800,9 +715,9 @@
 			}
 
 
-		<b>Delete all balances of this Merchant</b> (AUTH REQ)
-		------------------------------------
-		The following API enables you to delete all balanced tied to the Merchant.
+		<b>Delete all balances with this Merchant</b> (AUTH REQ)
+		--------------------------------------
+		The following API enables you to delete all balances involving this Merchant.
 
 		DELETE api.pointup.io/merchants/balances
 
@@ -824,9 +739,9 @@
 			}
 
 
-		<b>Delete a specific balance from URL</b> (AUTH REQ)
-		----------------------------------
-		The following API enables you to delete a specific balance in the URL.
+		<b>Delete a specific balance with this Merchant</b> (AUTH REQ)
+		--------------------------------------------
+		The following API enables you to delete a specific balance involving this Merchant.
 
 		DELETE api.pointup.io/merchants/balances/:balanceId
 
@@ -900,7 +815,7 @@
 
 		<b>Display QR code</b> (AUTH REQ)
 		---------------
-			The following API enables you view a generated QR code
+			The following API enables you to view a generated QR code
 
 			GET api.pointup.io/qr/:balanceId
 
@@ -934,7 +849,6 @@
 
 				Request
 				-------
-				Content-Type: application/json
 				{
 				}
 
