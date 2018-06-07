@@ -32,21 +32,19 @@ router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant/*, bC
 //Balances
 
 //Get Balances
-router.get('/balances', merchantAuth, merchantExist, bController.merchantGet);
-router.get('/balances/:balanceId', balanceValid, bController.merchantGetFromURL);
+router.get('/balances', merchantAuth, merchantExist, bController.merchantGetAll);
+router.get('/balances/:balanceId', balanceValid, bController.merchantGetOne);
 
 //Create Balance
 router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate);
-router.post('/balances/:phone', merchantAuth, merchantExist, bController.merchantCreateFromURL);
 
 //Update Balance
-router.put('/balances', merchantAuth, merchantExist, bController.merchantUpdate);
-router.put('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantUpdateFromURL);
+router.put('/balances', merchantAuth, merchantExist, balanceValid, bController.merchantUpdate);
 
 //Delete Balance
-router.delete('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantDeleteFromURL);
+router.delete('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantDeleteOne);
 
 //(Debug)
-router.delete('/balances', merchantAuth, merchantAuth, bController.merchantDelete);
+router.delete('/balances', merchantAuth, merchantAuth, bController.merchantDeleteAll);
 
 module.exports = router;

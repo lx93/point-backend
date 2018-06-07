@@ -33,17 +33,16 @@ router.delete('/', userAuth, userExist, uController.deleteUser/*, bController.us
 //Balances
 
 //Get Balances
-router.get('/balances', userAuth, userExist, bController.userGet);
-router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetFromURL);
+router.get('/balances', userAuth, userExist, bController.userGetAll);
+router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userGetOne);
 
 //Create Balance
 router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);
-router.post('/balances/:merchantId', userAuth, userExist, merchantValid, bController.userCreateFromURL);
 
 //Delete Balance
-router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteFromURL);
+router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteOne);
 
 //(Debug)
-router.delete('/balances', userAuth, userExist, bController.userDelete);
+router.delete('/balances', userAuth, userExist, bController.userDeleteAll);
 
 module.exports = router;
