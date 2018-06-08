@@ -217,7 +217,7 @@ function merchantGetAll(req, res, next) {
     });
 };
 
-//merchantGetFromURL
+//merchantGetOne
 //GET api.pointup.io/merchants/balances/:balanceId
 function merchantGetOne(req, res, next) {
   Balance.findOne({ _id: req.params.balanceId })
@@ -480,7 +480,7 @@ exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
 exports.userDeleteAll = userDeleteAll;
 exports.userDeleteOne = userDeleteOne;
-//exports.userGetTransactions = userGetTransactions;
+exports.userGetTransactions = userGetTransactions;
 
 exports.merchantGetAll = merchantGetAll;
 exports.merchantGetOne = merchantGetOne;
@@ -488,6 +488,6 @@ exports.merchantCreate = merchantCreate;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantDeleteAll = merchantDeleteAll;
 exports.merchantDeleteOne = merchantDeleteOne;
-//exports.merchantGetTransactions = merchantGetTransactions;
+exports.merchantGetTransactions = merchantGetTransactions;
 
 exports.getQRCode = getQRCode;

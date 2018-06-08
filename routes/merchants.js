@@ -51,6 +51,6 @@ router.delete('/balances', merchantAuth, merchantAuth, bController.merchantDelet
 //Transactions
 
 //Get Transactions
-//router.get('/transactions', merchantAuth, merchantExist, bController.merchantGetTransactions);
+router.get('/transactions', merchantAuth, merchantExist, bController.merchantGetTransactions);
 
 module.exports = router;
