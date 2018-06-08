@@ -63,8 +63,7 @@ function userCreate(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: req.body.merchantId,
-          transaction: 0,
-          timestamp: new Date
+          transaction: 0
         });
         newTransaction
           .save()
@@ -166,7 +165,7 @@ function userDeleteOne(req, res, next) {
       throwErr(res, err);
     });
 };
-
+/*
 //userGetTransactions
 //GET api.pointup.io/users/transactions
 function userGetTransactions(req, res, next) {
@@ -190,7 +189,7 @@ function userGetTransactions(req, res, next) {
       throwErr(res, err);
     });
 }
-
+*/
 
 //Merchants
 
@@ -261,8 +260,7 @@ function merchantCreate(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: phone,
           merchantId: id,
-          transaction: req.body.balance,
-          timestamp: new Date
+          transaction: req.body.balance
         });
         newTransaction
           .save()
@@ -330,8 +328,7 @@ function merchantUpdate(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: balance.phone,
           merchantId: id,
-          transaction: req.body.value,
-          timestamp: new Date
+          transaction: req.body.value
         });
         newTransaction
           .save()
@@ -420,7 +417,7 @@ function merchantDeleteOne(req, res, next) {
       throwErr(res, err);
     });
 };
-
+/*
 //merchantGetTransactions
 //GET api.pointup.io/merchants/transactions
 function merchantGetTransactions(req, res, next) {
@@ -444,7 +441,7 @@ function merchantGetTransactions(req, res, next) {
       throwErr(res, err);
     });
 }
-
+*/
 //getQRCode
 //GET api.pointup.io/qr/r/:balanceId
 function getQRCode(req, res, next) {
@@ -483,7 +480,7 @@ exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
 exports.userDeleteAll = userDeleteAll;
 exports.userDeleteOne = userDeleteOne;
-exports.userGetTransactions = userGetTransactions;
+//exports.userGetTransactions = userGetTransactions;
 
 exports.merchantGetAll = merchantGetAll;
 exports.merchantGetOne = merchantGetOne;
@@ -491,6 +488,6 @@ exports.merchantCreate = merchantCreate;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantDeleteAll = merchantDeleteAll;
 exports.merchantDeleteOne = merchantDeleteOne;
-exports.merchantGetTransactions = merchantGetTransactions;
+//exports.merchantGetTransactions = merchantGetTransactions;
 
 exports.getQRCode = getQRCode;
