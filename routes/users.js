@@ -49,6 +49,6 @@ router.delete('/balances', userAuth, userExist, bController.userDeleteAll);
 //Transactions
 
 //Get Transactions
-router.get('/transactions', userAuth, userExist, bController.userGetTransactions);
+//router.get('/transactions', userAuth, userExist, bController.userGetTransactions);
 
 module.exports = router;
