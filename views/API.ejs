@@ -187,7 +187,6 @@
 			Request
 			-------
 			Authorization: Bearer 919Token
-			Content-Type: application/json
 			{
 			}
 
@@ -205,7 +204,7 @@
 	The User Balance API lets you perform actions regarding your the balances your User Point account holds. You can retrive all balances you hold and information about them here.
 
 	The following actions can be performed with the User Balance API
-	- Get all balances by this User
+	- Get all balances with this User
 	- Get information about a specific balance from URL
 	- Create a new balance with a Merchant
 	- Create a new balance with a Merchant from URL
@@ -366,6 +365,65 @@
 			}
 
 
+	<b>User Transactions</b>
+	-----------------
+	The User Transactions API lets you view all transactions to the balances your User Point account holds.
+
+	The following actions can be performed with the User Balance API
+	- Get all transactions with this User
+
+	<i>BaseURI:</i> api.pointup.io/users/transactions
+
+
+		<b>Get all transactions with this User</b> (AUTH REQ)
+		-----------------------------------
+		The following API enables you to retrieve all transactions involving this User.
+
+		GET api.pointup.io/users/transactions
+
+		<i>Arguments:</i> None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"transaction": [
+					{
+						"timestamp": "2018-06-05T19:32:59.968Z",
+						"_id": "5b16e56b538a4d7c8ccee72d",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"transaction": 20,
+						"__v": 0
+					},
+					{
+						"timestamp": "2018-06-06T21:19:17.375Z",
+						"_id": "5b16f98131bfa41e36270500",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"transaction": -5,
+						"__v": 0
+					},
+					{
+						"timestamp": "2018-06-06T21:39:09.192Z",
+						"_id": "5b17f6ae4c1a005bed7a666f",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe90",
+						"transaction": 25,
+						"__v": 0
+					}
+				]
+			}
+
+
 	<b>Merchant</b>
 	--------
 	The Merchant API lets you perform actions regarding your Merchant Point account. When you sign up on Point, you will be given your own account. You can retrive your account details like phone number, merchantId, and balances using the Merchant API. You can also modify your password here.
@@ -375,6 +433,7 @@
 	- Sign up as a Merchant
 	- Log in as a Merchant
 	- Modify Merchant name
+	- Modify Merchant image
 	- Modify Merchant password
 	- Delete Merchant
 
@@ -470,7 +529,7 @@
 		--------------------
 		The following API enables you to change the name to your Merchant Point account.
 
-		PUT api.pointup.io/merchants/password
+		PUT api.pointup.io/merchants/name
 
 		<i>Arguments:</i>
 		---------
@@ -555,7 +614,6 @@
 			Request
 			-------
 			Authorization: Bearer AToken
-			Content-Type: application/json
 			{
 			}
 
@@ -573,7 +631,7 @@
 	The Merchant Balance API lets you perform actions regarding your the balances your Merchant Point account holds. You can retrive all balances you hold and information about them here.
 
 	The following actions can be performed with the Merchant Balance API
-	- Get all balances by this Merchant
+	- Get all balances with this Merchant
 	- Get information about a specific balance from URL
 	- Create a new balance with a Merchant
 	- Create a new balance with a Merchant from URL
@@ -764,6 +822,65 @@
 			}
 
 
+	<b>Merchant Transactions</b>
+	---------------------
+	The Merchant Transactions API lets you view all transactions to the balances your Merchant Point account holds.
+
+	The following actions can be performed with the Merchant Balance API
+	- Get all transactions with this Merchant
+
+	<i>BaseURI:</i> api.pointup.io/merchants/transactions
+
+
+		<b>Get all transactions with this Merchant</b> (AUTH REQ)
+		   ---------------------------------------
+		The following API enables you to retrieve all transactions involving this Merchant.
+
+		GET api.pointup.io/merchants/transactions
+
+		<i>Arguments:</i> None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"transaction": [
+					{
+						"timestamp": "2018-06-05T19:32:59.968Z",
+						"_id": "5b16e56b538a4d7c8ccee72d",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"transaction": 20,
+						"__v": 0
+					},
+					{
+						"timestamp": "2018-06-06T21:19:17.375Z",
+						"_id": "5b16f98131bfa41e36270500",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"transaction": -5,
+						"__v": 0
+					},
+					{
+						"timestamp": "2018-06-06T21:40:14.192Z",
+						"_id": "5b17f6ae4c1a005bed7a666f",
+						"phone": 16177635369,
+						"merchantId": "5afaffc015833716e170fe8f",
+						"transaction": 30,
+						"__v": 0
+					}
+				]
+			}
+
+
 	<b>Messaging</b>
 	---------
 	The Messaging API lets you send an SMS message.
@@ -813,7 +930,7 @@
 	<i>BaseURI:</i> api.pointup.io/qr
 
 
-		<b>Display QR code</b> (AUTH REQ)
+		<b>Display QR code</b>
 		---------------
 			The following API enables you to view a generated QR code
 

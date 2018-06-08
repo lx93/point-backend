@@ -45,4 +45,10 @@ router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bContro
 //(Debug)
 router.delete('/balances', userAuth, userExist, bController.userDeleteAll);
 
+
+//Transactions
+
+//Get Transactions
+router.get('/transactions', userAuth, userExist, bController.userGetTransactions);
+
 module.exports = router;

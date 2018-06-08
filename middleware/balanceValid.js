@@ -17,11 +17,7 @@ function balanceValid(req, res, next) {
   Balance.findOne({ _id: id })
     .exec()
     .then( balance => {
-      if (!balance) {
-        next();
-      } else {
-        next();
-      }
+      next();
     })
     .catch( err => {
       console.log('Invalid balanceId!');
