@@ -425,7 +425,7 @@ function merchantDeleteOne(req, res, next) {
 //GET api.pointup.io/merchants/transactions
 function merchantGetTransactions(req, res, next) {
   const id = req.merchantData.merchantId;
-  Transaction.find({ merchantId: id })
+  Transaction.find({ merchantId: id }).sort({timestamp:1})
     .exec()
     .then( transaction => {
       if (!transaction.length) {
