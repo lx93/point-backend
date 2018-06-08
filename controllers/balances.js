@@ -165,7 +165,7 @@ function userDeleteOne(req, res, next) {
       throwErr(res, err);
     });
 };
-/*
+
 //userGetTransactions
 //GET api.pointup.io/users/transactions
 function userGetTransactions(req, res, next) {
@@ -189,7 +189,6 @@ function userGetTransactions(req, res, next) {
       throwErr(res, err);
     });
 }
-*/
 
 //Merchants
 
