@@ -165,7 +165,7 @@ function userDeleteOne(req, res, next) {
       throwErr(res, err);
     });
 };
-/*
+
 //userGetTransactions
 //GET api.pointup.io/users/transactions
 function userGetTransactions(req, res, next) {
@@ -189,7 +189,6 @@ function userGetTransactions(req, res, next) {
       throwErr(res, err);
     });
 }
-*/
 
 //Merchants
 
@@ -417,7 +416,7 @@ function merchantDeleteOne(req, res, next) {
       throwErr(res, err);
     });
 };
-/*
+
 //merchantGetTransactions
 //GET api.pointup.io/merchants/transactions
 function merchantGetTransactions(req, res, next) {
@@ -441,7 +440,7 @@ function merchantGetTransactions(req, res, next) {
       throwErr(res, err);
     });
 }
-*/
+
 //getQRCode
 //GET api.pointup.io/qr/r/:balanceId
 function getQRCode(req, res, next) {
