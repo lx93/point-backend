@@ -32,6 +32,12 @@ function validateString(string) {
 function validateNumber(number) {
   if (number) {
     return (typeof number === 'number');
+    //if (typeof number == 'number') {
+    //  var re = /^\d+(\.\d{2})?$/;
+    //  return re.test(String(number));
+    //} else {
+    //  return false;
+    //}
   } else {
     return false;
   }

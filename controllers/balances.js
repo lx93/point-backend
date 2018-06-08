@@ -171,7 +171,7 @@ function userDeleteOne(req, res, next) {
 //GET api.pointup.io/users/transactions
 function userGetTransactions(req, res, next) {
   const phone = req.userData.phone;
-  Transaction.find({ phone: phone })
+  Transaction.find({ phone: phone }).sort({timestamp:1})
     .exec()
     .then( transaction => {
       if (!transaction.length) {
