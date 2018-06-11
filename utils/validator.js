@@ -30,15 +30,9 @@ function validateString(string) {
 };
 
 function validateNumber(number) {
-  if (number) {
-    return true;
-    //return (typeof number === 'number');
-    //if (typeof number == 'number') {
-    //  var re = /^\d+(\.\d{2})?$/;
-    //  return re.test(String(number));
-    //} else {
-    //  return false;
-    //}
+  if (typeof parseFloat(number) == 'number') {
+    var re = /^(\-)?(\d+)(\.)(\d{2})$/;
+    return re.test(number);
   } else {
     return false;
   }

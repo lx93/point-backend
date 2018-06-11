@@ -2,8 +2,8 @@ const User = require('../models/users');
 const mongoose = require('mongoose');
 
 function userExist(req, res, next) {
-  const id = req.userData.userId;
-  User.findOne({ _id: id })
+  const validUserId = req.userData.userId;
+  User.findOne({ _id: validUserId, isActive: true })
     .exec()
     .then( user => {
       if (!user) {

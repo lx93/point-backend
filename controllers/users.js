@@ -1,35 +1,83 @@
 const User = require('../models/users');
 const Balance = require('../models/balances');
+const Verification = require('../models/verifications');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('../utils/validator');
 const throwErr = require('../utils/throwErr');
+const RNG = require('../utils/RNG');
+const messenger = require('../utils/messenger')
 
 
 //Get User info
 //GET api.pointup.io/users/
 function getUser(req, res, next) {
-  const id = req.userData.userId;
-  User.findOne({ _id: id })
+  const validUserId = req.userData.userId;
+  User.findOne({ _id: validUserId })
     .exec()
     .then( user => {
-      console.log('\n'+user+'\n');
-      return res.status(200).json({
-        phone: user.phone,
-        userId: user._id
-      });
+      if (!user || !user.isActive) {
+        console.log('User doesn\'t exist!');
+        return res.status(409).json({
+          message: "User doesn't exist!"
+        });
+      } else {
+        console.log('\n'+user+'\n');
+        return res.status(200).json({
+          phone: user.phone,
+          userId: user._id,
+          lastLoginAt: user.lastLoginAt
+        });
+      }
     })
     .catch( err => {
       throwErr(res, err);
     });
 };
 
+//Verify
+//POST api.pointup.io/users/verify
+function verify(req, res, next) {
+  const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");
+  if (!validator.phone(validPhone)) {
+    console.log('Invalid phone!');
+    return res.status(422).json({
+      message: "Invalid phone!"
+    });
+  }
+  User.findOne({ phone: validPhone })
+    .exec()
+    .then( user => {
+      var x = RNG();
+      var newVerification = new Verification({
+        _id: new mongoose.Types.ObjectId,
+        phone: validPhone,
+        code: x
+      });
+      newVerification
+        .save()
+        .then( result => {
+          messenger.sendMessage(validPhone, "Pointup Verification code: " + x);
+          console.log('Code sent!');
+          return res.status(201).json({
+            message: "Code sent!"
+          });
+        })
+        .catch( err => {
+          throwErr(res, err);
+        });
+    })
+    .catch( err => {
+      throwErr(res, err);
+    })
+};
+
 //Sign up
 //POST api.pointup.io/users/signup
 function signUp(req, res, next) {
-  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone)) {
+  const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");
+  if (!validator.phone(validPhone)) {
     console.log('Invalid phone!');
     return res.status(422).json({
       message: "Invalid phone!"
@@ -40,36 +88,115 @@ function signUp(req, res, next) {
       message: "Invalid password!"
     });
   }
-  User.findOne({ phone: phone })
+  const validPassword = req.body.password;
+  const validCode = req.body.code;
+  Verification.findOne({ phone: validPhone, code: validCode })
     .exec()
-    .then( user => {
-      if (!user) {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            throwErr(res, err);
-          }
-          var newUser = new User({
-            _id: new mongoose.Types.ObjectId,
-            phone: phone,
-            password: hash
-          });
-          newUser
-            .save()
-            .then( result => {
-              console.log('User created!');
-              return res.status(201).json({
-                message: "User created!"
+    .then( verification => {
+      if (!verification) {
+        /*console.log('Auth failed');
+        return res.status(401).json({
+          message: 'Auth failed'
+        });*/
+        User.findOne({ phone: validPhone })
+          .exec()
+          .then( user => {
+            if (!user) {
+              bcrypt.hash(validPassword, 10)
+                .then( hash => {
+                  var newUser = new User({
+                    _id: new mongoose.Types.ObjectId,
+                    phone: validPhone,
+                    password: hash,
+                    isActive: true,
+                    lastLoginAt: null,
+                    createdAt: new Date,
+                    updatedAt: new Date
+                  });
+                  newUser
+                    .save()
+                    .then( result => {
+                      console.log('User created!');
+                      return res.status(201).json({
+                        message: "User created!"
+                      });
+                    })
+                    .catch( err => {
+                      throwErr(res, err);
+                    });
+                })
+                .catch( err => {
+                  throwErr(res, err);
+                });
+            } else if (!user.isActive) {
+              user.update({ $set: { isActive: true } })
+                .exec()
+                .then( result => {
+                  console.log('User created!');
+                  return res.status(201).json({
+                    message: "User created!"
+                  });
+                })
+                .catch( err => {
+                  throwErr(res, err);
+                });
+            } else {
+              console.log('User exists!');
+              return res.status(409).json({
+                message: "User exists!"
               });
-            })
-            .catch( err => {
-              throwErr(res, err);
-            });
-        });
+            }
+        })
       } else {
-        console.log('User exists!');
-        return res.status(409).json({
-          message: "User exists!"
-        });
+        User.findOne({ phone: validPhone })
+          .exec()
+          .then( user => {
+            if (!user) {
+              bcrypt.hash(validPassword, 10)
+                .then( hash => {
+                  var newUser = new User({
+                    _id: new mongoose.Types.ObjectId,
+                    phone: validPhone,
+                    password: hash,
+                    isActive: true,
+                    lastLoginAt: null,
+                    createdAt: new Date,
+                    updatedAt: new Date
+                  });
+                  newUser
+                    .save()
+                    .then( result => {
+                      console.log('User created!');
+                      return res.status(201).json({
+                        message: "User created!"
+                      });
+                    })
+                    .catch( err => {
+                      throwErr(res, err);
+                    });
+                })
+                .catch( err => {
+                  throwErr(res, err);
+                });
+            } else if (!user.isActive) {
+              user.update({ $set: { isActive: true } })
+                .exec()
+                .then( result => {
+                  console.log('User created!');
+                  return res.status(201).json({
+                    message: "User created!"
+                  });
+                })
+                .catch( err => {
+                  throwErr(res, err);
+                });
+            } else {
+              console.log('User exists!');
+              return res.status(409).json({
+                message: "User exists!"
+              });
+            }
+        })
       }
     })
     .catch( err => {
@@ -80,8 +207,8 @@ function signUp(req, res, next) {
 //Log in
 //POST api.pointup.io/users/login
 function logIn(req, res, next) {
-  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone)) {
+  const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");
+  if (!validator.phone(validPhone)) {
     console.log('Invalid phone!');
     return res.status(422).json({
       message: "Invalid phone!"
@@ -92,77 +219,60 @@ function logIn(req, res, next) {
       message: "Invalid password!"
     });
   }
-  User.findOne({ phone: phone })
+  const validPassword = req.body.password;
+  User.findOne({ phone: validPhone })
     .exec()
     .then( user => {
-      if (!user) {
+      if (!user || !user.isActive) {
         console.log('Auth failed');
         return res.status(401).json({
           message: 'Auth failed'
-        })
-      } else {
-        bcrypt.compare(req.body.password, user.password, (err, result) => {
-          if (err) {
-            throwErr(res, err);
-          }
-          if (result) {
-            const token = jwt.sign(
-              {
-                phone: user.phone,
-                userId: user._id
-              },
-              process.env.JWT_KEY,
-              {
-                  expiresIn: "1y"
-              }
-            );
-            console.log('Auth successful');
-            return res.status(201).header('Authorization', token).json({
-              message: "Auth successful",
-              token: token
-            });
-          }
-          console.log('Auth failed');
-          return res.status(401).json({
-            message: "Auth failed"
-          });
         });
+      } else {
+        bcrypt.compare(validPassword, user.password)
+          .then( result => {
+            user.update({ $set: { lastLoginAt: new Date } })
+              .exec()
+              .then( result => {
+                const token = jwt.sign(
+                  {
+                    phone: user.phone,
+                    userId: user._id,
+                    lastLoginAt: new Date
+                  },
+                  process.env.JWT_KEY,
+                  {
+                      expiresIn: "1y"
+                  }
+                );
+                console.log('Auth successful');
+                return res.status(201).json({
+                  message: "Auth successful",
+                  token: token
+                });
+              })
+              .catch( err => {
+                console.log('Auth failed');
+                return res.status(401).json({
+                  message: "Auth failed"
+                });
+              });
+          })
+          .catch( err => {
+            console.log('Auth failed');
+            return res.status(401).json({
+              message: "Auth failed"
+            });
+          });
       }
     })
     .catch( err => {
-      throwErr(res, err);
+      console.log('Auth failed');
+      return res.status(401).json({
+        message: "Auth failed"
+      });
     });
 };
-
-//Recommend
-//POST api.pointup.io/users/recommend
-function recommend(req, res, next) {
-  const phone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(phone)) {
-    console.log('Invalid phone!');
-    return res.status(422).json({
-      message: "Invalid phone!"
-    });
-  }
-  User.findOne({ phone: phone })
-    .exec()
-    .then( user => {
-      if (!user) {
-        Console.log("Recommendation sent!");
-        return res.status(422).json({
-          message: "Recommendation sent!"
-        });
-      } else {
-        console.log('Phone number already registered!');
-        return res.status(422).json({
-          message: "Phone number already registered!"
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-}
 
 //Update
 //PUT api.pointup.io/users/password
@@ -173,64 +283,38 @@ function updatePassword(req, res, next) {
       message: "Invalid password!"
     });
   }
-  const id = req.userData.userId;
-  bcrypt.hash(req.body.password, 10, (err, hash) => {
-    if (err) {
-      throwErr(res, err);
-    }
-    User.findOneAndUpdate({ _id: id }, { $set: { password: hash } })
-      .exec()
-      .then( user => {
-        console.log('Password changed!');
-        return res.status(201).json({
-          message: "Password changed!"
+  const validPassword = req.body.password;
+  const validUserId = req.userData.userId;
+  bcrypt.hash(validPassword, 10)
+    .then( hash => {
+      User.findOneAndUpdate({ _id: validUserId }, { $set: { password: hash, updatedAt: new Date } })
+        .exec()
+        .then( user => {
+          console.log('Password changed!');
+          return res.status(201).json({
+            message: "Password changed!"
+          });
+        })
+        .catch( err => {
+          throwErr(res, err);
         });
-      })
-      .catch( err => {
-        throwErr(res, err);
-      });
-  });
+    })
+    .catch( err => {
+      throwErr(res, err);
+    });
 };
 
 //Delete User
 //DELETE api.pointup.io/users/
 function deleteUser(req, res, next) {
-  const id = req.userData.userId;
-  User.findOne({ _id: id })
+  const validUserId = req.userData.userId;
+  User.findOneAndUpdate({ _id: validUserId }, { $set: { isActive: false, updatedAt: new Date } })
     .exec()
     .then( user => {
-      if (!user) {
-        console.log('User doesn\'t exist!');
-        return res.status(409).json({
-          message: "User doesn't exist!"
-        });
-      } else {
-        User.remove({ _id: id })
-          .exec()
-          .then(result => {
-            console.log('User deleted!');
-            /*Balance.find({ phone: req.userData.phone })
-              .exec()
-              .then( balance => {
-                if (!balance.length) {
-                  return res.status(201).json({
-                    message: "User deleted!"
-                  });
-                } else {
-                  next();
-                }
-              })
-              .catch( err => {
-                throwErr(res, err);
-              });*/
-            return res.status(201).json({
-              message: "User deleted!"
-            });
-          })
-          .catch(err => {
-            throwErr(res, err);
-          });
-      }
+      console.log('User deleted!');
+      return res.status(201).json({
+        message: "User deleted!"
+      });
     })
     .catch( err => {
       throwErr(res, err);
@@ -240,6 +324,7 @@ function deleteUser(req, res, next) {
 exports.getUser = getUser;
 exports.signUp = signUp;
 exports.logIn = logIn;
-exports.recommend = recommend
+exports.verify = verify;
+//exports.recommend = recommend
 exports.updatePassword = updatePassword;
 exports.deleteUser = deleteUser;

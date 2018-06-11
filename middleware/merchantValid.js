@@ -2,7 +2,7 @@ const Merchant = require('../models/merchants');
 const mongoose = require('mongoose');
 
 function merchantValid(req, res, next) {
-  var id;
+  var validMerchantId;
   if (!req.body.merchantId && !req.params.merchantId) {
     console.log('Invalid merchantId!');
     return res.status(422).json({
@@ -10,11 +10,11 @@ function merchantValid(req, res, next) {
     });
   }
   else if (req.params.merchantId) {
-    id = req.params.merchantId;
+    validMerchantId = req.params.merchantId;
   } else {
-    id = req.body.merchantId;
+    validMerchantId = req.body.merchantId;
   }
-  Merchant.findOne({ _id: id })
+  Merchant.findOne({ _id: validMerchantId, isActive: true })
     .exec()
     .then( merchant => {
       if (!merchant) {

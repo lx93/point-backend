@@ -61,6 +61,7 @@
 
 	The following actions can be performed with the User API
 	- Get User information
+	- Verify as a User
 	- Sign up as a User
 	- Log in as a User
 	- Modify User password
@@ -90,7 +91,34 @@
 			HTTP Status Code: 200
 			{
 				"phone": 19198229889,
-				"userId": "5afaffbf15833716e170fe8c"
+				"userId": "5afaffbf15833716e170fe8c",
+				"lastLoginAt": "2018-06-06T15:42:10.192Z"
+			}
+
+
+		<b>Verify as a User</b>
+		----------------
+		The following API enables you to verify a User Point account. A verification code will be sent to the listed phone number.
+
+		POST api.pointup.io/users/verify
+
+		<i>Arguments:</i>
+		---------
+		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"phone": 19198229889
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "User created!"
 			}
 
 
@@ -104,13 +132,15 @@
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+		- code: A valid 6-digit verification code sent to the listed phone. Ex. 123456. Codes will expire within 5 minutes of creation.
 
 			Request
 			-------
 			Content-Type: application/json
 			{
 				"phone": 19198229889,
-				"password": "verygoodpassword"
+				"password": "verygoodpassword",
+				"code": 123456
 			}
 
 
@@ -236,24 +266,33 @@
 			{
 				"balance": [
 					{
+						"isActive": true,
+            "createdAt": "2018-06-11T21:13:24.996Z",
+            "updatedAt": "2018-06-11T21:13:24.996Z",
 						"_id": "5afafff415833716e170fe92",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": 0,
+						"balance": "0.00",
 						"__v": 0
 					},
 					{
+						"isActive": true,
+            "createdAt": "2018-06-11T21:13:24.996Z",
+            "updatedAt": "2018-06-11T21:19:45.367Z",
 						"_id": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
-						"balance": 0,
+						"balance": 12.11,
 						"__v": 0
 					},
 					{
+						"isActive": true,
+            "createdAt": "2018-06-11T21:13:24.996Z",
+            "updatedAt": "2018-06-11T21:13:24.996Z",
 						"_id": "5afb02a415833716e170fe96",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe91",
-						"balance": 0,
+						"balance": 37.35,
 						"__v": 0
 					}
 				]
@@ -281,10 +320,12 @@
 			--------
 			HTTP Status Code: 200
 			{
-					"_id": "5afb04ef15833716e170fe9a",
-					"phone": 19198229889,
-					"merchantId": "5afaffc015833716e170fe8f",
-					"balance": 20
+				"balanceId": "5b1ee75c2be6f168d4caed41",
+				"phone": 19198229889,
+				"merchantId": "5afaffc015833716e170fe8f",
+				"balance": "12.11",
+    		"createdAt": "2018-06-11T21:13:24.996Z",
+    		"updatedAt": "2018-06-11T21:19:45.367Z"
 			}
 
 
@@ -312,13 +353,13 @@
 			HTTP Status Code: 201
 			{
 				"message": "Balance created!",
-				"balanceId": "5afb04ef15833716e170fe9a"
+				"balanceId": "5afafff415833716e170fe92"
 			}
 
 
 		<b>Delete all balances with this User</b> (AUTH REQ)
 		----------------------------------
-		The following API enables you to delete all balances involving this User.
+		The following API enables you to set the isActive value to false on all balances involving this User.
 
 		DELETE api.pointup.io/users/balances
 
