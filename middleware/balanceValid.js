@@ -2,7 +2,7 @@ const Balance = require('../models/balances');
 const mongoose = require('mongoose');
 
 function balanceValid(req, res, next) {
-  var id;
+  var validBalanceId;
   if (!req.body.balanceId && !req.params.balanceId) {
     console.log('Invalid balanceId!');
     return res.status(422).json({
@@ -10,11 +10,11 @@ function balanceValid(req, res, next) {
     });
   }
   else if (req.params.balanceId) {
-    id = req.params.balanceId;
+    validBalanceId = req.params.balanceId;
   } else {
-    id = req.body.balanceId;
+    validBalanceId = req.body.balanceId;
   }
-  Balance.findOne({ _id: id })
+  Balance.findOne({ _id: validBalanceId, isActive: true })
     .exec()
     .then( balance => {
       next();

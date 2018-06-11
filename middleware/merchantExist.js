@@ -2,8 +2,8 @@ const Merchant = require('../models/merchants');
 const mongoose = require('mongoose');
 
 function merchantExist(req, res, next) {
-  const id = req.merchantData.merchantId;
-  Merchant.findOne({ _id: id })
+  const validMerchantId = req.merchantData.merchantId;
+  Merchant.findOne({ _id: validMerchantId, isActive: true })
     .exec()
     .then( merchant => {
       if (!merchant) {

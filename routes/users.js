@@ -20,8 +20,11 @@ router.post('/signup', uController.signUp);
 //LogIn
 router.post('/login', uController.logIn);
 
+//Verify
+router.post('/verify', uController.verify);
+
 //Recommend
-router.post('/recommend', userAuth, userExist, uController.recommend);
+//router.post('/recommend', userAuth, userExist, uController.recommend);
 
 //Update
 router.put('/password', userAuth, userExist, uController.updatePassword);
