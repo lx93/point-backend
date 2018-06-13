@@ -11,10 +11,6 @@ var verificationSchema = new Schema({
   createdAt: { type: Date, expires: 300, default: new Date }
 });
 
-/* INDEXES (used to speed up queries)
- * db.users.createIndex({ isActive: -1, _id: 1 })
- */
-
 // the schema is useless so far
 // we need to create a model using it
 var Verification = mongoose.model('verifications', verificationSchema);

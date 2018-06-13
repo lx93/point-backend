@@ -377,40 +377,41 @@ function merchantUpdate(req, res, next) {
         return res.status(409).json({
           message: "Balance doesn't exist!"
         });
-      } else if (Math.abs(Number(validAmount)) > Number(balance.balance)) {
-        console.log('Invalid amount!');
-        return res.status(422).json({
-          message: "Invalid amount!"
-        });
-      } else {
-        var newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);
-        balance.update({ $set: { balance: newBalance, updatedAt: new Date } })
-          .exec()
-          .then( result => {
-            const newTransaction = new Transaction({
-              _id: new mongoose.Types.ObjectId,
-              balanceId: balance.balanceId,
-              phone: balance.phone,
-              merchantId: validMerchantId,
-              amount: validAmount,
-              timestamp: new Date
-            });
-            newTransaction
-              .save()
-              .then( result => {
-                console.log('Balance updated!');
-                return res.status(201).json({
-                  message: "Balance updated!"
-                });
-              })
-              .catch( err => {
-                throwErr(res, err);
-              });
-          })
-          .catch( err => {
-            throwErr(res, err);
+      } else if (Number(validAmount) < 0) {
+        if (Math.abs(Number(validAmount)) > Number(balance.balance)) {
+          console.log('Invalid amount!');
+          return res.status(422).json({
+            message: "Invalid amount!"
           });
+        }
       }
+      var newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);
+      balance.update({ $set: { balance: newBalance, updatedAt: new Date } })
+        .exec()
+        .then( result => {
+          const newTransaction = new Transaction({
+            _id: new mongoose.Types.ObjectId,
+            balanceId: balance._id,
+            phone: balance.phone,
+            merchantId: validMerchantId,
+            amount: validAmount,
+            timestamp: new Date
+          });
+          newTransaction
+            .save()
+            .then( result => {
+              console.log('Balance updated!');
+              return res.status(201).json({
+                message: "Balance updated!"
+              });
+            })
+            .catch( err => {
+              throwErr(res, err);
+            });
+        })
+        .catch( err => {
+          throwErr(res, err);
+        });
     })
     .catch( err => {
       throwErr(res, err);

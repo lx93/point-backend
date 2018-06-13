@@ -92,7 +92,7 @@
 			{
 				"phone": 19198229889,
 				"userId": "5afaffbf15833716e170fe8c",
-				"lastLoginAt": "2018-06-13T14:47:58.525Z"
+				"lastLoginAt": "2018-06-13T15:12:01.153Z"
 			}
 
 
@@ -267,8 +267,8 @@
 				"balance": [
 					{
 						"isActive": true,
-            "createdAt": "2018-06-11T21:13:24.996Z",
-            "updatedAt": "2018-06-11T21:13:24.996Z",
+            "createdAt": "2018-06-13T15:10:52.272Z",
+            "updatedAt": "2018-06-13T15:10:52.272Z",
 						"_id": "5afafff415833716e170fe92",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
@@ -277,22 +277,22 @@
 					},
 					{
 						"isActive": true,
-            "createdAt": "2018-06-11T21:13:24.996Z",
-            "updatedAt": "2018-06-11T21:19:45.367Z",
+            "createdAt": "2018-06-13T15:10:52.272Z",
+            "updatedAt": "2018-06-13T15:14:09.546Z",
 						"_id": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
-						"balance": 12.11,
+						"balance": "12.11",
 						"__v": 0
 					},
 					{
 						"isActive": true,
-            "createdAt": "2018-06-11T21:13:24.996Z",
-            "updatedAt": "2018-06-11T21:13:24.996Z",
+            "createdAt": "2018-06-13T15:14:05.629Z",
+            "updatedAt": "2018-06-13T15:14:05.629Z",
 						"_id": "5afb02a415833716e170fe96",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe91",
-						"balance": 37.35,
+						"balance": "37.35",
 						"__v": 0
 					}
 				]
@@ -320,18 +320,18 @@
 			--------
 			HTTP Status Code: 200
 			{
-				"balanceId": "5b1ee75c2be6f168d4caed41",
+				"balanceId": "5afafff415833716e170fe92",
 				"phone": 19198229889,
 				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": "12.11",
-    		"createdAt": "2018-06-11T21:13:24.996Z",
-    		"updatedAt": "2018-06-11T21:19:45.367Z"
+				"balance": "0.00",
+    		"createdAt": "2018-06-13T15:10:52.272Z",
+    		"updatedAt": "2018-06-13T15:10:52.272Z"
 			}
 
 
 		<b>Create a new balance with a Merchant</b> (AUTH REQ)
 		------------------------------------
-		The following API enables you to create a new balance of 0 with a specified Merchant.
+		The following API enables you to create a new balance of 0.00 with a specified Merchant.
 
 		POST api.pointup.io/users/balances
 
@@ -383,7 +383,7 @@
 
 		<b>Delete a specific balance with this User</b> (AUTH REQ)
 		----------------------------------------
-		The following API enables you to delete a specific balance involving this User.
+		The following API enables you to delete a specific balance involving this User. This balance must be empty with 0.00.
 
 		DELETE api.pointup.io/users/balances/:balanceId
 
@@ -438,29 +438,41 @@
 			{
 				"transaction": [
 					{
-						"timestamp": "2018-06-05T19:32:59.968Z",
-						"_id": "5b16e56b538a4d7c8ccee72d",
+						"timestamp": "2018-06-13T15:13:10.277Z",
+            "_id": "5b2134868f8e3f1722cd0bfb",
+						"balanceId": "5afafff415833716e170fe92",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"transaction": 20,
-						"__v": 0
+						"amount": "0.00",
+            "__v": 0
 					},
 					{
-						"timestamp": "2018-06-06T21:19:17.375Z",
-						"_id": "5b16f98131bfa41e36270500",
-						"phone": 19198229889,
-						"merchantId": "5afaffc015833716e170fe8f",
-						"transaction": -5,
-						"__v": 0
-					},
-					{
-						"timestamp": "2018-06-06T21:39:09.192Z",
-						"_id": "5b17f6ae4c1a005bed7a666f",
+						"timestamp": "2018-06-13T15:13:22.299Z",
+            "_id": "5b2134928f8e3f1722cd0bfe",
+						"balanceId": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
-						"transaction": 25,
+						"amount": "20.00",
 						"__v": 0
-					}
+					},
+					{
+						"timestamp": "2018-06-13T15:14:09.596Z",
+            "_id": "5b2134c1b6a97118343fdff0",
+						"balanceId": "5afb028615833716e170fe95",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe90",
+						"amount": "-7.89",
+						"__v": 0
+					},
+					{
+            "timestamp": "2018-06-13T15:14:27.464Z",
+            "_id": "5b2134d3b6a97118343fdff3",
+            "balanceId": "5afb028615833716e170fe96",
+            "phone": 19198229889,
+            "merchantId": "5afaffc015833716e170fe91",
+            "amount": "37.35",
+            "__v": 0
+        	}
 				]
 			}
 
@@ -501,11 +513,12 @@
 			Response
 			--------
 			HTTP Status Code: 200
-			{,
+			{
 				"name": "Merchant A",
-				"email": "merchant@a.mail",
-				"image": "uploads/Default.png",
+    		"email": "merchant@a.mail",
+    		"image": "uploads/Default.png",
 				"merchantId": "5afaffc015833716e170fe8f"
+    		"lastLoginAt": "2018-06-13T15:12:01.760Z"
 			}
 
 
@@ -520,6 +533,7 @@
 		- name: A valid string containing your name. Ex. Merchant A.
 		- email: A valid string containing your email. Ex. merchant@a.mail.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+		- code: A valid 6-digit verification code sent to the listed phone. Ex. 123456. Codes will expire within 5 minutes of creation.
 
 			Request
 			-------
@@ -527,7 +541,8 @@
 			{
 				"name": "Merchant A",
 				"email": "merchant@a.mail",
-				"password": "verygoodpassword"
+				"password": "verygoodpassword",
+				"code": 123456
 			}
 
 
@@ -663,7 +678,7 @@
 			--------
 			HTTP Status Code: 201
 			{
-				"message": "Merchant deleted!"
+				"message1": "Merchant deleted!"
 
 			}
 
@@ -705,25 +720,34 @@
 			{
 				"balance": [
 					{
+						"isActive": true,
+            "createdAt": "2018-06-13T15:10:52.272Z",
+            "updatedAt": "2018-06-13T15:30:35.654Z",
 						"_id": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": 20,
-						"__v": 0
+						"balance": "10.00",
+            "__v": 0
 					},
 					{
+						"isActive": true,
+            "createdAt": "2018-06-13T15:14:05.629Z",
+            "updatedAt": "2018-06-13T15:14:05.629Z",
 						"_id": "5afb04f115833716e170fe9b",
 						"phone": 19802160745,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": 25,
-						"__v": 0
+						"balance": "25.56",
+            "__v": 0
 					},
 					{
+						"isActive": true,
+            "createdAt": "2018-06-13T15:30:32.222Z",
+            "updatedAt": "2018-06-13T15:30:32.222Z",
 						"_id": "5afb04f715833716e170fe9c",
 						"phone": 16177635369,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": 30,
-						"__v": 0
+						"balance": "30.17",
+            "__v": 0
 					}
 				]
 			}
@@ -753,7 +777,9 @@
 					"_id": "5afb04ef15833716e170fe9a",
 					"phone": 19198229889,
 					"merchantId": "5afaffc015833716e170fe8f",
-					"balance": 20
+					"balance": "10.00",
+    			"createdAt": "2018-06-13T15:10:52.272Z",
+    			"updatedAt": "2018-06-13T15:30:35.654Z"
 			}
 
 
@@ -766,15 +792,15 @@
 		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- balance: A valid number containing the balance held between the Merchant and User.
+		- balance: A valid string containing the balance held between the Merchant and User. Ex. "30.17". Must be fixed to two decimals.
 
 			Request
 			-------
 			Authorization: Bearer AToken
 			Content-Type: application/json
 			{
-				"phone": 19198229889,
-				"balance": 20
+				"phone": 16177635369,
+				"balance": "30.17"
 			}
 
 
@@ -783,7 +809,7 @@
 			HTTP Status Code: 201
 			{
 				"message": "Balance created!",
-				"balanceId": "5afb04ef15833716e170fe9a"
+				"balanceId": "5afb04f715833716e170fe9c"
 			}
 
 
@@ -796,6 +822,7 @@
 		<i>Arguments:</i>
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+		- amount: A valid string containing the change in the balance held between the Merchant and User. Ex. "10.00". Must be fixed to two decimals.
 
 			Request
 			-------
@@ -803,7 +830,7 @@
 			Content-Type: application/json
 			{
 				"balanceId": "5afb04ef15833716e170fe9a",
-				"value": -5
+				"amount": "10.00"
 			}
 
 
@@ -835,13 +862,13 @@
 			--------
 			HTTP Status Code: 201
 			{
-				"message": "Balances deleted!"
+				"message2": "Balances deleted!"
 			}
 
 
 		<b>Delete a specific balance with this Merchant</b> (AUTH REQ)
 		--------------------------------------------
-		The following API enables you to delete a specific balance involving this Merchant.
+		The following API enables you to delete a specific balance involving this Merchant. This balance must be empty with 0.00.
 
 		DELETE api.pointup.io/merchants/balances/:balanceId
 
@@ -896,29 +923,41 @@
 			{
 				"transaction": [
 					{
-						"timestamp": "2018-06-05T19:32:59.968Z",
-						"_id": "5b16e56b538a4d7c8ccee72d",
+						"timestamp": "2018-06-13T15:13:10.277Z",
+            "_id": "5b2134868f8e3f1722cd0bfb",
+						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"transaction": 20,
-						"__v": 0
+						"amount": "0.00",
+            "__v": 0
 					},
 					{
-						"timestamp": "2018-06-06T21:19:17.375Z",
-						"_id": "5b16f98131bfa41e36270500",
+						"timestamp": "2018-06-13T15:23:49.156Z",
+            "_id": "5b213705b6a97118343fdffb",
+						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"transaction": -5,
-						"__v": 0
+						"amount": "25.56",
+            "__v": 0
 					},
 					{
-						"timestamp": "2018-06-06T21:40:14.192Z",
-						"_id": "5b17f6ae4c1a005bed7a666f",
-						"phone": 16177635369,
+						"timestamp": "2018-06-13T15:30:35.697Z",
+            "_id": "5b21389b2c57911a16790e44",
+						"balanceId": "5afb04ef15833716e170fe9b",
+						"phone": 19802160745,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"transaction": 30,
-						"__v": 0
-					}
+						"amount": "10.00",
+            "__v": 0
+					},
+					{
+            "timestamp": "2018-06-13T15:31:04.539Z",
+            "_id": "5b2138b82c57911a16790e47",
+            "balanceId": "5afb04f715833716e170fe9c",
+            "phone": 16177635369,
+            "merchantId": "5b2134388f8e3f1722cd0bea",
+            "amount": "30.17",
+            "__v": 0
+        }
 				]
 			}
 
