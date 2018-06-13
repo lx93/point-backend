@@ -14,14 +14,14 @@ const router = express.Router();
 //Get info
 router.get('/', userAuth, userExist, uController.getUser);
 
+//Verify
+router.post('/verify', uController.verify);
+
 //SignUp
 router.post('/signup', uController.signUp);
 
 //LogIn
 router.post('/login', uController.logIn);
-
-//Verify
-router.post('/verify', uController.verify);
 
 //Recommend
 //router.post('/recommend', userAuth, userExist, uController.recommend);

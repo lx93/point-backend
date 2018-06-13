@@ -338,7 +338,7 @@ function merchantCreate(req, res, next) {
             console.log('Balance created!');
             return res.status(201).json({
               message: "Balance created!",
-              balanceId: newBalance._id
+              balanceId: balance._id
             });
           })
           .catch( err => {

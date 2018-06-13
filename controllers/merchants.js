@@ -43,13 +43,14 @@ function getMerchant(req, res, next) {
 //Verify
 //POST api.pointup.io/merchants/verify
 function verify(req, res, next) {
+  const validEmail = req.body.email;
   Merchant.findOne({ email: validEmail })
     .exec()
     .then( merchant => {
       var x = RNG();
       var newVerification = new Verification({
         _id: new mongoose.Types.ObjectId,
-        phone: validPhone,
+        email: validEmail,
         code: x
       });
       newVerification
@@ -436,6 +437,7 @@ function deleteMerchant(req, res, next) {
 };
 
 exports.getMerchant = getMerchant;
+exports.verify = verify;
 exports.signUp = signUp;
 exports.logIn = logIn;
 exports.updateName = updateName;

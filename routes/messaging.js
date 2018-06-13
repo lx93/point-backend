@@ -5,7 +5,7 @@ const messenger = require('../utils/messenger');
 const router = express.Router();
 
 router.post('/', function (req, res, next) {
-  messenger.sendMessage(req.body.dst, req.body.text);
+  messenger.sendMessage(req, res, next);
 });
 
 module.exports = router;
