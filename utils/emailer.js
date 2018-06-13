@@ -26,3 +26,5 @@ function sendEmail(dst, text) {
   });
 
 }
+
+exports.sendEmail = sendEmail;

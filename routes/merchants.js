@@ -14,6 +14,9 @@ const router = express.Router();
 //Get info
 router.get('/', merchantAuth, merchantExist, mController.getMerchant);
 
+//Verify
+router.post('/verify', mController.verify);
+
 //SignUp
 router.post('/signup', mController.signUp);
 

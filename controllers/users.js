@@ -58,7 +58,7 @@ function verify(req, res, next) {
       newVerification
         .save()
         .then( result => {
-          messenger.sendMessage(validPhone, "Pointup Verification code: " + x);
+          messenger.sendText(validPhone, "Pointup Verification code: " + x);
           console.log('Code sent!');
           return res.status(201).json({
             message: "Code sent!"
@@ -322,9 +322,8 @@ function deleteUser(req, res, next) {
 };
 
 exports.getUser = getUser;
+exports.verify = verify;
 exports.signUp = signUp;
 exports.logIn = logIn;
-exports.verify = verify;
-//exports.recommend = recommend
 exports.updatePassword = updatePassword;
 exports.deleteUser = deleteUser;
