@@ -9,8 +9,8 @@ var balanceSchema = new Schema({
   merchantId: { type: mongoose.Schema.Types.ObjectId, required: true },
   balance: { type: String, required: true },
   isActive: { type: Boolean, default: true },
-  createdAt: { type: Date, default: new Date },
-  updatedAt: { type: Date, default: new Date }
+  createdAt: { type: Date, required: true },
+  updatedAt: { type: Date, required: true }
 });
 
 /* INDEXES (used to speed up queries)

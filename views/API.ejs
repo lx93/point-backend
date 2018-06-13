@@ -267,8 +267,8 @@
 				"balance": [
 					{
 						"isActive": true,
-            "createdAt": "2018-06-13T15:10:52.272Z",
-            "updatedAt": "2018-06-13T15:10:52.272Z",
+						"createdAt": "2018-06-13T15:10:52.272Z",
+						"updatedAt": "2018-06-13T15:10:52.272Z",
 						"_id": "5afafff415833716e170fe92",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
@@ -950,14 +950,14 @@
             "__v": 0
 					},
 					{
-            "timestamp": "2018-06-13T15:31:04.539Z",
-            "_id": "5b2138b82c57911a16790e47",
-            "balanceId": "5afb04f715833716e170fe9c",
-            "phone": 16177635369,
-            "merchantId": "5b2134388f8e3f1722cd0bea",
-            "amount": "30.17",
-            "__v": 0
-        }
+						"timestamp": "2018-06-13T15:31:04.539Z",
+						"_id": "5b2138b82c57911a16790e47",
+						"balanceId": "5afb04f715833716e170fe9c",
+						"phone": 16177635369,
+						"merchantId": "5b2134388f8e3f1722cd0bea",
+						"amount": "30.17",
+						"__v": 0
+					}
 				]
 			}
 
@@ -1013,51 +1013,51 @@
 
 		<b>Display QR code</b>
 		---------------
-			The following API enables you to view a generated QR code
+		The following API enables you to view a generated QR code
 
-			GET api.pointup.io/qr/:balanceId
+		GET api.pointup.io/qr/:balanceId
 
-			<i>Arguments:</i>
-			---------
-			- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+		<i>Arguments:</i>
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
 
-				Request
-				-------
-				{
-				}
-
-
-				Response
-				--------
-				HTTP Status Code: 304
-				{
-					<!DOCTYPE HTML>
-				}
+			Request
+			-------
+			{
+			}
 
 
-			<b>Create QR code</b>
-			--------------
-			The following API enables you to generate a QR code of a balanceId.
+			Response
+			--------
+			HTTP Status Code: 304
+			{
+				<!DOCTYPE HTML>
+			}
 
-			GET api.pointup.io/qr/r/:balanceId
 
-			<i>Arguments:</i>
-			---------
-			- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+		<b>Create QR code</b>
+		--------------
+		The following API enables you to generate a QR code of a balanceId.
 
-				Request
-				-------
-				{
-				}
+		GET api.pointup.io/qr/r/:balanceId
 
-				Response
-				--------
-				HTTP Status Code: 200
-				{
-					"qrcode": "data:image/png;base64,QRCODE",
-					"phone": 19198229889,
-					"balance": 20
-				}
+		<i>Arguments:</i>
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+
+			Request
+			-------
+			{
+			}
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"qrcode": "data:image/png;base64,QRCODE",
+				"phone": 19198229889,
+				"balance": 20
+			}
 
 
 	<b>Uploads</b>

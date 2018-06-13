@@ -7,8 +7,8 @@ var verificationSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
   phone: { type: Number },
   email: { type: String },
-  code: { type: Number, default: true },
-  createdAt: { type: Date, expires: 300, default: new Date }
+  code: { type: Number, required: true },
+  createdAt: { type: Date, expires: 300, required: true }
 });
 
 // the schema is useless so far

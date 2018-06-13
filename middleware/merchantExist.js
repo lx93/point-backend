@@ -1,26 +1,28 @@
 const Merchant = require('../models/merchants');
 const mongoose = require('mongoose');
 
-function merchantExist(req, res, next) {
-  const validMerchantId = req.merchantData.merchantId;
-  Merchant.findOne({ _id: validMerchantId, isActive: true })
-    .exec()
-    .then( merchant => {
-      if (!merchant) {
-        console.log('Auth failed');
-        return res.status(401).json({
-          message: "Auth failed"
-        });
-      } else {
-        next();
-      }
-    })
-    .catch( err => {
+async function merchantExist(req, res, next) {
+  try {
+    const validMerchantId = req.merchantData.merchantId;
+    //Find a real and active Merchant
+    let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+
+    //If no Merchant exists
+    if (!merchant) {
       console.log('Auth failed');
       return res.status(401).json({
         message: "Auth failed"
       });
+    //Else
+    } else {
+      next();
+    }
+  } catch (err) {
+    console.log('Auth failed');
+    return res.status(401).json({
+      message: "Auth failed"
     });
+  }
 };
 
 module.exports = merchantExist;
