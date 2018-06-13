@@ -85,7 +85,8 @@ function userCreate(req, res, next) {
               balanceId: newBalance._id,
               phone: validPhone,
               merchantId: validMerchantId,
-              amount: "0.00"
+              amount: "0.00",
+              timestamp: new Date
             });
             newTransaction
               .save()
@@ -311,7 +312,8 @@ function merchantCreate(req, res, next) {
               balanceId: newBalance._id,
               phone: validPhone,
               merchantId: validMerchantId,
-              amount: validBalance
+              amount: validBalance,
+              timestamp: new Date
             });
             newTransaction
               .save()
@@ -387,9 +389,11 @@ function merchantUpdate(req, res, next) {
           .then( result => {
             const newTransaction = new Transaction({
               _id: new mongoose.Types.ObjectId,
+              balanceId: balance.balanceId,
               phone: balance.phone,
               merchantId: validMerchantId,
-              amount: validAmount
+              amount: validAmount,
+              timestamp: new Date
             });
             newTransaction
               .save()
