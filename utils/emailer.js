@@ -5,8 +5,8 @@ function sendEmail(dst, text) {
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'pointup@gmail.com',
-      pass: 'admin'
+      user: 'xli@pointup.io',
+      pass: process.env.EMAIL_KEY
     }
   });
 
