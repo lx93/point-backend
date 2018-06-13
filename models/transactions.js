@@ -9,11 +9,11 @@ var transactionSchema = new Schema({
   phone: { type: Number, required: true },
   merchantId: { type: mongoose.Schema.Types.ObjectId, required: true },
   amount: { type: String, required: true },
-  timestamp: { type: Date, default: new Date }
+  timestamp: { type: Date, required: true }
 });
 
 /* INDEXES (used to speed up queries)
- * db.balances.createIndex({ timestamp: 1 })
+ * db.transactions.createIndex({ timestamp: 1 })
  */
 
 // the schema is useless so far

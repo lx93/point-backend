@@ -42,6 +42,9 @@ router.get('/balances/:balanceId', userAuth, userExist, balanceValid, bControlle
 //Create Balance
 router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);
 
+//Regift Balance
+router.put('/balances', userAuth, userExist, balanceValid, bController.userRegift);
+
 //Delete Balance
 router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteOne);
 

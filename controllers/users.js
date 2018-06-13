@@ -53,7 +53,8 @@ function verify(req, res, next) {
       var newVerification = new Verification({
         _id: new mongoose.Types.ObjectId,
         phone: validPhone,
-        code: x
+        code: x,
+        createdAt: new Date
       });
       newVerification
         .save()

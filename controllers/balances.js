@@ -11,545 +11,695 @@ const QRCode = require('qrcode');
 
 //userGetAll
 //GET api.pointup.io/users/balances
-function userGetAll(req, res, next) {
-  const validPhone = req.userData.phone;
-  Balance.find({ phone: validPhone })
-    .exec()
-    .then( balance => {
-      if (!balance.length) {
-        console.log('User has no balances!');
-        return res.status(409).json({
-          message: "User has no balances!"
-        });
-      } else {
-        console.log("\n"+balance+"\n");
-        return res.status(200).json({
-          balance
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Retrieve all balances involving this User. */
+async function userGetAll(req, res, next) {
+  try {
+    const validPhone = req.userData.phone;      //Phone number of the User
+    //Find the balances of this User
+    let balance = await Balance.find({ phone: validPhone }).exec();
+
+    //If no balances exist
+    if (!balance.length) {
+      console.log('User has no balances!');
+      return res.status(409).json({
+        message: "User has no balances!"
+      });
+    // Else balances must exist
+    } else {
+      console.log("\n"+balance+"\n");
+      return res.status(200).json({
+        balance
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //userGetOne
 //GET api.pointup.io/users/balances/:balanceId
-function userGetOne(req, res, next) {
-  const validBalanceId = req.params.balanceId;
-  Balance.findOne({ _id: validBalanceId, isActive: true })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        console.log(balance);
-        return res.status(200).json({
-          balanceId: balance._id,
-          phone: balance.phone,
-          merchantId: balance.merchantId,
-          balance: balance.balance,
-          createdAt: balance.createdAt,
-          updatedAt: balance.updatedAt
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Retrieve a specific balance involving this User. */
+async function userGetOne(req, res, next) {
+  try {
+    const validBalanceId = req.params.balanceId;      //Valid balanceId
+    //Find a real and active balance
+    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Balance doesn\'t exist!');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
+      });
+    //Else balance must exist
+    } else {
+      console.log(balance);
+      return res.status(200).json({
+        balanceId: balance._id,
+        phone: balance.phone,
+        merchantId: balance.merchantId,
+        balance: balance.balance,
+        createdAt: balance.createdAt,
+        updatedAt: balance.updatedAt
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //userCreate
 //POST api.pointup.io/users/balances/
-function userCreate(req, res, next) {
-  const validPhone = req.userData.phone;
-  const validMerchantId = req.body.merchantId;
-  Balance.findOne({ phone: validPhone, merchantId: validMerchantId })
-    .exec()
-    .then( balance => {
+/* Create a new balance of 0.00 with a specified Merchant. */
+async function userCreate(req, res, next) {
+  try {
+    const validPhone = req.userData.phone;      //Phone number of the User
+    const validMerchantId = req.body.merchantId;      //MerchantId of the Merchant
+    //Find a balance with this User and Merchant
+    let balance = await Balance.findOne({ phone: validPhone, merchantId: validMerchantId }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      //Create balance
+      const newBalance = new Balance({
+        _id: new mongoose.Types.ObjectId,
+        phone: validPhone,
+        merchantId: validMerchantId,
+        balance: "0.00",
+        isActive: true,
+        createdAt: new Date,
+        updatedAt: new Date
+      });
+      //Save balance
+      await newBalance.save();
+      //Create transaction
+      const newTransaction = new Transaction({
+        _id: new mongoose.Types.ObjectId,
+        balanceId: newBalance._id,
+        phone: validPhone,
+        merchantId: validMerchantId,
+        amount: "0.00",
+        timestamp: new Date
+      });
+      //Save transaction
+      await newTransaction.save();
+
+      console.log('Balance created!');
+      return res.status(201).json({
+        message: "Balance created!",
+        balanceId: newBalance._id
+      });
+    //If the balance exists but is not active
+    } else if (!balance.isActive) {
+      //Activate the balance
+      await balance.update({ $set: { isActive: true }}).exec();
+
+      console.log('Balance created!');
+      return res.status(201).json({
+        message: "Balance created!",
+        balanceId: balance._id
+      });
+    //Else
+    } else {
+      console.log('Balance exists!');
+      return res.status(409).json({
+        message: "Balance exists!",
+        balanceId: balance._id
+      });
+    }
+  } catch (err) {
+    throwErr(res, next);
+  }
+};
+
+//userRegift
+//PUT api.pointup.io/users/balances/
+/* Deduct a specified amount from a balance this User holds and give it to a specified phone number */
+async function userRegift(req, res, next) {
+  try {
+    const validNewPhone = String(req.body.newPhone).replace(/[^0-9]/g, "");     //Phone number of gift recipient
+    //If the new phone isn't valid
+    if (!validator.phone(validNewPhone)) {
+      console.log('Invalid phone!');
+      return res.status(422).json({
+        message: "Invalid phone!"
+      });
+    //If the amount isn't valid
+    } else if(!validator.number(req.body.amount) || (req.body.amount < 0) ) {
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
+      });
+    }
+    const validAmount = Number(req.body.amount).toFixed(2);     //Amount to be gifted (Taken from giver, given to receiver)
+    const validPhone = req.userData.phone;      //Phone number of the User (gift giver)
+    const validBalanceId = req.body.balanceId;      //BalanceId of the User's balance
+    //Find a real balance with the User
+    let balance = await Balance.findOne({ _id: validBalanceId, phone: validPhone}).exec();
+
+    //If no balance exists
+    if (!balance || !balance.isActive) {
+      console.log('Balance doesn\'t exist!');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
+      });
+    //If the gifted amount exceeds the User's balance
+    } else if (Number(validAmount) > Number(balance.balance)) {
+      console.log('Invalid amount!');
+      return res.status(422).json({
+        message: "Invalid amount!"
+      });
+    //Else
+    } else {
+      const validNewBalance = (Number(balance.balance) - Number(validAmount)).toFixed(2);     //User's new balance
+      const validMerchantId = balance.merchantId;     //MerchantId of the gifted balance
+      //Update User's balance
+      await balance.update({ $set: { balance: validNewBalance } }).exec();
+
+      const newValidAmount = "-" + (Number(validAmount)).toFixed(2)     //Gifted amount with "-" in front
+      //Create transaction
+      const newTransaction = new Transaction({
+        _id: new mongoose.Types.ObjectId,
+        balanceId: balance._id,
+        phone: validPhone,
+        merchantId: validMerchantId,
+        amount: newValidAmount,
+        timestamp: new Date
+      });
+      //Save transaction
+      await newTransaction.save();
+      //Check if recipient has a balance with the Merchant
+      let balance = await Balance.findOne({ _id: validBalanceId, phone: validNewPhone }).exec();
+
+      //If no balance exists
       if (!balance) {
+        //Create balance
         const newBalance = new Balance({
           _id: new mongoose.Types.ObjectId,
+          phone: validNewPhone,
+          merchantId: validMerchantId,
+          balance: validAmount,
+          isActive: true,
+          createdAt: new Date,
+          updatedAt: new Date
+        });
+        //Save balance
+        await newBalance.save();
+        //Create transaction
+        const newTransaction = new Transaction({
+          _id: new mongoose.Types.ObjectId,
+          balanceId: newBalance._id,
           phone: validPhone,
           merchantId: validMerchantId,
-          balance: "0.00"
+          amount: validAmount,
+          timestamp: new Date
         });
-        newBalance
-          .save()
-          .then( result => {
-            const newTransaction = new Transaction({
-              _id: new mongoose.Types.ObjectId,
-              balanceId: newBalance._id,
-              phone: validPhone,
-              merchantId: validMerchantId,
-              amount: "0.00",
-              timestamp: new Date
-            });
-            newTransaction
-              .save()
-              .then( result => {
-                console.log('Balance created!');
-                return res.status(201).json({
-                  message: "Balance created!",
-                  balanceId: newBalance._id
-                });
-              })
-              .catch( err => {
-                throwErr(err)
-              });
-          })
-          .catch( err => {
-            throwErr(err);
-          });
+        //Save transaction
+        await newTransaction.save();
+
+        /*TODO--notify user--*/
+        console.log('Balance exchanged!');
+        return res.status(201).json({
+          message: "Balance exchanged!"
+        });
+      //If the balance exists but is inactive (it must have a value of 0.00)
       } else if (!balance.isActive) {
-        balance.update({ $set: { isActive: true }})
-          .exec()
-          .then( result => {
-            console.log('Balance created!');
-            return res.status(201).json({
-              message: "Balance created!",
-              balanceId: balance._id
-            });
-          })
-          .catch( err => {
-            throwErr(res, err);
-          });
+        //Reactivate and initialize the balance
+        await balance.update({ $set: { balance: validAmount, isActive: true } }).exec();
+
+        //Create transaction
+        const newTransaction = new Transaction({
+          _id: new mongoose.Types.ObjectId,
+          balanceId: balance._id,
+          phone: validNewPhone,
+          merchantId: validMerchantId,
+          amount: validAmount,
+          timestamp: new Date
+        });
+        //Save transaction
+        await newTransaction.save()
+
+        /*TODO--notify user--*/
+        console.log('Balance exchanged!');
+        return res.status(201).json({
+          message: "Balance exchanged!"
+        });
+      //Else the balance must exist
       } else {
-        console.log('Balance exists!');
-        return res.status(409).json({
-          message: "Balance exists!",
-          balanceId: balance._id
+        const validNewBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);     //Gift recipient's new balance
+        //Add the gift to recipient's balance
+        await balance.update({ $set: { balance: validNewBalance } }).exec();
+
+        //Create transaction
+        const newTransaction = new Transaction({
+          _id: new mongoose.Types.ObjectId,
+          balanceId: balance._id,
+          phone: validPhone,
+          merchantId: validMerchantId,
+          amount: validAmount,
+          timestamp: new Date
+        });
+        //Save transaction
+        await newTransaction.save();
+
+        /*TODO--notify user--*/
+        console.log('Balance exchanged!');
+        return res.status(201).json({
+          message: "Balance exchanged!"
         });
       }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-};
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
+}
 
 //userDeleteAll DEBUG ONLY
 //DELETE api.pointup.io/users
-function userDeleteAll(req, res, next) {
-  const validPhone = req.userData.phone;
-  Balance.findOne({ phone: validPhone, isActive: true })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('User has no balances!');
-        return res.status(409).json({
-          message: "User has no balances!"
-        });
-      } else {
-          Balance.updateMany({ phone: validPhone }, { $set: { isActive: false } })
-            .exec()
-            .then ( result => {
-              console.log('Balances deleted!');
-              return res.status(201).json({
-                message: "Balances deleted!"
-              });
-            })
-            .catch( err => {
-              throwErr(res, err);
-            });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Set the isActive value to false on all balances involving this User.  */
+async function userDeleteAll(req, res, next) {
+  try {
+    const validPhone = req.userData.phone;      //Phone number of the User
+    //Find a real and active balance with this User
+    let balance = await Balance.findOne({ phone: validPhone, isActive: true }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('User has no balances!');
+      return res.status(409).json({
+        message: "User has no balances!"
+      });
+    //Else
+    } else {
+      //Set all balances with this User as inactive
+      await Balance.updateMany({ phone: validPhone }, { $set: { isActive: false } }).exec();
+
+      console.log('Balances deleted!');
+      return res.status(201).json({
+        message: "Balances deleted!"
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //userDeleteOne
 //DELETE api.pointup.io/users/balances/:balanceId
-function userDeleteOne(req, res, next) {
-  const validBalanceId = req.params.balanceId;
-  Balance.findOne({ _id: validBalanceId, isActive: true })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else if (balance.balance != 0.00) {
-        console.log('Cannot delete active balance!');
-        return res.status(409).json({
-          message: "Cannot delete active balance!"
-        });
-      } else {
-          balance.update({ $set: { isActive: false } })
-            .exec()
-            .then( result => {
-              console.log('Balance deleted!');
-              return res.status(201).json({
-                message: "Balance deleted!"
-              });
-            })
-            .catch( err => {
-              throwErr(res, err);
-            });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Delete a specific balance involving this User. This balance must be empty with 0.00. */
+async function userDeleteOne(req, res, next) {
+  try {
+    const validBalanceId = req.params.balanceId;      //Valid balanceId
+    //Find a real and active balance
+    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Balance doesn\'t exist!');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
+      });
+    //If the balance is not 0.00
+    } else if (balance.balance != 0.00) {
+      console.log('Cannot delete active balance!');
+      return res.status(409).json({
+        message: "Cannot delete active balance!"
+      });
+    //Else
+    } else {
+      //Set balance as inactive
+      await balance.update({ $set: { isActive: false } })
+
+      console.log('Balance deleted!');
+      return res.status(201).json({
+        message: "Balance deleted!"
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //userGetTransactions
 //GET api.pointup.io/users/transactions
-function userGetTransactions(req, res, next) {
-  const validPhone = req.userData.phone;
-  Transaction.find({ phone: validPhone })
-    .sort({ timestamp: 1 })
-    .exec()
-    .then( transaction => {
-      if (!transaction.length) {
-        console.log('User has no transactions!');
-        return res.status(409).json({
-          message: "User has no transactions!"
-        });
-      } else {
-        console.log("\n"+transaction+"\n");
-        return res.status(200).json({
-          transaction
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* View all transactions to the balances your User Point account holds. */
+async function userGetTransactions(req, res, next) {
+  try {
+    const validPhone = req.userData.phone;      //Phone number of the User
+    //Find transactions with this User
+    let transaction = await Transaction.find({ phone: validPhone }).sort({ timestampe: 1}).exec();
+
+    //If no transactions exist
+    if (!transaction.length) {
+      console.log('User has no transactions!');
+      return res.status(409).json({
+        message: "User has no transactions!"
+      });
+    //Else
+    } else {
+      console.log("\n"+transaction+"\n");
+      return res.status(200).json({
+        transaction
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 }
 
 //Merchants
 
 //merchantGetOne
 //GET api.pointup.io/merchants/balances
-function merchantGetAll(req, res, next) {
-  const validMerchantId = req.merchantData.merchantId;
-  Balance.find({ merchantId: validMerchantId })
-    .exec()
-    .then( balance => {
-      if (!balance.length) {
-        console.log('Merchant has no balances!');
-        return res.status(409).json({
-          message: "Merchant has no balances!"
-        });
-      } else {
-        console.log('\n'+balance+'\n');
-        return res.status(200).json({
-          balance
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Retrieve all balances involving this Merchant. */
+async function merchantGetAll(req, res, next) {
+  try {
+    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    //Find all balances with this Merchant
+    let balance = await Balance.find({ merchantId: validMerchantId }).exec();
+
+    //If no balances exists
+    if (!balance.length) {
+      console.log('Merchant has no balances!');
+      return res.status(409).json({
+        message: "Merchant has no balances!"
+      });
+    //Else
+    } else {
+      console.log('\n'+balance+'\n');
+      return res.status(200).json({
+        balance
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //merchantGetOne
 //GET api.pointup.io/merchants/balances/:balanceId
-function merchantGetOne(req, res, next) {
-  const validBalanceId = req.params.balanceId;
-  Balance.findOne({ _id: validBalanceId, isActive: true })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else {
-        console.log(balance);
-        return res.status(200).json({
-          balanceId: balance._id,
-          phone: balance.phone,
-          merchantId: balance.merchantId,
-          balance: balance.balance,
-          createdAt: balance.createdAt,
-          updatedAt: balance.updatedAt
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Retrieve a specific balance involving this Merchant. */
+async function merchantGetOne(req, res, next) {
+  try {
+    const validBalanceId = req.params.balanceId;      //Valid balanceId
+    //Find a real and active balance
+    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Balance doesn\'t exist!');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
+      });
+    //Else
+    } else {
+      console.log(balance);
+      return res.status(200).json({
+        balanceId: balance._id,
+        phone: balance.phone,
+        merchantId: balance.merchantId,
+        balance: balance.balance,
+        createdAt: balance.createdAt,
+        updatedAt: balance.updatedAt
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //merchantCreate
 //POST api.pointup.io/merchants/balances/
-function merchantCreate(req, res, next) {
-  const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(validPhone)) {
-    console.log('Invalid phone!');
-    return res.status(422).json({
-      message: "Invalid phone!"
-    });
-  } else if(!validator.number(req.body.balance) || (req.body.balance < 0) ) {
-    console.log('Invalid balance!');
-    return res.status(422).json({
-      message: "Invalid balance!"
-    });
+/* Create a new balance with a specified User. */
+async function merchantCreate(req, res, next) {
+  try {
+    const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+    if (!validator.phone(validPhone)) {
+      console.log('Invalid phone!');
+      return res.status(422).json({
+        message: "Invalid phone!"
+      });
+    } else if(!validator.number(req.body.balance) || (req.body.balance < 0) ) {
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
+      });
+    }
+    const validBalance = Number(req.body.balance).toFixed(2);     //Balance amount to be issued
+    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    //Find a balance with this User and Merchant
+    let balance = await Balance.findOne({ phone: validPhone, merchantId: validMerchantId }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      //Create balance
+      const newBalance = new Balance({
+        _id: new mongoose.Types.ObjectId,
+        phone: validPhone,
+        merchantId: validMerchantId,
+        balance: validBalance,
+        isActive: true,
+        createdAt: new Date,
+        updatedAt: new Date
+      });
+      //Save balance
+      await newBalance.save();
+      //Create transaction
+      const newTransaction = new Transaction({
+        _id: new mongoose.Types.ObjectId,
+        balanceId: newBalance._id,
+        phone: validPhone,
+        merchantId: validMerchantId,
+        amount: validBalance,
+        timestamp: new Date
+      });
+      //Save transaction
+      await newTransaction.save();
+
+      console.log('Balance created!');
+      return res.status(201).json({
+        message: "Balance created!",
+        balanceId: newBalance._id
+      });
+    //If the balance exists but is inactive
+    } else if (!balance.isActive) {
+      //Activate and set the balance
+      await balance.update({ $set: { balance: validBalance, isActive: true }}).exec();
+
+      console.log('Balance created!');
+      return res.status(201).json({
+        message: "Balance created!",
+        balanceId: balance._id
+      });
+    //Else
+    } else {
+      console.log('Balance exists!');
+      return res.status(409).json({
+        message: "Balance exists!",
+        balanceId: balance._id
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
   }
-  const validBalance = Number(req.body.balance).toFixed(2);
-  const validMerchantId = req.merchantData.merchantId;
-  Balance.findOne({ phone: validPhone, merchantId: validMerchantId })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        const newBalance = new Balance({
-          _id: new mongoose.Types.ObjectId,
-          phone: validPhone,
-          merchantId: validMerchantId,
-          balance: validBalance
-        });
-        newBalance
-          .save()
-          .then( result => {
-            const newTransaction = new Transaction({
-              _id: new mongoose.Types.ObjectId,
-              balanceId: newBalance._id,
-              phone: validPhone,
-              merchantId: validMerchantId,
-              amount: validBalance,
-              timestamp: new Date
-            });
-            newTransaction
-              .save()
-              .then( result => {
-                console.log('Balance created!');
-                return res.status(201).json({
-                  message: "Balance created!",
-                  balanceId: newBalance._id
-                });
-              })
-              .catch( err => {
-                throwErr(res, err);
-              });
-          })
-          .catch( err => {
-            throwErr(res, err);
-          });
-      } else if (!balance.isActive) {
-        balance.update({ $set: { balance: validBalance, isActive: true }})
-          .exec()
-          .then( result => {
-            console.log('Balance created!');
-            return res.status(201).json({
-              message: "Balance created!",
-              balanceId: balance._id
-            });
-          })
-          .catch( err => {
-            throwErr(res, err);
-          });
-      } else {
-        console.log('Balance exists!');
-        return res.status(409).json({
-          message: "Balance exists!",
-          balanceId: balance._id
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
 };
 
 //merchantUpdate
 //PUT api.pointup.io/merchants/balances/
-function merchantUpdate(req, res, next) {
-  if (!validator.number(req.body.amount)) {
-    console.log('Invalid amount!');
-    return res.status(422).json({
-      message: "Invalid amount!"
-    });
-  }
-  const validAmount = Number(req.body.amount).toFixed(2);
-  const validBalanceId = req.body.balanceId;
-  const validMerchantId = req.merchantData.merchantId;
-  Balance.findOne({ _id: validBalanceId, merchantId: validMerchantId })
-    .exec()
-    .then( balance => {
-      if (!balance || !balance.isActive) {
-        console.log('Balance doesn\'t! exist');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
+/* Update an existing balance. */
+async function merchantUpdate(req, res, next) {
+  try {
+    if (!validator.number(req.body.amount)) {
+      console.log('Invalid amount!');
+      return res.status(422).json({
+        message: "Invalid amount!"
+      });
+    }
+    const validAmount = Number(req.body.amount).toFixed(2);     //Amount of the change in balance
+    const validBalanceId = req.body.balanceId;      //Valid balanceId
+    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    //Find a real balance with the Merchant
+    let balance = await Balance.findOne({ _id: validBalanceId, merchantId: validMerchantId }).exec();
+
+    //If no balance exists or is inactive
+    if (!balance || !balance.isActive) {
+      console.log('Balance doesn\'t! exist');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
+      });
+    //If the amount to be deducted is greater than the balance
+    } else if (Number(validAmount) < 0) {
+      if (Math.abs(Number(validAmount)) > Number(balance.balance)) {
+        console.log('Insufficient balance!');
+        return res.status(422).json({
+          message: "Insufficient balance!"
         });
-      } else if (Number(validAmount) < 0) {
-        if (Math.abs(Number(validAmount)) > Number(balance.balance)) {
-          console.log('Invalid amount!');
-          return res.status(422).json({
-            message: "Invalid amount!"
-          });
-        }
       }
-      var newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);
-      balance.update({ $set: { balance: newBalance, updatedAt: new Date } })
-        .exec()
-        .then( result => {
-          const newTransaction = new Transaction({
-            _id: new mongoose.Types.ObjectId,
-            balanceId: balance._id,
-            phone: balance.phone,
-            merchantId: validMerchantId,
-            amount: validAmount,
-            timestamp: new Date
-          });
-          newTransaction
-            .save()
-            .then( result => {
-              console.log('Balance updated!');
-              return res.status(201).json({
-                message: "Balance updated!"
-              });
-            })
-            .catch( err => {
-              throwErr(res, err);
-            });
-        })
-        .catch( err => {
-          throwErr(res, err);
-        });
-    })
-    .catch( err => {
-      throwErr(res, err);
+    }
+    //Else
+    const newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);      //New balance
+    //Set the new balance
+    await balance.update({ $set: { balance: newBalance, updatedAt: new Date } }).exec();
+    //Create transaction
+    const newTransaction = new Transaction({
+      _id: new mongoose.Types.ObjectId,
+      balanceId: balance._id,
+      phone: balance.phone,
+      merchantId: validMerchantId,
+      amount: validAmount,
+      timestamp: new Date
     });
+    //Save transaction
+    await newTransaction.save();
+
+    console.log('Balance updated!');
+    return res.status(201).json({
+      message: "Balance updated!"
+    });
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //merchantDeleteAll
 //DELETE api.pointup.io/merchants/
-function merchantDeleteAll(req, res, next) {
-  const validMerchantId = req.merchantData.merchantId;
-  Balance.findOne({ merchantId: validMerchantId, isActive: true })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Merchant has no balances!');
-        return res.status(201).json({
-          message1: res.message1,
-          message2: "Merchant has no balances!"
-        });
-      } else {
-          Balance.updateMany({ merchantId: validMerchantId }, { $set: { isActive: false } })
-            .exec()
-            .then( result => {
-              /*TO-DO--notify all users associated that this merchant is no longer supported by our service.*/
-              console.log('Balances deleted!');
-              return res.status(201).json({
-                message1: res.message1,
-                message2: "Balances deleted!"
-              });
-            })
-            .catch( err => {
-              throwErr(res, err);
-            });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Delete all balances involving this Merchant. */
+async function merchantDeleteAll(req, res, next) {
+  try {
+    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    //Find a real and active balance with the Merchant
+    let balance = await Balance.findOne({ merchantId: validMerchantId, isActive: true }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Merchant has no balances!');
+      return res.status(201).json({
+        message1: res.message1,
+        message2: "Merchant has no balances!"
+      });
+    //Else
+    } else {
+      //Set all balances with this Merchant as inactive
+      await Balance.updateMany({ merchantId: validMerchantId }, { $set: { isActive: false } }).exec();
+
+      /*TO-DO--notify all users associated that this merchant is no longer supported by our service.*/
+      console.log('Balances deleted!');
+      return res.status(201).json({
+        message1: res.message1,
+        message2: "Balances deleted!"
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //merchantDeleteOne
 //DELETE api.pointup.io/merchants/balances/:balanceId
-function merchantDeleteOne(req, res, next) {
-  const validBalanceId = req.params.balanceId;
-  Balance.findOne({ _id: validBalanceId, isActive: true })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
-        });
-      } else if (balance.balance != 0.00) {
-        console.log('Cannot delete active balance!');
-        return res.status(409).json({
-          message: "Cannot delete active balance!"
-        });
-      } else {
-          balance.update({ $set: { isActive: false } })
-            .exec()
-            .then( result => {
-              console.log('Balance deleted!');
-              return res.status(201).json({
-                message: "Balance deleted!"
-              });
-            })
-            .catch( err => {
-              throwErr(res, err);
-            });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Delete a specific balance involving this Merchant. This balance must be empty with 0.00. */
+async function merchantDeleteOne(req, res, next) {
+  try {
+    const validBalanceId = req.params.balanceId;      //Valid balanceId
+    //Find a real and active balance
+    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Balance doesn\'t exist!');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
+      });
+    //If the balance is not 0.00
+    } else if (balance.balance != 0.00) {
+      console.log('Cannot delete active balance!');
+      return res.status(409).json({
+        message: "Cannot delete active balance!"
+      });
+    //Else
+    } else {
+      //Set balance as inactives
+      await balance.update({ $set: { isActive: false } }).exec();
+
+      console.log('Balance deleted!');
+      return res.status(201).json({
+        message: "Balance deleted!"
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //merchantGetTransactions
 //GET api.pointup.io/merchants/transactions
-function merchantGetTransactions(req, res, next) {
-  const validMerchantId = req.merchantData.merchantId;
-  Transaction.find({ merchantId: validMerchantId })
-    .sort({ timestamp: 1 })
-    .exec()
-    .then( transaction => {
-      if (!transaction.length) {
-        console.log('Merchant has no transactions!');
-        return res.status(409).json({
-          message: "Merchant has no transactions!"
-        });
-      } else {
-        console.log("\n"+transaction+"\n");
-        return res.status(200).json({
-          transaction
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
-}
+/* Retrieve all transactions involving this Merchant. */
+async function merchantGetTransactions(req, res, next) {
+  try {
+    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    //Find transactions with this Merchant
+    let transaction = await Transaction.find({ merchantId: validMerchantId }).sort({ timestamp: 1 }).exec();
 
+    //If no transactions exist
+    if (!transaction.length) {
+      console.log('Merchant has no transactions!');
+      return res.status(409).json({
+        message: "Merchant has no transactions!"
+      });
+    //Else
+    } else {
+      console.log("\n"+transaction+"\n");
+      return res.status(200).json({
+        transaction
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
+};
+
+//QR Code
 
 //getQRCode
 //GET api.pointup.io/qr/r/:balanceId
-function getQRCode(req, res, next) {
-  const validBalanceId = req.params.balanceId
-  Balance.findOne({ _id: validBalanceId, isActive: true })
-    .exec()
-    .then( balance => {
-      if (!balance) {
-        console.log('Balance doesn\'t exist!');
-        return res.status(409).json({
-          message: "Balance doesn't exist!"
+/* Generate a QR code of a balanceId. */
+async function getQRCode(req, res, next) {
+  try {
+    const validBalanceId = req.params.balanceId     //Valid balanceId
+    //Find a real and active balance
+    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Balance doesn\'t exist!');
+      return res.status(409).json({
+        message: "Balance doesn't exist!"
+      });
+    //Else
+    } else {
+      console.log('\n'+balance+'\n');
+      var text = {
+        balanceId: balance.id,
+      };
+      text = JSON.stringify(text);
+      //Return QR code
+      QRCode.toDataURL(text, (err, qrcode) => {
+        if (err) throw err;
+        return res.status(200).json({
+          "qrcode": qrcode,
+          "phone": balance.phone,
+          "balance": balance.balance
         });
-      } else {
-        console.log('\n'+balance+'\n');
-        var text = {
-          balanceId: balance.id,
-        };
-        text = JSON.stringify(text);
-        QRCode.toDataURL(text, (err, qrcode) => {
-          if (err) throw err;
-          return res.status(200).json({
-            "qrcode": qrcode,
-            "phone": balance.phone,
-            "balance": balance.balance
-          });
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 exports.userGetAll = userGetAll;
 exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
+exports.userRegift = userRegift;
 exports.userDeleteAll = userDeleteAll;
 exports.userDeleteOne = userDeleteOne;
 exports.userGetTransactions = userGetTransactions;

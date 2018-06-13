@@ -11,10 +11,10 @@ var merchantSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   image: { type: String, required: true },
-  isActive: { type: Boolean, default: true },
-  lastLoginAt: { type: Date, default: new Date },
-  createdAt: { type: Date, default: new Date },
-  updatedAt: { type: Date, default: new Date }
+  isActive: { type: Boolean, required: true },
+  lastLoginAt: { type: Date },
+  createdAt: { type: Date, required: true },
+  updatedAt: { type: Date, required: true }
 });
 
 /* INDEXES (used to speed up queries)
