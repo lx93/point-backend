@@ -522,6 +522,32 @@
 			}
 
 
+		<b>Verify as a Merchant</b>
+		--------------------
+		The following API enables you to verify a Merchant Point account. A verification code will be sent to the listed email.
+
+		POST api.pointup.io/users/verify
+
+		<i>Arguments:</i>
+		---------
+		- email: A valid string containing your email. Ex. merchant@a.mail.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"email": "merchant@a.mail"
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Code sent!"
+			}
+
+
 		<b>Sign up as a Merchant</b>
 		---------------------
 		The following API enables you to sign up and create a Merchant Point account.
