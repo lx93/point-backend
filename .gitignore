@@ -1,6 +1,7 @@
 node_modules
 .gitignore
 .elasticbeanstalk/
+nodemon.json
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
