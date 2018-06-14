@@ -24,7 +24,7 @@ mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-app.use(redirectToHTTPS([/localhost:(\d{4})/]));
+//app.use(redirectToHTTPS([/localhost:(\d{4})/]));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
