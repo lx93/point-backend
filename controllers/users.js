@@ -12,314 +12,290 @@ const messenger = require('../utils/messenger')
 
 //Get User info
 //GET api.pointup.io/users/
-function getUser(req, res, next) {
-  const validUserId = req.userData.userId;
-  User.findOne({ _id: validUserId })
-    .exec()
-    .then( user => {
-      if (!user || !user.isActive) {
-        console.log('User doesn\'t exist!');
-        return res.status(409).json({
-          message: "User doesn't exist!"
-        });
-      } else {
-        console.log('\n'+user+'\n');
-        return res.status(200).json({
-          phone: user.phone,
-          userId: user._id,
-          lastLoginAt: user.lastLoginAt
-        });
-      }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+/* Retrieve information about your User Point account. */
+async function getUser(req, res, next) {
+  try {
+    const validUserId = req.userData.userId;      //UserId of the User
+    //Find a real and active User
+    let user = await User.findOne({ _id: validUserId, isActive: true }).exec();
+
+    //If no User exists or is inactive
+    if (!user || !user.isActive) {
+      console.log('User doesn\'t exist!');
+      return res.status(409).json({
+        message: "User doesn't exist!"
+      });
+    //Else
+    } else {
+      console.log('\n'+user+'\n');
+      return res.status(200).json({
+        phone: user.phone,
+        userId: user._id,
+        lastLoginAt: user.lastLoginAt
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //Verify
 //POST api.pointup.io/users/verify
-function verify(req, res, next) {
-  const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(validPhone)) {
-    console.log('Invalid phone!');
-    return res.status(422).json({
-      message: "Invalid phone!"
-    });
-  }
-  User.findOne({ phone: validPhone })
-    .exec()
-    .then( user => {
-      var x = RNG();
-      var newVerification = new Verification({
-        _id: new mongoose.Types.ObjectId,
-        phone: validPhone,
-        code: x,
-        createdAt: new Date
+/* Verify a User Point account. A verification code will be sent to the listed phone number. */
+async function verify(req, res, next) {
+  try {
+    const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+    if (!validator.phone(validPhone)) {
+      console.log('Invalid phone!');
+      return res.status(422).json({
+        message: "Invalid phone!"
       });
-      newVerification
-        .save()
-        .then( result => {
-          messenger.sendText(validPhone, "Pointup Verification code: " + x);
-          console.log('Code sent!');
-          return res.status(201).json({
-            message: "Code sent!"
-          });
-        })
-        .catch( err => {
-          throwErr(res, err);
-        });
-    })
-    .catch( err => {
-      throwErr(res, err);
-    })
+    }
+    var x = RNG();      //Randomly generated code
+    //Create verification
+    var newVerification = new Verification({
+      _id: new mongoose.Types.ObjectId,
+      phone: validPhone,
+      code: x,
+      createdAt: new Date
+    });
+    //Save verification
+    await newVerification.save();
+    messenger.sendText(validPhone, "Pointup Verification code: " + x);
+
+    console.log('Code sent!');
+    return res.status(201).json({
+      message: "Code sent!"
+    });
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //Sign up
 //POST api.pointup.io/users/signup
-function signUp(req, res, next) {
-  const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(validPhone)) {
-    console.log('Invalid phone!');
-    return res.status(422).json({
-      message: "Invalid phone!"
-    });
-  } else if (!validator.string(req.body.password)) {
-    console.log('Invalid password!');
-    return res.status(422).json({
-      message: "Invalid password!"
-    });
-  }
-  const validPassword = req.body.password;
-  const validCode = req.body.code;
-  Verification.findOne({ phone: validPhone, code: validCode })
-    .exec()
-    .then( verification => {
-      if (!verification) {
-        /*console.log('Auth failed');
-        return res.status(401).json({
-          message: 'Auth failed'
-        });*/
-        User.findOne({ phone: validPhone })
+/* Sign up and create a User Point account. */
+async function signUp(req, res, next) {
+  try {
+    const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+    if (!validator.phone(validPhone)) {
+      console.log('Invalid phone!');
+      return res.status(422).json({
+        message: "Invalid phone!"
+      });
+    } else if (!validator.string(req.body.password)) {
+      console.log('Invalid password!');
+      return res.status(422).json({
+        message: "Invalid password!"
+      });
+    }
+    const validPassword = req.body.password;      //Password of the User
+    const validCode = req.body.code;      //Verification code
+    //Find a real verification with this User
+    let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
+
+    //If no verification exists
+    if (!verification) {
+      /*Uncomment for PRODUCTION*/
+      /*
+      console.log('Auth failed');
+      return res.status(401).json({
+        message: 'Auth failed'
+      });
+      */
+
+      /*Uncomment for DEVELOPMENT*/
+      /*Delete that----->*/
+      let user = await User.findOne({ phone: validPhone }).exec();
+      if (!user) {
+        let hash = await bcrypt.hash(validPassword, 10);
+        var newUser = new User({
+          _id: new mongoose.Types.ObjectId,
+          phone: validPhone,
+          password: hash,
+          isActive: true,
+          lastLoginAt: null,
+          createdAt: new Date,
+          updatedAt: new Date
+        });
+        await newUser.save();
+        console.log('User created!');
+        return res.status(201).json({
+          message: "User created!"
+        });
+      } else if (!user.isActive) {
+        user.update({ $set: { isActive: true } })
           .exec()
-          .then( user => {
-            if (!user) {
-              bcrypt.hash(validPassword, 10)
-                .then( hash => {
-                  var newUser = new User({
-                    _id: new mongoose.Types.ObjectId,
-                    phone: validPhone,
-                    password: hash,
-                    isActive: true,
-                    lastLoginAt: null,
-                    createdAt: new Date,
-                    updatedAt: new Date
-                  });
-                  newUser
-                    .save()
-                    .then( result => {
-                      console.log('User created!');
-                      return res.status(201).json({
-                        message: "User created!"
-                      });
-                    })
-                    .catch( err => {
-                      throwErr(res, err);
-                    });
-                })
-                .catch( err => {
-                  throwErr(res, err);
-                });
-            } else if (!user.isActive) {
-              user.update({ $set: { isActive: true } })
-                .exec()
-                .then( result => {
-                  console.log('User created!');
-                  return res.status(201).json({
-                    message: "User created!"
-                  });
-                })
-                .catch( err => {
-                  throwErr(res, err);
-                });
-            } else {
-              console.log('User exists!');
-              return res.status(409).json({
-                message: "User exists!"
-              });
-            }
-        })
+          .then( result => {
+            console.log('User created!');
+            return res.status(201).json({
+              message: "User created!"
+            });
+          })
+          .catch( err => {
+            throwErr(res, err);
+          });
       } else {
-        User.findOne({ phone: validPhone })
-          .exec()
-          .then( user => {
-            if (!user) {
-              bcrypt.hash(validPassword, 10)
-                .then( hash => {
-                  var newUser = new User({
-                    _id: new mongoose.Types.ObjectId,
-                    phone: validPhone,
-                    password: hash,
-                    isActive: true,
-                    lastLoginAt: null,
-                    createdAt: new Date,
-                    updatedAt: new Date
-                  });
-                  newUser
-                    .save()
-                    .then( result => {
-                      console.log('User created!');
-                      return res.status(201).json({
-                        message: "User created!"
-                      });
-                    })
-                    .catch( err => {
-                      throwErr(res, err);
-                    });
-                })
-                .catch( err => {
-                  throwErr(res, err);
-                });
-            } else if (!user.isActive) {
-              user.update({ $set: { isActive: true } })
-                .exec()
-                .then( result => {
-                  console.log('User created!');
-                  return res.status(201).json({
-                    message: "User created!"
-                  });
-                })
-                .catch( err => {
-                  throwErr(res, err);
-                });
-            } else {
-              console.log('User exists!');
-              return res.status(409).json({
-                message: "User exists!"
-              });
-            }
-        })
+        console.log('User exists!');
+        return res.status(409).json({
+          message: "User exists!"
+        });
       }
-    })
-    .catch( err => {
-      throwErr(res, err);
-    });
+      /*<----Delete that*/
+    //Else
+    } else {
+      //Find a real User
+      let user = await User.findOne({ phone: validPhone }).exec();
+
+      //If no User exists
+      if (!user) {
+        //Hash password
+        let hash = await bcrypt.hash(validPassword, 10);
+
+        //Create User
+        var newUser = new User({
+          _id: new mongoose.Types.ObjectId,
+          phone: validPhone,
+          password: hash,
+          isActive: true,
+          lastLoginAt: null,
+          createdAt: new Date,
+          updatedAt: new Date
+        });
+        //Save User
+        await newUser.save();
+
+        console.log('User created!');
+        return res.status(201).json({
+          message: "User created!"
+        });
+      //If the User exists but is inactive
+      } else if (!user.isActive) {
+        //Reactivate the User
+        await user.update({ $set: { isActive: true } }).exec();
+
+        console.log('User created!');
+        return res.status(201).json({
+          message: "User created!"
+        });
+      //Else
+      } else {
+        console.log('User exists!');
+        return res.status(409).json({
+          message: "User exists!"
+        });
+      }
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //Log in
 //POST api.pointup.io/users/login
-function logIn(req, res, next) {
-  const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");
-  if (!validator.phone(validPhone)) {
-    console.log('Invalid phone!');
-    return res.status(422).json({
-      message: "Invalid phone!"
-    });
-  } else if (!validator.string(req.body.password)) {
-    console.log('Invalid password!');
-    return res.status(422).json({
-      message: "Invalid password!"
-    });
-  }
-  const validPassword = req.body.password;
-  User.findOne({ phone: validPhone })
-    .exec()
-    .then( user => {
-      if (!user || !user.isActive) {
-        console.log('Auth failed');
-        return res.status(401).json({
-          message: 'Auth failed'
-        });
-      } else {
-        bcrypt.compare(validPassword, user.password)
-          .then( result => {
-            user.update({ $set: { lastLoginAt: new Date } })
-              .exec()
-              .then( result => {
-                const token = jwt.sign(
-                  {
-                    phone: user.phone,
-                    userId: user._id,
-                    lastLoginAt: new Date
-                  },
-                  process.env.JWT_KEY,
-                  {
-                      expiresIn: "1y"
-                  }
-                );
-                console.log('Auth successful');
-                return res.status(201).json({
-                  message: "Auth successful",
-                  token: token
-                });
-              })
-              .catch( err => {
-                console.log('Auth failed');
-                return res.status(401).json({
-                  message: "Auth failed"
-                });
-              });
-          })
-          .catch( err => {
-            console.log('Auth failed');
-            return res.status(401).json({
-              message: "Auth failed"
-            });
-          });
-      }
-    })
-    .catch( err => {
+/* Log into your User Point account. A token will be sent back in the response, enabling the User to store it for authorization. */
+async function logIn(req, res, next) {
+  try {
+    const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+    if (!validator.phone(validPhone)) {
+      console.log('Invalid phone!');
+      return res.status(422).json({
+        message: "Invalid phone!"
+      });
+    } else if (!validator.string(req.body.password)) {
+      console.log('Invalid password!');
+      return res.status(422).json({
+        message: "Invalid password!"
+      });
+    }
+    const validPassword = req.body.password;    //Password of the User
+    //Find a real User with that phone
+    let user = await User.findOne({ phone: validPhone }).exec();
+
+    //If no User exists or is inactive
+    if (!user || !user.isActive) {
       console.log('Auth failed');
       return res.status(401).json({
-        message: "Auth failed"
+        message: 'Auth failed'
       });
-    });
-};
+    //Else
+    } else {
+      //Check hashed password
+      await bcrypt.compare(validPassword, user.password);
+      //Log in User
+      await user.update({ $set: { lastLoginAt: new Date } }).exec();
+      //Create JWT Token
+      const token = jwt.sign(
+        {
+          phone: user.phone,
+          userId: user._id,
+          lastLoginAt: new Date
+        },
+        process.env.JWT_KEY,
+        {
+            expiresIn: "1y"
+        }
+      );
 
-//Update
-//PUT api.pointup.io/users/password
-function updatePassword(req, res, next) {
-  if (!validator.string(req.body.password)) {
-    console.log('Invalid password!');
-    return res.status(422).json({
-      message: "Invalid password!"
+      //Pass JWT Token
+      console.log('Auth successful');
+      return res.status(201).json({
+        message: "Auth successful",
+        token: token
+      });
+    }
+  } catch (err) {
+    console.log('Auth failed');
+    return res.status(401).json({
+      message: "Auth failed"
     });
   }
-  const validPassword = req.body.password;
-  const validUserId = req.userData.userId;
-  bcrypt.hash(validPassword, 10)
-    .then( hash => {
-      User.findOneAndUpdate({ _id: validUserId }, { $set: { password: hash, updatedAt: new Date } })
-        .exec()
-        .then( user => {
-          console.log('Password changed!');
-          return res.status(201).json({
-            message: "Password changed!"
-          });
-        })
-        .catch( err => {
-          throwErr(res, err);
-        });
-    })
-    .catch( err => {
-      throwErr(res, err);
+};
+
+//Update password
+//PUT api.pointup.io/users/password
+/* Change the password to your User Point account. */
+async function updatePassword(req, res, next) {
+  try {
+    if (!validator.string(req.body.password)) {
+      console.log('Invalid password!');
+      return res.status(422).json({
+        message: "Invalid password!"
+      });
+    }
+    const validPassword = req.body.password;      //New password of the User
+    const validUserId = req.userData.userId;      //UserId of the User
+    //Hash password
+    let hash = await bcrypt.hash(validPassword, 10);
+
+    //Find and update User password
+    let user = await User.findOneAndUpdate({ _id: validUserId }, { $set: { password: hash, updatedAt: new Date } }).exec();
+
+    console.log('Password changed!');
+    return res.status(201).json({
+      message: "Password changed!"
     });
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 //Delete User
 //DELETE api.pointup.io/users/
-function deleteUser(req, res, next) {
-  const validUserId = req.userData.userId;
-  User.findOneAndUpdate({ _id: validUserId }, { $set: { isActive: false, updatedAt: new Date } })
-    .exec()
-    .then( user => {
-      console.log('User deleted!');
-      return res.status(201).json({
-        message: "User deleted!"
-      });
-    })
-    .catch( err => {
-      throwErr(res, err);
+/* Completely delete the User from the Point database. */
+async function deleteUser(req, res, next) {
+  try {
+    const validUserId = req.userData.userId;      //UserId of the User
+    //Find and deactive a real and active User
+    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { isActive: false, updatedAt: new Date } }).exec();
+
+    console.log('User deleted!');
+    return res.status(201).json({
+      message: "User deleted!"
     });
+  } catch (err) {
+    throwErr(res, err);
+  }
 };
 
 exports.getUser = getUser;

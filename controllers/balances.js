@@ -15,8 +15,8 @@ const QRCode = require('qrcode');
 async function userGetAll(req, res, next) {
   try {
     const validPhone = req.userData.phone;      //Phone number of the User
-    //Find the balances of this User
-    let balance = await Balance.find({ phone: validPhone }).exec();
+    //Find real and active balances of this User
+    let balance = await Balance.find({ phone: validPhone, isActive: true }).exec();
 
     //If no balances exist
     if (!balance.length) {
@@ -26,9 +26,20 @@ async function userGetAll(req, res, next) {
       });
     // Else balances must exist
     } else {
-      console.log("\n"+balance+"\n");
+      var balances = [];
+      for (var i = 0; i < balance.length; i++) {
+        balances[i] = {
+          balanceId: balance[i]._id,
+          phone: balance[i].phone,
+          merchantId: balance[i].merchantId,
+          balance: balance[i].balance,
+          createdAt: balance[i].createdAt,
+          updatedAt: balance[i].updatedAt
+        }
+      }
+      console.log("\n"+balances+"\n");
       return res.status(200).json({
-        balance
+        balances
       });
     }
   } catch (err) {
@@ -45,6 +56,9 @@ async function userGetOne(req, res, next) {
     //Find a real and active balance
     let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
 
+    //Find a real and active Merchant
+    let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
+
     //If no balance exists
     if (!balance) {
       console.log('Balance doesn\'t exist!');
@@ -57,6 +71,8 @@ async function userGetOne(req, res, next) {
       return res.status(200).json({
         balanceId: balance._id,
         phone: balance.phone,
+        merchantName: merchant.name,
+        merchantImage: merchant.image,
         merchantId: balance.merchantId,
         balance: balance.balance,
         createdAt: balance.createdAt,
@@ -328,7 +344,7 @@ async function userDeleteOne(req, res, next) {
     //Else
     } else {
       //Set balance as inactive
-      await balance.update({ $set: { isActive: false } })
+      await balance.update({ $set: { isActive: false, updatedAt: new Date } })
 
       console.log('Balance deleted!');
       return res.status(201).json({
@@ -376,7 +392,7 @@ async function merchantGetAll(req, res, next) {
   try {
     const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
     //Find all balances with this Merchant
-    let balance = await Balance.find({ merchantId: validMerchantId }).exec();
+    let balance = await Balance.find({ merchantId: validMerchantId, isActive: true }).exec();
 
     //If no balances exists
     if (!balance.length) {
@@ -386,9 +402,20 @@ async function merchantGetAll(req, res, next) {
       });
     //Else
     } else {
-      console.log('\n'+balance+'\n');
+      var balances = [];
+      for (var i = 0; i < balance.length; i++) {
+        balances[i] = {
+          balanceId: balance[i]._id,
+          phone: balance[i].phone,
+          merchantId: balance[i].merchantId,
+          balance: balance[i].balance,
+          createdAt: balance[i].createdAt,
+          updatedAt: balance[i].updatedAt
+        }
+      }
+      console.log("\n"+balances+"\n");
       return res.status(200).json({
-        balance
+        balances
       });
     }
   } catch (err) {

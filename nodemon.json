@@ -1,9 +1,0 @@
-{
-  "env": {
-    "MONGO_ATLAS_PW": "admin2018",
-    "JWT_KEY": "secret",
-    "PLIVO_AUTH_ID": "MANJZIMMVJN2RHMZE1MJ",
-    "PLIVO_AUTH_TOKEN": "Basic TUFOSlpJTU1WSk4yUkhNWkUxTUo6Wldaa1ltSTRORFkyT1RFNE9EVTVOVFpsT0RabU16ZzBZbUUwWmpVeQ==",
-    "EMAIL_KEY": "pointupio123"
-  }
-}

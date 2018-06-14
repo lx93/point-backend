@@ -44,13 +44,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
-
 app.use('/', index);
 app.use('/users', users);
 app.use('/merchants', merchants);
 app.use('/messaging', messaging);
 app.use('/qr', qr);
-app.use('/uploads', express.static('uploads'));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
