@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
-const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
+//const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
 const routes = require('./routes');
 const index = require('./routes/index');
