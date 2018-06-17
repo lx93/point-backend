@@ -103,6 +103,7 @@
 		The following API enables you to retrieve information about your Merchant Point account.
 
 		GET api.pointup.io/users/merchants
+
 		<i>Arguments:</i> None
 		---------
 
@@ -142,6 +143,7 @@
 		The following API enables you to retrieve information about your Merchant Point account.
 
 		GET api.pointup.io/users/merchants/:merchantId
+
 		<i>Arguments:</i> None
 		---------
 
@@ -760,6 +762,7 @@
 		DELETE api.pointup.io/merchants/
 
 		<i>Arguments:</i> None
+		---------
 
 			Request
 			-------
@@ -1150,40 +1153,6 @@
 				"qrcode": "data:image/png;base64,QRCODE",
 				"phone": 19198229889,
 				"balance": 20
-			}
-
-
-	<b>Uploads</b>
-	-------
-	The Uploads API allows you to view an uploaded image.
-
-	The following actions can be performed with the Uploads API
-	- View an uploaded image
-
-	<i>BaseURI:</i> api.pointup.io/uploads
-
-
-		<b>View an uploaded image</b>
-		----------------------
-		The following API enables you view an uploaded image
-
-		GET api.pointup.io/uploads/:image
-
-		<i>Arguments:</i>
-		---------
-		image: A valid image name
-
-			Request
-			-------
-			{
-			}
-
-
-			Response
-			--------
-			HTTP Status Code: 200
-			{
-				image
 			}
 </pre>
 </body>
