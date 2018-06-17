@@ -32,16 +32,18 @@ async function userGetAll(req, res, next) {
       for (var i = 0; i < balance.length; i++) {
         ids[i] = balance[i].merchantId;
       }
-      //Find a real and active Merchant
+      //Find a real and active Merchants mentioned in the balances
       let merchant = await Merchant.find({ _id: { $in: ids }, isActive: true }).exec();
 
-      var balances = [];
+      var balances = [];      //Array of balances
       for (var i = 0; i < balance.length; i++) {
         for (var x = 0; x < merchant.length; x++) {
+          //If the Merchant's id is the same as the merchantId in the balance
           if (merchant[x]._id.equals(balance[i].merchantId)) {
             break;
           }
         }
+        //Save balance
         balances[i] = {
           balanceId: balance[i]._id,
           name: merchant[x].name,
@@ -52,9 +54,8 @@ async function userGetAll(req, res, next) {
           createdAt: balance[i].createdAt,
           updatedAt: balance[i].updatedAt
         };
-        var arr1 = merchant.splice(0,x);
-        var arr2 = merchant.splice(x+1);
-        merchant = arr1.concat(arr2);
+        //Remove that Merchant from the list of Merchants
+        merchant.splice(x,1);
       }
       console.log("\n"+JSON.stringify(balances)+"\n");
       return res.status(200).json({
