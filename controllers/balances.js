@@ -56,7 +56,7 @@ async function userGetAll(req, res, next) {
         //Remove that Merchant from the list of Merchants
         merchant.splice(x,1);
       }
-      console.log("\n"+JSON.stringify(balances)+"\n");
+      console.log("\n"+JSON.stringify(balances, ",", " ")+"\n");
       return res.status(200).json({
         balances
       });
@@ -181,9 +181,9 @@ async function userRegift(req, res, next) {
       });
     //If the amount isn't valid
     } else if(!validator.number(req.body.amount) || (req.body.amount < 0) ) {
-      console.log('Invalid balance!');
+      console.log('Invalid amount!');
       return res.status(422).json({
-        message: "Invalid balance!"
+        message: "Invalid amount!"
       });
     }
     const validAmount = Number(req.body.amount).toFixed(2);     //Amount to be gifted (Taken from giver, given to receiver)
@@ -194,9 +194,9 @@ async function userRegift(req, res, next) {
 
     //If no balance exists
     if (!balance || !balance.isActive) {
-      console.log('Balance doesn\'t exist!');
+      console.log('Invalid balance!');
       return res.status(409).json({
-        message: "Balance doesn't exist!"
+        message: "Invalid balance!"
       });
     //If the gifted amount exceeds the User's balance
     } else if (Number(validAmount) > Number(balance.balance)) {
@@ -209,7 +209,7 @@ async function userRegift(req, res, next) {
       const validNewBalance = (Number(balance.balance) - Number(validAmount)).toFixed(2);     //User's new balance
       const validMerchantId = balance.merchantId;     //MerchantId of the gifted balance
       //Update User's balance
-      await balance.update({ $set: { balance: validNewBalance } }).exec();
+      await balance.update({ $set: { balance: validNewBalance, updatedAt: new Date } }).exec();
 
       const newValidAmount = "-" + (Number(validAmount)).toFixed(2)     //Gifted amount with "-" in front
       //Create transaction
@@ -224,7 +224,7 @@ async function userRegift(req, res, next) {
       //Save transaction
       await newTransaction.save();
       //Check if recipient has a balance with the Merchant
-      let balance = await Balance.findOne({ _id: validBalanceId, phone: validNewPhone }).exec();
+      balance = await Balance.findOne({ phone: validNewPhone, merchantId: validMerchantId }).exec();
 
       //If no balance exists
       if (!balance) {
@@ -260,7 +260,7 @@ async function userRegift(req, res, next) {
       //If the balance exists but is inactive (it must have a value of 0.00)
       } else if (!balance.isActive) {
         //Reactivate and initialize the balance
-        await balance.update({ $set: { balance: validAmount, isActive: true } }).exec();
+        await balance.update({ $set: { balance: validAmount, isActive: true, updatedAt: new Date } }).exec();
 
         //Create transaction
         const newTransaction = new Transaction({
@@ -283,7 +283,7 @@ async function userRegift(req, res, next) {
       } else {
         const validNewBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);     //Gift recipient's new balance
         //Add the gift to recipient's balance
-        await balance.update({ $set: { balance: validNewBalance } }).exec();
+        await balance.update({ $set: { balance: validNewBalance, updatedAt: new Date } }).exec();
 
         //Create transaction
         const newTransaction = new Transaction({
@@ -432,7 +432,7 @@ async function merchantGetAll(req, res, next) {
           updatedAt: balance[i].updatedAt
         }
       }
-      console.log("\n"+JSON.stringify(balances)+"\n");
+      console.log("\n"+JSON.stringify(balances, ",", " ")+"\n");
       return res.status(200).json({
         balances
       });

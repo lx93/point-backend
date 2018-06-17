@@ -69,7 +69,7 @@ async function getMerchantAll(req, res, next) {
         image: merchant[i].image
       }
     }
-    console.log('\n'+JSON.stringify(merchants)+'\n');
+    console.log('\n'+JSON.stringify(merchants, ",", " ")+'\n');
     return res.status(200).json({
       merchants
     });
