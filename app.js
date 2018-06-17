@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
-//const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
+const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
 const routes = require('./routes');
 const index = require('./routes/index');
@@ -23,8 +23,7 @@ mongoose.connect(mongoDB);
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
-//app.use(redirectToHTTPS([/localhost:(\d{4})/]));
+app.use(redirectToHTTPS([/localhost:(\d{4})/]));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
