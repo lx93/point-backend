@@ -19,7 +19,6 @@ async function userGetAll(req, res, next) {
     //Find real and active balances of this User
     let balance = await Balance.find({ phone: validPhone, isActive: true }).exec();
 
-
     //If no balances exist
     if (!balance.length) {
       console.log('User has no balances!');
@@ -28,11 +27,11 @@ async function userGetAll(req, res, next) {
       });
     // Else balances must exist
     } else {
-      var ids = [];
+      var ids = [];     //Array of merchantIds mentioned in the balances
       for (var i = 0; i < balance.length; i++) {
         ids[i] = balance[i].merchantId;
       }
-      //Find a real and active Merchants mentioned in the balances
+      //Find real and active Merchants mentioned in the balances
       let merchant = await Merchant.find({ _id: { $in: ids }, isActive: true }).exec();
 
       var balances = [];      //Array of balances
