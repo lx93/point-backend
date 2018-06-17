@@ -1,4 +1,5 @@
 const Balance = require('../models/balances');
+const Merchant = require('../models/merchants');
 const Transaction = require('../models/transactions');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -18,6 +19,7 @@ async function userGetAll(req, res, next) {
     //Find real and active balances of this User
     let balance = await Balance.find({ phone: validPhone, isActive: true }).exec();
 
+
     //If no balances exist
     if (!balance.length) {
       console.log('User has no balances!');
@@ -26,18 +28,35 @@ async function userGetAll(req, res, next) {
       });
     // Else balances must exist
     } else {
+      var ids = [];
+      for (var i = 0; i < balance.length; i++) {
+        ids[i] = balance[i].merchantId;
+      }
+      //Find a real and active Merchant
+      let merchant = await Merchant.find({ _id: { $in: ids }, isActive: true }).exec();
+
       var balances = [];
       for (var i = 0; i < balance.length; i++) {
+        for (var x = 0; x < merchant.length; x++) {
+          if (merchant[x]._id.equals(balance[i].merchantId)) {
+            break;
+          }
+        }
         balances[i] = {
           balanceId: balance[i]._id,
+          name: merchant[x].name,
+          image: merchant[x].image,
           phone: balance[i].phone,
           merchantId: balance[i].merchantId,
           balance: balance[i].balance,
           createdAt: balance[i].createdAt,
           updatedAt: balance[i].updatedAt
-        }
+        };
+        var arr1 = merchant.splice(0,x);
+        var arr2 = merchant.splice(x+1);
+        merchant = arr1.concat(arr2);
       }
-      console.log("\n"+balances+"\n");
+      console.log("\n"+JSON.stringify(balances)+"\n");
       return res.status(200).json({
         balances
       });
@@ -70,9 +89,9 @@ async function userGetOne(req, res, next) {
       console.log(balance);
       return res.status(200).json({
         balanceId: balance._id,
+        name: merchant.name,
+        image: merchant.image,
         phone: balance.phone,
-        merchantName: merchant.name,
-        merchantImage: merchant.image,
         merchantId: balance.merchantId,
         balance: balance.balance,
         createdAt: balance.createdAt,
@@ -413,7 +432,7 @@ async function merchantGetAll(req, res, next) {
           updatedAt: balance[i].updatedAt
         }
       }
-      console.log("\n"+balances+"\n");
+      console.log("\n"+JSON.stringify(balances)+"\n");
       return res.status(200).json({
         balances
       });
