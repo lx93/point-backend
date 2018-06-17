@@ -14,12 +14,6 @@ const router = express.Router();
 //Get info
 router.get('/', merchantAuth, merchantExist, mController.getMerchant);
 
-//Get one Merchant
-router.get('/:merchantId', mController.getMerchantOne);
-
-//Get all Merchants
-router.get('/list', mController.getMerchantAll);
-
 //Verify
 router.post('/verify', mController.verify);
 

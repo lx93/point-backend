@@ -1,5 +1,6 @@
 const express = require('express');
 const uController = require('../controllers/users');
+const mController = require('../controllers/merchants');
 const bController = require('../controllers/balances');
 const userAuth = require('../middleware/userAuth');
 const userExist = require('../middleware/userExist');
@@ -13,6 +14,12 @@ const router = express.Router();
 
 //Get info
 router.get('/', userAuth, userExist, uController.getUser);
+
+//Get all Merchants
+router.get('/merchants', userAuth, userExist, mController.getMerchantAll);
+
+//Get one Merchant
+router.get('/merchants/:merchantId', userAuth, userExist, merchantValid, mController.getMerchantOne);
 
 //Verify
 router.post('/verify', uController.verify);

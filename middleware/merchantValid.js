@@ -18,6 +18,7 @@ async function merchantValid(req, res, next) {
     } else {
       validMerchantId = req.body.merchantId;
     }
+    console.log(validMerchantId);
     //Find a real and active Merchant
     let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
 
