@@ -46,30 +46,8 @@ async function getMerchant(req, res, next) {
   }
 };
 
-//Get Specific Merchant
-//GET api.pointup.io/merchants/:merchantId
-/* Retreive information about a specific Merchant */
-async function getMerchantOne(req, res, next) {
-  const validMerchantId = req.params.merchantId;
-  let merchant = await Merchant.findOne({ _id: merchantId, isActive: true }).exec();
-
-  if (!merchant) {
-    console.log('Merchant doesn\'t exist!');
-    return res.status(409).json({
-      message: "Merchant doesn't exist!"
-    });
-  } else {
-    console.log(merchant);
-    return res.status(200).json({
-      merchantId: merchant._id,
-      name: merchant.name,
-      image: merchant.image
-    });
-  }
-}
-
 //Get All Merchants
-//GET api.pointup.io/merchants/list
+//GET api.pointup.io/users/merchants
 /* Retrieve a list of all Merchants */
 async function getMerchantAll(req, res, next) {
   //Find all Merchants
@@ -87,8 +65,8 @@ async function getMerchantAll(req, res, next) {
     for (var i = 0; i < merchant.length; i++) {
       merchants[i] = {
         merchantId: merchant[i]._id,
-        merchantName: merchant[i].name,
-        merchantImage: merchant[i].image
+        name: merchant[i].name,
+        image: merchant[i].image
       }
     }
     console.log('\n'+merchants+'\n');
@@ -96,7 +74,30 @@ async function getMerchantAll(req, res, next) {
       merchants
     });
   }
-}
+};
+
+//Get Specific Merchant
+//GET api.pointup.io/users/merchants/:merchantId
+/* Retreive information about a specific Merchant */
+async function getMerchantOne(req, res, next) {
+  const validMerchantId = req.params.merchantId;
+  let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+
+  if (!merchant) {
+    console.log('Merchant doesn\'t exist!');
+    return res.status(409).json({
+      message: "Merchant doesn't exist!"
+    });
+  } else {
+    console.log(merchant);
+    return res.status(200).json({
+      merchantId: merchant._id,
+      name: merchant.name,
+      image: merchant.image,
+      createdAt: merchant.createdAt
+    });
+  }
+};
 
 //Verify
 //POST api.pointup.io/merchants/verify
@@ -179,7 +180,7 @@ async function signUp(req, res, next) {
           name: validName,
           email: validEmail,
           password: hash,
-          image: "uploads/Default.png",
+          image: "Default.png",
           isActive: true,
           lastLoginAt: null,
           createdAt: new Date,

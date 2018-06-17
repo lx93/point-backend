@@ -61,6 +61,8 @@
 
 	The following actions can be performed with the User API
 	- Get User information
+	- Get all Merchants
+	- Get a specific Merchant
 	- Verify as a User
 	- Sign up as a User
 	- Log in as a User
@@ -93,6 +95,71 @@
 				"phone": 19198229889,
 				"userId": "5afaffbf15833716e170fe8c",
 				"lastLoginAt": "2018-06-13T15:12:01.153Z"
+			}
+
+
+		<b>Get all Merchants</b> (AUTH REQ)
+		-----------------
+		The following API enables you to retrieve information about your Merchant Point account.
+
+		GET api.pointup.io/users/merchants
+		<i>Arguments:</i> None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"merchants": [
+					{
+						"merchantId": "5afaffc015833716e170fe8f",
+						"name": "Merchant A",
+						"image": "Default.png"
+					},
+					{
+						"merchantId": "5afaffc015833716e170fe90",
+						"name": "Merchant B",
+						"image": "Default.png"
+					},
+					{
+						"merchantId": "5afaffc015833716e170fe91",
+						"name": "Merchant C",
+						"image": "Default.png"
+					}
+				]
+			}
+
+
+		<b>Get a specific Merchant</b> (AUTH REQ)
+		-----------------------
+		The following API enables you to retrieve information about your Merchant Point account.
+
+		GET api.pointup.io/users/merchants/:merchantId
+		<i>Arguments:</i> None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"merchantId": "5afaffc015833716e170fe8f",
+				"name": "Merchant A",
+				"image": "Default.png",
+				"lastLoginAt": "2018-06-13T15:11:40.760Z"
 			}
 
 
