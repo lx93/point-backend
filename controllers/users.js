@@ -124,17 +124,12 @@ async function signUp(req, res, next) {
           message: "User created!"
         });
       } else if (!user.isActive) {
-        user.update({ $set: { isActive: true } })
-          .exec()
-          .then( result => {
-            console.log('User created!');
-            return res.status(201).json({
-              message: "User created!"
-            });
-          })
-          .catch( err => {
-            throwErr(res, err);
-          });
+        await user.update({ $set: { isActive: true } }).exec();
+
+        console.log('User created!');
+        return res.status(201).json({
+          message: "User created!"
+        });
       } else {
         console.log('User exists!');
         return res.status(409).json({
