@@ -40,7 +40,6 @@
 
 	200 - OK, The request has succeeded. Resource has not been modified.
 	201 - Created, The request has succeeded. Resource has been modified.
-	304 - Not Modified, The request has succeeded. A conditional GET or HEAD request has been received and would have resulted in a 200 OK response if it were not for the fact that the condition evaluated to false.
 	401 - Unauthorized, The request requires authentication. The Authentication header field must contain a valid Bearer token in order to be authenticated.
 	409 - Conflict, The request could not be completed due to a conflict with the current state of the target resource.
 	413 - Entity too large, The server is refusing to process a request because the request payload is larger than the server is willing or able to process.
@@ -345,22 +344,22 @@
 						"updatedAt": "2018-06-13T15:10:52.272Z",
 					},
 					{
-						"_id": "5afb028615833716e170fe95",
+						"balanceId": "5afb028615833716e170fe95",
 						"name": "Merchant B",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
 						"balance": "12.11",
 						"createdAt": "2018-06-13T15:14:05.629Z",
-            "updatedAt": "2018-06-13T15:14:05.629Z"
+						"updatedAt": "2018-06-13T15:14:05.629Z"
 					},
 					{
-            "_id": "5afb02a415833716e170fe96",
+						"balanceId": "5afb02a415833716e170fe96",
 						"name": "Merchant C",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe91",
 						"balance": "37.35",
 						"createdAt": "2018-06-13T15:14:05.629Z",
-            "updatedAt": "2018-06-13T15:14:05.629Z"
+						"updatedAt": "2018-06-13T15:14:05.629Z"
 					}
 				]
 			}
@@ -393,8 +392,8 @@
 				"phone": 19198229889,
 				"merchantId": "5afaffc015833716e170fe8f",
 				"balance": "0.00",
-    		"createdAt": "2018-06-13T15:10:52.272Z",
-    		"updatedAt": "2018-06-13T15:10:52.272Z"
+				"createdAt": "2018-06-13T15:10:52.272Z",
+				"updatedAt": "2018-06-13T15:10:52.272Z"
 			}
 
 
@@ -505,43 +504,39 @@
 			--------
 			HTTP Status Code: 200
 			{
-				"transaction": [
+				"transactions": [
 					{
-						"timestamp": "2018-06-13T15:13:10.277Z",
-            "_id": "5b2134868f8e3f1722cd0bfb",
+						"transactionId": "5b2134868f8e3f1722cd0bfb",
 						"balanceId": "5afafff415833716e170fe92",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"amount": "0.00",
-            "__v": 0
+						"timestamp": "2018-06-13T15:13:10.277Z"
 					},
 					{
-						"timestamp": "2018-06-13T15:13:22.299Z",
-            "_id": "5b2134928f8e3f1722cd0bfe",
+						"transactionId": "5b2134928f8e3f1722cd0bfe",
 						"balanceId": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
 						"amount": "20.00",
-						"__v": 0
+						"timestamp": "2018-06-13T15:13:22.299Z"
 					},
 					{
-						"timestamp": "2018-06-13T15:14:09.596Z",
-            "_id": "5b2134c1b6a97118343fdff0",
+						"transactionId": "5b2134c1b6a97118343fdff0",
 						"balanceId": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
 						"amount": "-7.89",
-						"__v": 0
+						"timestamp": "2018-06-13T15:14:09.596Z"
 					},
 					{
-            "timestamp": "2018-06-13T15:14:27.464Z",
-            "_id": "5b2134d3b6a97118343fdff3",
-            "balanceId": "5afb028615833716e170fe96",
-            "phone": 19198229889,
-            "merchantId": "5afaffc015833716e170fe91",
-            "amount": "37.35",
-            "__v": 0
-        	}
+						"transactionId": "5b2134d3b6a97118343fdff3",
+						"balanceId": "5afb028615833716e170fe96",
+						"phone": 19198229889,
+						"merchantId": "5afaffc015833716e170fe91",
+						"amount": "37.35",
+						"timestamp": "2018-06-13T15:14:27.464Z"
+					}
 				]
 			}
 
@@ -816,34 +811,28 @@
 			{
 				"balance": [
 					{
-						"isActive": true,
-            "createdAt": "2018-06-13T15:10:52.272Z",
-            "updatedAt": "2018-06-13T15:30:35.654Z",
-						"_id": "5afb04ef15833716e170fe9a",
+						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"balance": "10.00",
-            "__v": 0
+						"createdAt": "2018-06-13T15:10:52.272Z",
+						"updatedAt": "2018-06-13T15:30:35.654Z"
 					},
 					{
-						"isActive": true,
-            "createdAt": "2018-06-13T15:14:05.629Z",
-            "updatedAt": "2018-06-13T15:14:05.629Z",
-						"_id": "5afb04f115833716e170fe9b",
+						"balanceId": "5afb04f115833716e170fe9b",
 						"phone": 19802160745,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"balance": "25.56",
-            "__v": 0
+						"createdAt": "2018-06-13T15:14:05.629Z",
+						"updatedAt": "2018-06-13T15:14:05.629Z"
 					},
 					{
-						"isActive": true,
-            "createdAt": "2018-06-13T15:30:32.222Z",
-            "updatedAt": "2018-06-13T15:30:32.222Z",
-						"_id": "5afb04f715833716e170fe9c",
+						"balanceId": "5afb04f715833716e170fe9c",
 						"phone": 16177635369,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"balance": "30.17",
-            "__v": 0
+						"createdAt": "2018-06-13T15:30:32.222Z",
+						"updatedAt": "2018-06-13T15:30:32.222Z"
 					}
 				]
 			}
@@ -870,12 +859,14 @@
 			--------
 			HTTP Status Code: 200
 			{
-					"_id": "5afb04ef15833716e170fe9a",
-					"phone": 19198229889,
-					"merchantId": "5afaffc015833716e170fe8f",
-					"balance": "10.00",
-    			"createdAt": "2018-06-13T15:10:52.272Z",
-    			"updatedAt": "2018-06-13T15:30:35.654Z"
+				"balanceId": "5afb04ef15833716e170fe9a",
+				"name": "Merchant A",
+				"image": "Default.png",
+				"phone": 19198229889,
+				"merchantId": "5afaffc015833716e170fe8f",
+				"balance": "10.00",
+				"createdAt": "2018-06-13T15:10:52.272Z",
+				"updatedAt": "2018-06-13T15:30:35.654Z"
 			}
 
 
@@ -998,7 +989,7 @@
 
 
 		<b>Get all transactions with this Merchant</b> (AUTH REQ)
-		   ---------------------------------------
+		---------------------------------------
 		The following API enables you to retrieve all transactions involving this Merchant.
 
 		GET api.pointup.io/merchants/transactions
@@ -1017,42 +1008,38 @@
 			--------
 			HTTP Status Code: 200
 			{
-				"transaction": [
+				"transactions": [
 					{
-						"timestamp": "2018-06-13T15:13:10.277Z",
-            "_id": "5b2134868f8e3f1722cd0bfb",
+						"transactionId": "5b2134868f8e3f1722cd0bfb",
 						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"amount": "0.00",
-            "__v": 0
+						"timestamp": "2018-06-13T15:13:10.277Z"
 					},
 					{
-						"timestamp": "2018-06-13T15:23:49.156Z",
-            "_id": "5b213705b6a97118343fdffb",
+						"transactionId": "5b213705b6a97118343fdffb",
 						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"amount": "25.56",
-            "__v": 0
+						"timestamp": "2018-06-13T15:23:49.156Z"
 					},
 					{
-						"timestamp": "2018-06-13T15:30:35.697Z",
-            "_id": "5b21389b2c57911a16790e44",
+						"transactionId": "5b21389b2c57911a16790e44",
 						"balanceId": "5afb04ef15833716e170fe9b",
 						"phone": 19802160745,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"amount": "10.00",
-            "__v": 0
+						"timestamp": "2018-06-13T15:30:35.697Z"
 					},
 					{
-						"timestamp": "2018-06-13T15:31:04.539Z",
-						"_id": "5b2138b82c57911a16790e47",
+						"transactionId": "5b2138b82c57911a16790e47",
 						"balanceId": "5afb04f715833716e170fe9c",
 						"phone": 16177635369,
 						"merchantId": "5b2134388f8e3f1722cd0bea",
 						"amount": "30.17",
-						"__v": 0
+						"timestamp": "2018-06-13T15:31:04.539Z"
 					}
 				]
 			}
@@ -1096,22 +1083,21 @@
 			}
 
 
-	<b>QR</b>
-	--
-	The QR API lets you retrieve a QR code.
+	<b>Balances</b>
+	--------
+	The Balances API lets you retrieve information about a Balance.
 
-	The following actions can be performed with the QR API
-	- Display QR code
-	- Create QR code
+	The following actions can be performed with the Balances API
+	- Get a balance
 
-	<i>BaseURI:</i> api.pointup.io/qr
+	<i>BaseURI:</i> api.pointup.io/balances
 
 
-		<b>Display QR code</b>
-		---------------
+		<b>Get a balance</b>
+		-------------
 		The following API enables you to view a generated QR code
 
-		GET api.pointup.io/qr/:balanceId
+		GET api.pointup.io/balances/:balanceId
 
 		<i>Arguments:</i>
 		---------
@@ -1122,37 +1108,19 @@
 			{
 			}
 
-
-			Response
-			--------
-			HTTP Status Code: 304
-			{
-				<!DOCTYPE HTML>
-			}
-
-
-		<b>Create QR code</b>
-		--------------
-		The following API enables you to generate a QR code of a balanceId.
-
-		GET api.pointup.io/qr/r/:balanceId
-
-		<i>Arguments:</i>
-		---------
-		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
-
-			Request
-			-------
-			{
-			}
 
 			Response
 			--------
 			HTTP Status Code: 200
 			{
-				"qrcode": "data:image/png;base64,QRCODE",
+				"balanceId": "5afafff415833716e170fe92",
+				"name": "Merchant A",
+				"image": "Default.png",
 				"phone": 19198229889,
-				"balance": 20
+				"merchantId": "5afaffc015833716e170fe8f",
+				"balance": "0.00",
+				"createdAt": "2018-06-13T15:10:52.272Z",
+				"updatedAt": "2018-06-13T15:10:52.272Z"
 			}
 </pre>
 </body>

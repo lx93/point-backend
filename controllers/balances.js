@@ -393,9 +393,20 @@ async function userGetTransactions(req, res, next) {
       });
     //Else
     } else {
-      console.log("\n"+transaction+"\n");
+      var transactions = [];
+      for (var i = 0; i < transaction.length; i++) {
+        transactions[i] = {
+          transactionId: transaction[i]._id,
+          balanceId: transaction[i].balanceId,
+          phone: transaction[i].phone,
+          merchantId: transaction[i].merchantId,
+          amount: transaction[i].amount,
+          timestamp: transaction[i].timestamp
+        }
+      }
+      console.log("\n"+JSON.stringify(transactions, ",", " ")+"\n");
       return res.status(200).json({
-        transaction
+        transactions
       });
     }
   } catch (err) {
@@ -727,9 +738,20 @@ async function merchantGetTransactions(req, res, next) {
       });
     //Else
     } else {
-      console.log("\n"+transaction+"\n");
+      var transactions = [];
+      for (var i = 0; i < transaction.length; i++) {
+        transactions[i] = {
+          transactionId: transaction[i]._id,
+          balanceId: transaction[i].balanceId,
+          phone: transaction[i].phone,
+          merchantId: transaction[i].merchantId,
+          amount: transaction[i].amount,
+          timestamp: transaction[i].timestamp
+        }
+      }
+      console.log("\n"+JSON.stringify(transactions, ",", " ")+"\n");
       return res.status(200).json({
-        transaction
+        transactions
       });
     }
   } catch (err) {
