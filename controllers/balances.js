@@ -607,6 +607,38 @@ async function merchantUpdate(req, res, next) {
   }
 };
 
+//merchantRestore
+//PUT api.pointup.io/merchants/restore
+/* Reactive inactive balances with this Merchant */
+async function merchantRestore(req, res, next) {
+  try {
+    const validMerchantId = res.merchantId;      //MerchantId of the Merchant
+    //Find a real inactive balance with the Merchant with a balance other than 0.00
+    let balance = await Balance.findOne({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Merchant has no inactive balances!');
+      return res.status(201).json({
+        message1: res.message1,
+        message2: "Merchant has no inactive balances!"
+      });
+    //Else
+    } else {
+      //Reactivate inactive balances
+      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }, { $set: { isActive: true, updatedAt: new Date }}).exec();
+
+      console.log('Balances restored!');
+      return res.status(201).json({
+        message1: res.message1,
+        message2: "Balances restored!"
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
+}
+
 //merchantDeleteAll
 //DELETE api.pointup.io/merchants/
 /* Delete all balances involving this Merchant. */
@@ -754,6 +786,7 @@ exports.merchantGetAll = merchantGetAll;
 exports.merchantGetOne = merchantGetOne;
 exports.merchantCreate = merchantCreate;
 exports.merchantUpdate = merchantUpdate;
+exports.merchantRestore = merchantRestore;
 exports.merchantDeleteAll = merchantDeleteAll;
 exports.merchantDeleteOne = merchantDeleteOne;
 exports.merchantGetTransactions = merchantGetTransactions;

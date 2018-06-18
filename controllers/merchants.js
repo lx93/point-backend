@@ -46,59 +46,6 @@ async function getMerchant(req, res, next) {
   }
 };
 
-//Get All Merchants
-//GET api.pointup.io/users/merchants
-/* Retrieve a list of all Merchants */
-async function getMerchantAll(req, res, next) {
-  //Find all Merchants
-  let merchant = await Merchant.find({ isActive: true }).sort({ name: 1 }).exec();
-
-  //If no Merchant exists
-  if (!merchant.length) {
-    console.log('There are no Merchants!');
-    return res.status(409).json({
-      message: "There are no Merchants!"
-    });
-  //Else
-  } else {
-    var merchants = [];
-    for (var i = 0; i < merchant.length; i++) {
-      merchants[i] = {
-        merchantId: merchant[i]._id,
-        name: merchant[i].name,
-        image: merchant[i].image
-      }
-    }
-    console.log('\n'+JSON.stringify(merchants, ",", " ")+'\n');
-    return res.status(200).json({
-      merchants
-    });
-  }
-};
-
-//Get Specific Merchant
-//GET api.pointup.io/users/merchants/:merchantId
-/* Retreive information about a specific Merchant */
-async function getMerchantOne(req, res, next) {
-  const validMerchantId = req.params.merchantId;
-  let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
-
-  if (!merchant) {
-    console.log('Merchant doesn\'t exist!');
-    return res.status(409).json({
-      message: "Merchant doesn't exist!"
-    });
-  } else {
-    console.log(merchant);
-    return res.status(200).json({
-      merchantId: merchant._id,
-      name: merchant.name,
-      image: merchant.image,
-      createdAt: merchant.createdAt
-    });
-  }
-};
-
 //Verify
 //POST api.pointup.io/merchants/verify
 /* Verify a Merchant Point account. A verification code will be sent to the listed email. */
@@ -160,52 +107,15 @@ async function signUp(req, res, next) {
     //Find a real verification with this Merchant
     let verification = await Verification.findOne({ email: validEmail, code: validCode }).exec();
 
+    /* //<-- Delete "/*" for production
     //If no verification exists
     if (!verification) {
-      /*Uncomment for PRODUCTION*/
-      /*
       console.log('Auth failed');
       return res.status(401).json({
         message: 'Auth failed'
       });
-      */
-
-      /*Uncomment for DEVELOPMENT*/
-      /*Delete that----->*/
-      let merchant = await Merchant.findOne({ $or:[{ name: validName }, { email: validEmail } ]} ).exec();
-      if (!merchant) {
-        let hash = await bcrypt.hash(validPassword, 10);
-        var newMerchant = new Merchant({
-          _id: new mongoose.Types.ObjectId,
-          name: validName,
-          email: validEmail,
-          password: hash,
-          image: "Default.png",
-          isActive: true,
-          lastLoginAt: null,
-          createdAt: new Date,
-          updatedAt: new Date
-        });
-        await newMerchant.save();
-        console.log('Merchant created!');
-        return res.status(201).json({
-          message: "Merchant created!"
-        });
-      } else if (!merchant.isActive) {
-        await merchant.update({ $set: { isActive: true } }).exec();
-        console.log('Merchant created!');
-        return res.status(201).json({
-          message: "Merchant created!"
-        });
-      } else {
-        console.log('Merchant exists!');
-        return res.status(409).json({
-          message: "Merchant exists!"
-        });
-      }
-      /*<----Delete that*/
     //Else
-    } else {
+    } else {    //Delete that ---> */
       //Find a Merchant with matching name or email
       let merchant = await Merchant.findOne({ $or:[{ name: validName }, { email: validEmail } ]} ).exec();
 
@@ -236,11 +146,10 @@ async function signUp(req, res, next) {
       } else if (!merchant.isActive) {
         //Set Merchant to active
         await merchant.update({ $set: { isActive: true } });
-
+        res.merchantId = merchant._id;
         console.log('Merchant created!');
-        return res.status(201).json({
-          message: "Merchant created!"
-        });
+        res.message1 = "Merchant created!";
+        next();
       //Else
       } else {
         console.log('Merchant exists!');
@@ -248,7 +157,7 @@ async function signUp(req, res, next) {
           message: "Merchant exists!"
         });
       }
-    }
+    // } //Delete starting "// for production
   } catch (err) {
     throwErr(res, err);
   }
@@ -472,9 +381,61 @@ async function deleteMerchant(req, res, next) {
   }
 };
 
+//Get All Merchants
+//GET api.pointup.io/users/merchants
+/* Retrieve a list of all Merchants */
+async function getMerchantAll(req, res, next) {
+  //Find all Merchants
+  let merchant = await Merchant.find({ isActive: true }).sort({ name: 1 }).exec();
+
+  //If no Merchant exists
+  if (!merchant.length) {
+    console.log('There are no Merchants!');
+    return res.status(409).json({
+      message: "There are no Merchants!"
+    });
+  //Else
+  } else {
+    var merchants = [];
+    for (var i = 0; i < merchant.length; i++) {
+      merchants[i] = {
+        merchantId: merchant[i]._id,
+        name: merchant[i].name,
+        image: merchant[i].image
+      }
+    }
+    console.log('\n'+JSON.stringify(merchants, ",", " ")+'\n');
+    return res.status(200).json({
+      merchants
+    });
+  }
+};
+
+//Get Specific Merchant
+//GET api.pointup.io/users/merchants/:merchantId
+/* Retreive information about a specific Merchant */
+async function getMerchantOne(req, res, next) {
+  const validMerchantId = req.params.merchantId;
+  let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+
+  if (!merchant) {
+    console.log('Merchant doesn\'t exist!');
+    return res.status(409).json({
+      message: "Merchant doesn't exist!"
+    });
+  } else {
+    console.log(merchant);
+    return res.status(200).json({
+      merchantId: merchant._id,
+      name: merchant.name,
+      image: merchant.image,
+      createdAt: merchant.createdAt
+    });
+  }
+};
+
+
 exports.getMerchant = getMerchant;
-exports.getMerchantOne = getMerchantOne;
-exports.getMerchantAll = getMerchantAll;
 exports.verify = verify;
 exports.signUp = signUp;
 exports.logIn = logIn;
@@ -482,3 +443,5 @@ exports.updateName = updateName;
 exports.updateImage = updateImage;
 exports.updatePassword = updatePassword;
 exports.deleteMerchant = deleteMerchant;
+exports.getMerchantOne = getMerchantOne;
+exports.getMerchantAll = getMerchantAll;
