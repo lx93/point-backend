@@ -197,7 +197,7 @@ async function userRegift(req, res, next) {
     //If no balance exists
     if (!balance || !balance.isActive) {
       console.log('Invalid balance!');
-      return res.status(409).json({
+      return res.status(422).json({
         message: "Invalid balance!"
       });
     //If the gifted amount exceeds the User's balance
@@ -468,7 +468,7 @@ async function merchantGetOne(req, res, next) {
     //If no balance exists
     if (!balance) {
       console.log('Invalid balance!');
-      return res.status(409).json({
+      return res.status(422).json({
         message: "Invalid balance!"
       });
     //Else
