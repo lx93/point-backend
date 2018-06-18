@@ -467,9 +467,9 @@ async function merchantGetOne(req, res, next) {
 
     //If no balance exists
     if (!balance) {
-      console.log('Balance doesn\'t exist!');
+      console.log('Invalid balance!');
       return res.status(409).json({
-        message: "Balance doesn't exist!"
+        message: "Invalid balance!"
       });
     //Else
     } else {
