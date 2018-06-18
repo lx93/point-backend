@@ -76,8 +76,6 @@ async function userGetOne(req, res, next) {
     //Find a real and active balance with this User
     let balance = await Balance.findOne({ _id: validBalanceId, phone: validPhone, isActive: true }).exec();
 
-    //Find a real and active Merchant
-    let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
 
     //If no balance exists
     if (!balance) {
@@ -87,6 +85,9 @@ async function userGetOne(req, res, next) {
       });
     //Else balance must exist
     } else {
+      //Find a real and active Merchant
+      let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
+
       console.log(balance);
       return res.status(200).json({
         balanceId: balance._id,
