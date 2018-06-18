@@ -94,51 +94,15 @@ async function signUp(req, res, next) {
     //Find a real verification with this User
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
+    /* //<-- Delete "/*" for production
     //If no verification exists
     if (!verification) {
-      /*Uncomment for PRODUCTION*/
-      /*
       console.log('Auth failed');
       return res.status(401).json({
         message: 'Auth failed'
       });
-      */
-
-      /*Uncomment for DEVELOPMENT*/
-      /*Delete that----->*/
-      let user = await User.findOne({ phone: validPhone }).exec();
-      if (!user) {
-        let hash = await bcrypt.hash(validPassword, 10);
-        var newUser = new User({
-          _id: new mongoose.Types.ObjectId,
-          phone: validPhone,
-          password: hash,
-          isActive: true,
-          lastLoginAt: null,
-          createdAt: new Date,
-          updatedAt: new Date
-        });
-        await newUser.save();
-        console.log('User created!');
-        return res.status(201).json({
-          message: "User created!"
-        });
-      } else if (!user.isActive) {
-        await user.update({ $set: { isActive: true } }).exec();
-
-        console.log('User created!');
-        return res.status(201).json({
-          message: "User created!"
-        });
-      } else {
-        console.log('User exists!');
-        return res.status(409).json({
-          message: "User exists!"
-        });
-      }
-      /*<----Delete that*/
     //Else
-    } else {
+    } else {    //Delete that ---> */
       //Find a real User
       let user = await User.findOne({ phone: validPhone }).exec();
 
@@ -180,7 +144,7 @@ async function signUp(req, res, next) {
           message: "User exists!"
         });
       }
-    }
+    // } //Delete starting "// for production
   } catch (err) {
     throwErr(res, err);
   }

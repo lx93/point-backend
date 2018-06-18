@@ -12,7 +12,7 @@ const index = require('./routes/index');
 const users = require('./routes/users');
 const merchants = require('./routes/merchants');
 const messaging = require('./routes/messaging');
-const qr = require('./routes/qr');
+const balances = require('./routes/balances');
 
 const app = express();
 
@@ -47,7 +47,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/merchants', merchants);
 app.use('/messaging', messaging);
-app.use('/qr', qr);
+app.use('/balances', balances);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");

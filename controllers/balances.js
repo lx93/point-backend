@@ -71,18 +71,19 @@ async function userGetAll(req, res, next) {
 /* Retrieve a specific balance involving this User. */
 async function userGetOne(req, res, next) {
   try {
+    const validPhone = req.userData.phone     //Phone number of the User
     const validBalanceId = req.params.balanceId;      //Valid balanceId
-    //Find a real and active balance
-    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+    //Find a real and active balance with this User
+    let balance = await Balance.findOne({ _id: validBalanceId, phone: validPhone, isActive: true }).exec();
 
     //Find a real and active Merchant
     let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
 
     //If no balance exists
     if (!balance) {
-      console.log('Balance doesn\'t exist!');
-      return res.status(409).json({
-        message: "Balance doesn't exist!"
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
       });
     //Else balance must exist
     } else {
@@ -447,9 +448,10 @@ async function merchantGetAll(req, res, next) {
 /* Retrieve a specific balance involving this Merchant. */
 async function merchantGetOne(req, res, next) {
   try {
+    const validMerchantId = req.merchantData.merchantId;     //MerchantId of the Merchant
     const validBalanceId = req.params.balanceId;      //Valid balanceId
-    //Find a real and active balance
-    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+    //Find a real and active balance with this Merchant
+    let balance = await Balance.findOne({ _id: validBalanceId, merchantId: validMerchantId, isActive: true }).exec();
 
     //If no balance exists
     if (!balance) {
@@ -607,6 +609,38 @@ async function merchantUpdate(req, res, next) {
   }
 };
 
+//merchantRestore
+//PUT api.pointup.io/merchants/restore
+/* Reactive inactive balances with this Merchant */
+async function merchantRestore(req, res, next) {
+  try {
+    const validMerchantId = res.merchantId;      //MerchantId of the Merchant
+    //Find a real inactive balance with the Merchant with a balance other than 0.00
+    let balance = await Balance.findOne({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }).exec();
+
+    //If no balance exists
+    if (!balance) {
+      console.log('Merchant has no inactive balances!');
+      return res.status(201).json({
+        message1: res.message1,
+        message2: "Merchant has no inactive balances!"
+      });
+    //Else
+    } else {
+      //Reactivate inactive balances
+      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }, { $set: { isActive: true, updatedAt: new Date }}).exec();
+
+      console.log('Balances restored!');
+      return res.status(201).json({
+        message1: res.message1,
+        message2: "Balances restored!"
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
+  }
+}
+
 //merchantDeleteAll
 //DELETE api.pointup.io/merchants/
 /* Delete all balances involving this Merchant. */
@@ -703,16 +737,19 @@ async function merchantGetTransactions(req, res, next) {
   }
 };
 
-//QR Code
+//Balances
 
-//getQRCode
-//GET api.pointup.io/qr/r/:balanceId
-/* Generate a QR code of a balanceId. */
-async function getQRCode(req, res, next) {
+//getBalance
+//GET api.pointup.io/balances/:balanceId
+/* Retrieve a specific balance. */
+async function getBalance(req, res, next) {
   try {
-    const validBalanceId = req.params.balanceId     //Valid balanceId
+    const validBalanceId = req.params.balanceId;      //Valid balanceId
     //Find a real and active balance
     let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+
+    //Find a real and active Merchant
+    let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
 
     //If no balance exists
     if (!balance) {
@@ -720,21 +757,18 @@ async function getQRCode(req, res, next) {
       return res.status(409).json({
         message: "Balance doesn't exist!"
       });
-    //Else
+    //Else balance must exist
     } else {
-      console.log('\n'+balance+'\n');
-      var text = {
-        balanceId: balance.id,
-      };
-      text = JSON.stringify(text);
-      //Return QR code
-      QRCode.toDataURL(text, (err, qrcode) => {
-        if (err) throw err;
-        return res.status(200).json({
-          "qrcode": qrcode,
-          "phone": balance.phone,
-          "balance": balance.balance
-        });
+      console.log(balance);
+      return res.status(200).json({
+        balanceId: balance._id,
+        name: merchant.name,
+        image: merchant.image,
+        phone: balance.phone,
+        merchantId: balance.merchantId,
+        balance: balance.balance,
+        createdAt: balance.createdAt,
+        updatedAt: balance.updatedAt
       });
     }
   } catch (err) {
@@ -754,8 +788,9 @@ exports.merchantGetAll = merchantGetAll;
 exports.merchantGetOne = merchantGetOne;
 exports.merchantCreate = merchantCreate;
 exports.merchantUpdate = merchantUpdate;
+exports.merchantRestore = merchantRestore;
 exports.merchantDeleteAll = merchantDeleteAll;
 exports.merchantDeleteOne = merchantDeleteOne;
 exports.merchantGetTransactions = merchantGetTransactions;
 
-exports.getQRCode = getQRCode;
+exports.getBalance = getBalance;

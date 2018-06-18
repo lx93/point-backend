@@ -18,7 +18,7 @@ router.get('/', merchantAuth, merchantExist, mController.getMerchant);
 router.post('/verify', mController.verify);
 
 //SignUp
-router.post('/signup', mController.signUp);
+router.post('/signup', mController.signUp, bController.merchantRestore);
 
 //LogIn
 router.post('/login', mController.logIn);
