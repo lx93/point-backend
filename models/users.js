@@ -9,7 +9,7 @@ var userSchema = new Schema({
   password: { type: String, required: true },
   firstName: { type: String },
   lastName: { type: String },
-  dob: { type: Date, required: true },
+  dob: { type: Date },
   image: { type: String, required: true },
   isActive: { type: Boolean, required: true },
   lastLoginAt: { type: Date },

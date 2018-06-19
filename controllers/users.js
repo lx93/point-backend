@@ -29,9 +29,14 @@ async function getUser(req, res, next) {
     } else {
       console.log('\n'+user+'\n');
       return res.status(200).json({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        dob: user.dob,
         phone: user.phone,
-        userId: user._id,
-        lastLoginAt: user.lastLoginAt
+        image: user.image,
+        lastLoginAt: user.lastLoginAt,
+        createdAt: user.createdAt,
+        userId: user._id
       });
     }
   } catch (err) {
@@ -78,6 +83,7 @@ async function verify(req, res, next) {
 async function signUp(req, res, next) {
   try {
     const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+    var validDOB;
     if (!validator.phone(validPhone)) {
       console.log('Invalid phone!');
       return res.status(422).json({
@@ -102,17 +108,19 @@ async function signUp(req, res, next) {
           message: "Invalid last name!"
         });
       }
-    } else if (!validator.dob(req.body.dob)) {
-      console.log('Invalid date!');
-      return res.status(422).json({
-        message: "Invalid date!"
-      });
+    } else if (req.body.dob) {
+      if (!validator.dob(req.body.dob)) {
+        console.log('Invalid date!');
+        return res.status(422).json({
+          message: "Invalid date!"
+        });
+      }
+      validDOB = new Date(req.body.dob);      //Date Of Birth of the User
     }
     const validPassword = req.body.password;      //Password of the User
     const validCode = req.body.code;      //Verification code
     const validFName = req.body.firstName;      //First name of the User
     const validLName = req.body.lastName;      //Last name of the User
-    const validDOB = new Date(req.body.dob);      //Date Of Birth of the User
     //Find a real verification with this User
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
@@ -212,9 +220,14 @@ async function logIn(req, res, next) {
       //Create JWT Token
       const token = jwt.sign(
         {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          dob: user.dob,
           phone: user.phone,
-          userId: user._id,
-          lastLoginAt: new Date
+          image: user.image,
+          lastLoginAt: user.lastLoginAt,
+          createdAt: user.createdAt,
+          userId: user._id
         },
         process.env.JWT_KEY,
         {
