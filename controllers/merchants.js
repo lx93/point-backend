@@ -445,3 +445,5 @@ exports.updatePassword = updatePassword;
 exports.deleteMerchant = deleteMerchant;
 exports.getMerchantOne = getMerchantOne;
 exports.getMerchantAll = getMerchantAll;
+
+//Written by Nathan Schwartz (https://github.com/CGTNathan)

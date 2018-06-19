@@ -394,3 +394,5 @@ exports.updateName = updateName;
 exports.updateImage = updateImage;
 exports.updatePassword = updatePassword;
 exports.deleteUser = deleteUser;
+
+//Written by Nathan Schwartz (https://github.com/CGTNathan)

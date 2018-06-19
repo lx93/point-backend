@@ -817,3 +817,5 @@ exports.merchantDeleteOne = merchantDeleteOne;
 exports.merchantGetTransactions = merchantGetTransactions;
 
 exports.getBalance = getBalance;
+
+//Written by Nathan Schwartz (https://github.com/CGTNathan)

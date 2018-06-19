@@ -52,3 +52,5 @@ exports.phone = validatePhone;
 exports.string = validateString;
 exports.number = validateNumber;
 exports.dob = validateDOB;
+
+//Written by Nathan Schwartz (https://github.com/CGTNathan)

@@ -84,3 +84,5 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+//Written by Nathan Schwartz (https://github.com/CGTNathan)
