@@ -38,7 +38,17 @@ function validateNumber(number) {
   }
 };
 
+function validateDOB(dob) {
+  if (typeof dob === 'string' || string instanceof String) {
+    var re = /^(\d{4})\-(\d{2})\-(\d{2})$/;
+    return re.test(dob);
+  } else {
+    return false;
+  }
+}
+
 exports.email = validateEmail;
 exports.phone = validatePhone;
 exports.string = validateString;
 exports.number = validateNumber;
+exports.dob = validateDOB;

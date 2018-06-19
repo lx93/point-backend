@@ -88,9 +88,31 @@ async function signUp(req, res, next) {
       return res.status(422).json({
         message: "Invalid password!"
       });
+    } else if (req.body.firstName) {
+      if (!validator.string(req.body.firstName)) {
+        console.log('Invalid first name!');
+        return res.status(422).json({
+          message: "Invalid first name!"
+        });
+      }
+    } else if (req.body.lastName) {
+      if (!validator.string(req.body.lastName)) {
+        console.log('Invalid last name!');
+        return res.status(422).json({
+          message: "Invalid last name!"
+        });
+      }
+    } else if (!validator.dob(req.body.dob)) {
+      console.log('Invalid date!');
+      return res.status(422).json({
+        message: "Invalid date!"
+      });
     }
     const validPassword = req.body.password;      //Password of the User
     const validCode = req.body.code;      //Verification code
+    const validFName = req.body.firstName;      //First name of the User
+    const validLName = req.body.lastName;      //Last name of the User
+    const validDOB = new Date(req.body.dob);      //Date Of Birth of the User
     //Find a real verification with this User
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
@@ -116,6 +138,10 @@ async function signUp(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: validPhone,
           password: hash,
+          firstName: validFName,
+          lastName: validLName,
+          dob: validDOB,
+          image: 'DefaultUser.png',
           isActive: true,
           lastLoginAt: null,
           createdAt: new Date,
@@ -208,6 +234,96 @@ async function logIn(req, res, next) {
     return res.status(401).json({
       message: "Auth failed"
     });
+  }
+};
+
+//Update name
+//PUT api.pointup.io/users/name
+/* Change the name to your User Point account. */
+async function updateName(req, res, next) {
+  try {
+    if (!validator.string(req.body.firstName)) {
+      console.log('Invalid first name!');
+      return res.status(422).json({
+        message: "Invalid first name!"
+      });
+    } else if (!validator.string(req.body.lastName)) {
+      console.log('Invalid last name!');
+      return res.status(422).json({
+        message: "Invalid last name!"
+      });
+    }
+    const validFName = req.body.firstName;      //New first name of the User
+    const validLName = req.body.lastName;     //New last name of the User
+    const validUserId = req.userData.userId;      //UserId of the User
+    //Find and update User name
+    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set:{ firstName: validFName, lastName: validLName, updatedAt: new Date } }).exec();
+
+    console.log('Name changed!');
+    return res.status(201).json({
+      message: "Name changed!"
+    });
+  } catch (err) {
+    throwErr(res, err);
+  }
+};
+
+//Update image
+//PUT api.pointup.io/users/image
+/* Change the image to your User Point account. */
+async function updateImage(req, res, next) {
+  try {
+    if (!req.file) {
+      console.log('Image invalid!');
+      return res.status(422).json({
+        message: "Image invalid!"
+      });
+    }
+    const validFile = req.file;     //Valid file
+    const validUserId = req.userData.userId;      //UserId of the User
+    //Find a real and active User
+    let user = await User.findOne({ _id: validUserId, isActive: true }).exec();
+    //If no User exists
+    if (!user) {
+      console.log('User doesn\'t exist!');
+      return res.status(409).json({
+        message: "User doesn't exist!"
+      });
+    //Else
+    } else {
+      //If User does not have the default image
+      if (user.image != 'DefaultUser.png') {
+        //Find the User's current image
+        const s3 = new aws.S3();
+        var params = {
+          Bucket: 'point-server',
+          Key: user.image
+        }
+        s3.headObject(params, function(err, data) {
+          if (!err) {
+            var params = {
+              Bucket: 'point-server',
+              Delete: {
+                Objects: [{ "Key": user.image }]
+              }
+            }
+            //Delete old image
+            s3.deleteObjects(params, function(err, data) {
+              if (err) throwErr(res, err);
+            });
+          }
+        });
+      }
+      //Update User image
+      await user.update({ $set:{ image: validFile.key, updatedAt: new Date } }).exec();
+
+      console.log('Image changed!');
+      return res.status(201).json({
+        message: "Image changed!"
+      });
+    }
+  } catch (err) {
+    throwErr(res, err);
   }
 };
 

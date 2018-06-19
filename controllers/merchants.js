@@ -288,7 +288,7 @@ async function updateImage(req, res, next) {
     //Else
     } else {
       //If Merchant does not have the default image
-      if (merchant.image != 'Default.png') {
+      if (merchant.image != 'DefaultMerchant.png') {
         //Find the Merchant's current image
         const s3 = new aws.S3();
         var params = {
