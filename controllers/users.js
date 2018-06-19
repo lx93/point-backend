@@ -377,5 +377,7 @@ exports.getUser = getUser;
 exports.verify = verify;
 exports.signUp = signUp;
 exports.logIn = logIn;
+exports.updateName = updateName;
+exports.updateImage = updateImage;
 exports.updatePassword = updatePassword;
 exports.deleteUser = deleteUser;
