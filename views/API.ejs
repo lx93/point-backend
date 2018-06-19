@@ -200,6 +200,9 @@
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
+		- firstName (optional): A valid string containing the User's first name. Ex. John.
+		- lastName (optional): A valid string containing the User's last name. Ex. Doe.
+		- dob (optional): A valid string containing the User's date of birth in yyyy-mm-dd format. Ex. 2000-01-01.
 		- code: A valid 6-digit verification code sent to the listed phone. Ex. 123456. Codes will expire within 5 minutes of creation.
 
 			Request
@@ -208,6 +211,9 @@
 			{
 				"phone": 19198229889,
 				"password": "verygoodpassword",
+				"firstName": "John",
+				"lastName": "Doe",
+				"dob": "2000-01-01",
 				"code": 123456
 			}
 
@@ -245,6 +251,60 @@
 			{
 				"message": "Auth succeeded",
 				"token": "919Token"
+			}
+
+
+		<b>Modify User name</b> (AUTH REQ)
+		----------------
+		The following API enables you to change the name to your User Point account.
+
+		PUT api.pointup.io/users/name
+
+		<i>Arguments:</i>
+		---------
+		- firstName (optional): A valid string containing the User's first name. Ex. Bob.
+		- lastName (optional): A valid string containing the User's last name. Ex. Ross.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			Content-Type: application/json
+			{
+				"firstName": "Bob",
+				"lastName": "Ross"
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Name changed!"
+			}
+
+
+		<b>Modify User image</b> (AUTH REQ)
+		-----------------
+		The following API enables you to change the image to your User Point account.
+
+		PUT api.pointup.io/users/image
+
+		<i>Arguments:</i>
+		---------
+		- password: A valid image in .jpeg or .png format. Max file size &lt= 5.24MB.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			Content-Type: application/json
+			image: Default.png
+			{
+			}
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Image changed!"
 			}
 
 

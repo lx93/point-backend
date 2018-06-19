@@ -6,6 +6,7 @@ const balanceValid = require('../middleware/balanceValid');
 const router = express.Router();
 
 //Balances
+
 //Get Balance
 router.get('/:balanceId', balanceValid, bController.getBalance);
 

@@ -5,10 +5,12 @@ const Schema = mongoose.Schema;
 // create a schema
 var userSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
-  firstName: { type: String },
-  lastName: { type: String },
   phone: { type: Number, required: true, unique: true },
   password: { type: String, required: true },
+  firstName: { type: String },
+  lastName: { type: String },
+  dob: { type: Date },
+  image: { type: String, required: true },
   isActive: { type: Boolean, required: true },
   lastLoginAt: { type: Date },
   createdAt: { type: Date, required: true },

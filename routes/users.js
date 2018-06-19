@@ -6,6 +6,7 @@ const userAuth = require('../middleware/userAuth');
 const userExist = require('../middleware/userExist');
 const merchantValid = require('../middleware/merchantValid');
 const balanceValid = require('../middleware/balanceValid');
+const imageValid = require('../middleware/imageValid');
 
 //api.pointup.io/users
 const router = express.Router();
@@ -34,6 +35,8 @@ router.post('/login', uController.logIn);
 //router.post('/recommend', userAuth, userExist, uController.recommend);
 
 //Update
+router.put('/name', userAuth, userExist, uController.updateName);
+router.put('/image', userAuth, userExist, imageValid.single('image'), uController.updateImage);
 router.put('/password', userAuth, userExist, uController.updatePassword);
 
 //DeleteUser
