@@ -58,13 +58,14 @@ async function verify(req, res, next) {
       });
     }
     const validEmail = req.body.email;      //Email of the Merchant
+    const now = new Date;     //Log time
     var x = RNG();    //Randomly generated code
     //Create verification
     var newVerification = new Verification({
       _id: new mongoose.Types.ObjectId,
       email: validEmail,
       code: x,
-      createdAt: new Date
+      createdAt: now
     });
     //Save verification
     await newVerification.save();
@@ -123,6 +124,8 @@ async function signUp(req, res, next) {
       if (!merchant) {
         //Hash password
         let hash = await bcrypt.hash(validPassword, 10);
+
+        const now = new Date;   //Log time
         //Create Merchant
         var newMerchant = new Merchant({
           _id: new mongoose.Types.ObjectId,
@@ -132,8 +135,8 @@ async function signUp(req, res, next) {
           image: "Default.png",
           isActive: true,
           lastLoginAt: null,
-          createdAt: new Date,
-          updatedAt: new Date
+          createdAt: now,
+          updatedAt: now
         });
         //Save Merchant
         await newMerchant.save();
@@ -144,8 +147,9 @@ async function signUp(req, res, next) {
         });
       //If Merchant exists but is not active
       } else if (!merchant.isActive) {
+        const now = new Date;     //Log time
         //Set Merchant to active
-        await merchant.update({ $set: { isActive: true } });
+        await merchant.update({ $set: { isActive: true, updatedAt: now } });
         res.merchantId = merchant._id;
         console.log('Merchant created!');
         res.message1 = "Merchant created!";
@@ -194,8 +198,9 @@ async function logIn(req, res, next) {
     } else {
       //Check hashed password
       await bcrypt.compare(validPassword, merchant.password);
+      const now = new Date;     //Log time
       //Log in Merchant
-      await merchant.update({ $set: { lastLoginAt: new Date } }).exec();
+      await merchant.update({ $set: { lastLoginAt: now } }).exec();
       //Create JWT Token
       const token = jwt.sign(
         {
@@ -251,8 +256,9 @@ async function updateName(req, res, next) {
       });
     //Else
     } else {
+      const now = new Date;     //Log time
       //Find and update Merchant name
-      await Merchant.findOneAndUpdate({ _id: validMerchantId, isActive: true }, { $set:{ name: validName, updatedAt: new Date } }).exec();
+      await Merchant.findOneAndUpdate({ _id: validMerchantId, isActive: true }, { $set:{ name: validName, updatedAt: now } }).exec();
 
       console.log('Name changed!');
       return res.status(201).json({
@@ -279,6 +285,7 @@ async function updateImage(req, res, next) {
     const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
     //Find a real and active Merchant
     let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+
     //If no Merchant exists
     if (!merchant) {
       console.log('Merchant doesn\'t exist!');
@@ -310,8 +317,9 @@ async function updateImage(req, res, next) {
           }
         });
       }
+      const now = new Date;     //Log time
       //Update Merchant image
-      await merchant.update({ $set:{ image: validFile.key, updatedAt: new Date } }).exec();
+      await merchant.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
 
       console.log('Image changed!');
       return res.status(201).json({
@@ -336,11 +344,12 @@ async function updatePassword(req, res, next) {
     }
     const validPassword = req.body.password;      //New password of the Merchant
     const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    const now = new Date;     //Log time
     //Hash password
     let hash = await bcrypt.hash(validPassword, 10);
 
     //Find and update Merchant password
-    await Merchant.findOneAndUpdate({ _id: validMerchantId, isActive: true }, { $set:{ password: hash, updatedAt: new Date } }).exec();
+    await Merchant.findOneAndUpdate({ _id: validMerchantId, isActive: true }, { $set:{ password: hash, updatedAt: now } }).exec();
 
     console.log('Password changed!');
     return res.status(201).json({
@@ -368,8 +377,9 @@ async function deleteMerchant(req, res, next) {
       });
     //Else
     } else {
+      const now = new Date;     //Log time
       //Deactivate Merchant
-      await merchant.update({ $set:{ isActive: false, updatedAt: new Date } }).exec();
+      await merchant.update({ $set:{ isActive: false, updatedAt: now } }).exec();
 
       console.log('Merchant deleted!');
       res.message1 = "Merchant deleted!";
@@ -380,6 +390,7 @@ async function deleteMerchant(req, res, next) {
     throwErr(res, err);
   }
 };
+
 
 //Get All Merchants
 //GET api.pointup.io/users/merchants
