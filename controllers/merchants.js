@@ -132,7 +132,7 @@ async function signUp(req, res, next) {
           name: validName,
           email: validEmail,
           password: hash,
-          image: "Default.png",
+          image: "DefaultMerchant.png",
           isActive: true,
           lastLoginAt: null,
           createdAt: now,
