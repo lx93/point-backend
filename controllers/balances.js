@@ -76,7 +76,6 @@ async function userGetOne(req, res, next) {
     //Find a real and active balance with this User
     let balance = await Balance.findOne({ _id: validBalanceId, phone: validPhone, isActive: true }).exec();
 
-
     //If no balance exists
     if (!balance) {
       console.log('Invalid balance!');
@@ -117,6 +116,7 @@ async function userCreate(req, res, next) {
 
     //If no balance exists
     if (!balance) {
+      const now = new Date;     //Log time
       //Create balance
       const newBalance = new Balance({
         _id: new mongoose.Types.ObjectId,
@@ -124,8 +124,8 @@ async function userCreate(req, res, next) {
         merchantId: validMerchantId,
         balance: "0.00",
         isActive: true,
-        createdAt: new Date,
-        updatedAt: new Date
+        createdAt: now,
+        updatedAt: now
       });
       //Save balance
       await newBalance.save();
@@ -136,7 +136,7 @@ async function userCreate(req, res, next) {
         phone: validPhone,
         merchantId: validMerchantId,
         amount: "0.00",
-        timestamp: new Date
+        timestamp: now
       });
       //Save transaction
       await newTransaction.save();
@@ -210,8 +210,9 @@ async function userRegift(req, res, next) {
     } else {
       const validNewBalance = (Number(balance.balance) - Number(validAmount)).toFixed(2);     //User's new balance
       const validMerchantId = balance.merchantId;     //MerchantId of the gifted balance
+      const now = new Date;     //Log time
       //Update User's balance
-      await balance.update({ $set: { balance: validNewBalance, updatedAt: new Date } }).exec();
+      await balance.update({ $set: { balance: validNewBalance, updatedAt: now } }).exec();
 
       const newValidAmount = "-" + (Number(validAmount)).toFixed(2)     //Gifted amount with "-" in front
       //Create transaction
@@ -221,7 +222,7 @@ async function userRegift(req, res, next) {
         phone: validPhone,
         merchantId: validMerchantId,
         amount: newValidAmount,
-        timestamp: new Date
+        timestamp: now
       });
       //Save transaction
       await newTransaction.save();
@@ -237,8 +238,8 @@ async function userRegift(req, res, next) {
           merchantId: validMerchantId,
           balance: validAmount,
           isActive: true,
-          createdAt: new Date,
-          updatedAt: new Date
+          createdAt: now,
+          updatedAt: now
         });
         //Save balance
         await newBalance.save();
@@ -249,7 +250,7 @@ async function userRegift(req, res, next) {
           phone: validPhone,
           merchantId: validMerchantId,
           amount: validAmount,
-          timestamp: new Date
+          timestamp: now
         });
         //Save transaction
         await newTransaction.save();
@@ -262,7 +263,7 @@ async function userRegift(req, res, next) {
       //If the balance exists but is inactive (it must have a value of 0.00)
       } else if (!balance.isActive) {
         //Reactivate and initialize the balance
-        await balance.update({ $set: { balance: validAmount, isActive: true, updatedAt: new Date } }).exec();
+        await balance.update({ $set: { balance: validAmount, isActive: true, updatedAt: now } }).exec();
 
         //Create transaction
         const newTransaction = new Transaction({
@@ -271,7 +272,7 @@ async function userRegift(req, res, next) {
           phone: validNewPhone,
           merchantId: validMerchantId,
           amount: validAmount,
-          timestamp: new Date
+          timestamp: now
         });
         //Save transaction
         await newTransaction.save()
@@ -285,7 +286,7 @@ async function userRegift(req, res, next) {
       } else {
         const validNewBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);     //Gift recipient's new balance
         //Add the gift to recipient's balance
-        await balance.update({ $set: { balance: validNewBalance, updatedAt: new Date } }).exec();
+        await balance.update({ $set: { balance: validNewBalance, updatedAt: now } }).exec();
 
         //Create transaction
         const newTransaction = new Transaction({
@@ -294,7 +295,7 @@ async function userRegift(req, res, next) {
           phone: validPhone,
           merchantId: validMerchantId,
           amount: validAmount,
-          timestamp: new Date
+          timestamp: now
         });
         //Save transaction
         await newTransaction.save();
@@ -364,8 +365,9 @@ async function userDeleteOne(req, res, next) {
       });
     //Else
     } else {
+      const now = new Date;     //Log time
       //Set balance as inactive
-      await balance.update({ $set: { isActive: false, updatedAt: new Date } })
+      await balance.update({ $set: { isActive: false, updatedAt: now } })
 
       console.log('Balance deleted!');
       return res.status(201).json({
@@ -507,6 +509,7 @@ async function merchantCreate(req, res, next) {
     }
     const validBalance = Number(req.body.balance).toFixed(2);     //Balance amount to be issued
     const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    const now = new Date;     //Log time
     //Find a balance with this User and Merchant
     let balance = await Balance.findOne({ phone: validPhone, merchantId: validMerchantId }).exec();
 
@@ -519,8 +522,8 @@ async function merchantCreate(req, res, next) {
         merchantId: validMerchantId,
         balance: validBalance,
         isActive: true,
-        createdAt: new Date,
-        updatedAt: new Date
+        createdAt: now,
+        updatedAt: now
       });
       //Save balance
       await newBalance.save();
@@ -531,7 +534,7 @@ async function merchantCreate(req, res, next) {
         phone: validPhone,
         merchantId: validMerchantId,
         amount: validBalance,
-        timestamp: new Date
+        timestamp: now
       });
       //Save transaction
       await newTransaction.save();
@@ -598,8 +601,9 @@ async function merchantUpdate(req, res, next) {
     }
     //Else
     const newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);      //New balance
+    const now = new Date;     //Log time
     //Set the new balance
-    await balance.update({ $set: { balance: newBalance, updatedAt: new Date } }).exec();
+    await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
     //Create transaction
     const newTransaction = new Transaction({
       _id: new mongoose.Types.ObjectId,
@@ -607,7 +611,7 @@ async function merchantUpdate(req, res, next) {
       phone: balance.phone,
       merchantId: validMerchantId,
       amount: validAmount,
-      timestamp: new Date
+      timestamp: now
     });
     //Save transaction
     await newTransaction.save();
@@ -639,8 +643,9 @@ async function merchantRestore(req, res, next) {
       });
     //Else
     } else {
+      const now = new Date;     //Log time
       //Reactivate inactive balances
-      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }, { $set: { isActive: true, updatedAt: new Date }}).exec();
+      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }, { $set: { isActive: true, updatedAt: now }}).exec();
 
       console.log('Balances restored!');
       return res.status(201).json({

@@ -56,13 +56,14 @@ async function verify(req, res, next) {
         message: "Invalid phone!"
       });
     }
+    const now = new Date;     //Log time
     var x = RNG();      //Randomly generated code
     //Create verification
     var newVerification = new Verification({
       _id: new mongoose.Types.ObjectId,
       phone: validPhone,
       code: x,
-      createdAt: new Date
+      createdAt: now
     });
     //Save verification
     await newVerification.save();
@@ -94,21 +95,24 @@ async function signUp(req, res, next) {
       return res.status(422).json({
         message: "Invalid password!"
       });
-    } else if (req.body.firstName) {
+    }
+    if (req.body.firstName) {
       if (!validator.string(req.body.firstName)) {
         console.log('Invalid first name!');
         return res.status(422).json({
           message: "Invalid first name!"
         });
       }
-    } else if (req.body.lastName) {
+    }
+    if (req.body.lastName) {
       if (!validator.string(req.body.lastName)) {
         console.log('Invalid last name!');
         return res.status(422).json({
           message: "Invalid last name!"
         });
       }
-    } else if (req.body.dob) {
+    }
+    if (req.body.dob) {
       if (!validator.dob(req.body.dob)) {
         console.log('Invalid date!');
         return res.status(422).json({
@@ -141,6 +145,7 @@ async function signUp(req, res, next) {
         //Hash password
         let hash = await bcrypt.hash(validPassword, 10);
 
+        const now = new Date;     //Log time
         //Create User
         var newUser = new User({
           _id: new mongoose.Types.ObjectId,
@@ -152,8 +157,8 @@ async function signUp(req, res, next) {
           image: 'DefaultUser.png',
           isActive: true,
           lastLoginAt: null,
-          createdAt: new Date,
-          updatedAt: new Date
+          createdAt: now,
+          updatedAt: now
         });
         //Save User
         await newUser.save();
@@ -164,8 +169,9 @@ async function signUp(req, res, next) {
         });
       //If the User exists but is inactive
       } else if (!user.isActive) {
+        const now = new Date;     //Log time
         //Reactivate the User
-        await user.update({ $set: { isActive: true } }).exec();
+        await user.update({ $set: { isActive: true, updatedAt: now } }).exec();
 
         console.log('User created!');
         return res.status(201).json({
@@ -215,8 +221,9 @@ async function logIn(req, res, next) {
     } else {
       //Check hashed password
       await bcrypt.compare(validPassword, user.password);
+      const now = new Date;     //Log time
       //Log in User
-      await user.update({ $set: { lastLoginAt: new Date } }).exec();
+      await user.update({ $set: { lastLoginAt: now } }).exec();
       //Create JWT Token
       const token = jwt.sign(
         {
@@ -266,11 +273,28 @@ async function updateName(req, res, next) {
         message: "Invalid last name!"
       });
     }
+    if (req.body.firstName) {
+      if (!validator.string(req.body.firstName)) {
+        console.log('Invalid first name!');
+        return res.status(422).json({
+          message: "Invalid first name!"
+        });
+      }
+    }
+    if (req.body.lastName) {
+      if (!validator.string(req.body.lastName)) {
+        console.log('Invalid last name!');
+        return res.status(422).json({
+          message: "Invalid last name!"
+        });
+      }
+    }
     const validFName = req.body.firstName;      //New first name of the User
     const validLName = req.body.lastName;     //New last name of the User
     const validUserId = req.userData.userId;      //UserId of the User
+    const now = new Date;     //Log time
     //Find and update User name
-    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set:{ firstName: validFName, lastName: validLName, updatedAt: new Date } }).exec();
+    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set:{ firstName: validFName, lastName: validLName, updatedAt: now } }).exec();
 
     console.log('Name changed!');
     return res.status(201).json({
@@ -296,6 +320,7 @@ async function updateImage(req, res, next) {
     const validUserId = req.userData.userId;      //UserId of the User
     //Find a real and active User
     let user = await User.findOne({ _id: validUserId, isActive: true }).exec();
+
     //If no User exists
     if (!user) {
       console.log('User doesn\'t exist!');
@@ -327,8 +352,9 @@ async function updateImage(req, res, next) {
           }
         });
       }
+      const now = new Date;     //Log time
       //Update User image
-      await user.update({ $set:{ image: validFile.key, updatedAt: new Date } }).exec();
+      await user.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
 
       console.log('Image changed!');
       return res.status(201).json({
@@ -353,11 +379,12 @@ async function updatePassword(req, res, next) {
     }
     const validPassword = req.body.password;      //New password of the User
     const validUserId = req.userData.userId;      //UserId of the User
+    const now = new Date;     //Log time
     //Hash password
     let hash = await bcrypt.hash(validPassword, 10);
 
     //Find and update User password
-    let user = await User.findOneAndUpdate({ _id: validUserId }, { $set: { password: hash, updatedAt: new Date } }).exec();
+    let user = await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { password: hash, updatedAt: now } }).exec();
 
     console.log('Password changed!');
     return res.status(201).json({
@@ -374,8 +401,9 @@ async function updatePassword(req, res, next) {
 async function deleteUser(req, res, next) {
   try {
     const validUserId = req.userData.userId;      //UserId of the User
+    const now = new Date;     //Log time
     //Find and deactive a real and active User
-    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { isActive: false, updatedAt: new Date } }).exec();
+    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { isActive: false, updatedAt: now } }).exec();
 
     console.log('User deleted!');
     return res.status(201).json({
