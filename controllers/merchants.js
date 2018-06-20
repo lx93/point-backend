@@ -161,7 +161,7 @@ async function signUp(req, res, next) {
           message: "Merchant exists!"
         });
       }
-    // } //Delete starting "// for production
+     //} //Delete starting "//" for production
   } catch (err) {
     throwErr(res, err);
   }

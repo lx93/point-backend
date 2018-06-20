@@ -15,16 +15,7 @@ const storage = multerS3({
     cb(null, new Date().toISOString() + file.originalname);
   }
 });
-/*
-const storage = multer.diskStorage({
-  destination: function(req, file, callback) {
-    callback(null, 'uploads/');
-  },
-  filename: function(req, file, callback) {
-    callback(null, new Date().toISOString() + file.originalname);
-  }
-});
-*/
+
 const fileFilter = (req, file, callback) => {
   if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
     callback(null, true);

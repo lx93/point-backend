@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const validator = require('../utils/validator');
 const throwErr = require('../utils/throwErr');
 const RNG = require('../utils/RNG');
-const messenger = require('../utils/messenger')
+const messenger = require('../utils/messenger');
 
 
 //Get User info
