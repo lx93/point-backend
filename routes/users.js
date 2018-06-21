@@ -31,6 +31,9 @@ router.post('/signup', uController.signUp);
 //LogIn
 router.post('/login', uController.logIn);
 
+//Facebook Authorization
+router.post('/fbAuth', uController.fbAuth);
+
 //Recommend
 //router.post('/recommend', userAuth, userExist, uController.recommend);
 
