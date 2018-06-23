@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 async function balanceValid(req, res, next) {
   try {
     var validHashId;
-    //If there is no hashId field
+    //If there is no balanceId field
     if (!req.body.balanceId && !req.params.balanceId) {
       console.log('Invalid balanceId!');
       return res.status(422).json({
@@ -27,6 +27,7 @@ async function balanceValid(req, res, next) {
         message: "Invalid balanceId!"
       });
     } else {
+      //Save the actual balanceId
       req.balanceId = balance._id;
       //Continue
       next();
