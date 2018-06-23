@@ -14,7 +14,6 @@ const merchants = require('./routes/merchants');
 const messaging = require('./routes/messaging');
 const balances = require('./routes/balances');
 
-
 const app = express();
 
 //Set up mongoose connection

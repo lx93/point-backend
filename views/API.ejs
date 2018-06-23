@@ -200,8 +200,7 @@
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
-		- firstName (optional): A valid string containing the User's first name. Ex. John.
-		- lastName (optional): A valid string containing the User's last name. Ex. Doe.
+		- name: A valid string containing the User's name. Ex. John Doe.
 		- dob (optional): A valid string containing the User's date of birth in yyyy-mm-dd format. Ex. 2000-01-01.
 		- code: A valid 6-digit verification code sent to the listed phone. Ex. 123456. Codes will expire within 5 minutes of creation.
 
@@ -211,8 +210,7 @@
 			{
 				"phone": 19198229889,
 				"password": "verygoodpassword",
-				"firstName": "John",
-				"lastName": "Doe",
+				"name": "John Doe",
 				"dob": "2000-01-01",
 				"code": 123456
 			}
@@ -262,16 +260,14 @@
 
 		<i>Arguments:</i>
 		---------
-		- firstName (optional): A valid string containing the User's first name. Ex. Bob.
-		- lastName (optional): A valid string containing the User's last name. Ex. Ross.
+		- name: A valid string containing the User's first name. Ex. Bob Ross.
 
 			Request
 			-------
 			Authorization: Bearer 919Token
 			Content-Type: application/json
 			{
-				"firstName": "Bob",
-				"lastName": "Ross"
+				"name": "Bob Ross"
 			}
 
 			Response

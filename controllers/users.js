@@ -32,8 +32,7 @@ async function getUser(req, res, next) {
     } else {
       console.log('\n'+user+'\n');
       return res.status(200).json({
-        firstName: user.firstName,
-        lastName: user.lastName,
+        name: user.name,
         dob: user.dob,
         phone: user.phone,
         image: user.image,
@@ -98,36 +97,25 @@ async function signUp(req, res, next) {
       return res.status(422).json({
         message: "Invalid password!"
       });
-    }
-    if (req.body.firstName) {
-      if (!validator.string(req.body.firstName)) {
-        console.log('Invalid first name!');
-        return res.status(422).json({
-          message: "Invalid first name!"
-        });
-      }
-    }
-    if (req.body.lastName) {
-      if (!validator.string(req.body.lastName)) {
-        console.log('Invalid last name!');
-        return res.status(422).json({
-          message: "Invalid last name!"
-        });
-      }
+    } else if (!validator.string(req.body.name)) {
+      console.log('Invalid name!');
+      return res.status(422).json({
+        message: "Invalid name!"
+      });
     }
     if (req.body.dob) {
-      if (!validator.dob(req.body.dob)) {
+      validDOB = dob[2]+"-"+dob[0]+"-"+dob[1];      //Date Of Birth of Facebook User
+      if (!validator.dob(validDOB)) {
         console.log('Invalid date!');
         return res.status(422).json({
           message: "Invalid date!"
         });
       }
-      validDOB = new Date(req.body.dob);      //Date Of Birth of the User
+      validDOB = new Date(validDOB);      //Date Of Birth of the User
     }
     const validPassword = req.body.password;      //Password of the User
     const validCode = req.body.code;      //Verification code
-    const validFName = req.body.firstName;      //First name of the User
-    const validLName = req.body.lastName;      //Last name of the User
+    const validName = req.body.name;      //Name of the User
     //Find a real verification with this User
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
@@ -154,8 +142,7 @@ async function signUp(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: validPhone,
           password: hash,
-          firstName: validFName,
-          lastName: validLName,
+          name: validName,
           dob: validDOB,
           image: 'DefaultUser.png',
           isActive: true,
@@ -275,27 +262,22 @@ async function fbAuth(req, res, next) {
       }
     };
     //Authenticate Facebook user
-    let response = await request(options);
-    const fbRes = JSON.parse(response);
-
-    if (fbRes.error) {
+    try {
+      let response = await request(options);
+    } catch (err) {
       console.log('Invalid access token!');
       return res.status(422).json({
         message: "Invalid access token!"
       });
     }
+    const fbRes = JSON.parse(response);
+
     const validFBId = fbRes.id;     //Facebook User Id
-    var validFName;
-    var validLName;
+    const validName = fbRes.name;     //Name of the Facebook User
     var validDOB;
-    if (fbRes.name) {
-      const name = fbRes.name.split(" ");
-      validFName = name[0];     //First name of the Facebook User
-      validLName = name[1];     //Last name of the Facebook User
-    }
     if (fbRes.birthday) {
       const dob = fbRes.birthday.split("/");
-      validDOB = new Dage(dob[2]+"-"+dob[0]+"-"+dob[1]);      //Date Of Birth of Facebook User
+      validDOB = new Date(dob[2]+"-"+dob[0]+"-"+dob[1]);      //Date Of Birth of Facebook User
     }
     //Find a real Facebook User ID
     let fbUser = await FBUser.findOne({ fbId: validFBId }).exec();
@@ -340,8 +322,7 @@ async function fbAuth(req, res, next) {
             var newUser = new User({
               _id: new mongoose.Types.ObjectId,
               phone: validPhone,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB,
               image: 'DefaultUser.png',
               isActive: true,
@@ -357,8 +338,7 @@ async function fbAuth(req, res, next) {
               _id: new mongoose.Types.ObjectId,
               phone: validPhone,
               fbId: validFBId,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB
             });
             //Save fbUser
@@ -378,8 +358,7 @@ async function fbAuth(req, res, next) {
               _id: new mongoose.Types.ObjectId,
               phone: user.phone,
               fbId: validFBId,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB
             });
             //Save fbUser
@@ -399,8 +378,7 @@ async function fbAuth(req, res, next) {
               _id: new mongoose.Types.ObjectId,
               phone: user.phone,
               fbId: validFBId,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB
             });
             //Save fbUser
@@ -425,7 +403,7 @@ async function fbAuth(req, res, next) {
       } else if (!user.isActive) {
         const now = new Date;     //Log time
         //Update FB information
-        await fbUser.update({ $set: { firstName: validFName, lastName: validLName, dob: validDOB }}).exec();
+        await fbUser.update({ $set: { name: validName, dob: validDOB }}).exec();
         //Log in the User
         await user.update({ $set: { isActive: true, updatedAt: now, lastLoginAt: now } }).exec();
 
@@ -434,10 +412,10 @@ async function fbAuth(req, res, next) {
         sendToken(req, res);
       } else {
         const now = new Date;     //Log time
+        //Update FB information
+        await fbUser.update({ $set: { name: validName, dob: validDOB }}).exec();
         //Log in the User
         await user.update({ $set: { lastLoginAt: now } }).exec();
-        //Update FB information
-        await fbUser.update({ $set: { firstName: validFName, lastName: validLName, dob: validDOB }}).exec();
 
         //Save User information
         req.userData = user;
@@ -454,39 +432,17 @@ async function fbAuth(req, res, next) {
 /* Change the name to your User Point account. */
 async function updateName(req, res, next) {
   try {
-    if (!validator.string(req.body.firstName)) {
-      console.log('Invalid first name!');
+    if (!validator.string(req.body.name)) {
+      console.log('Invalid name!');
       return res.status(422).json({
-        message: "Invalid first name!"
-      });
-    } else if (!validator.string(req.body.lastName)) {
-      console.log('Invalid last name!');
-      return res.status(422).json({
-        message: "Invalid last name!"
+        message: "Invalid name!"
       });
     }
-    if (req.body.firstName) {
-      if (!validator.string(req.body.firstName)) {
-        console.log('Invalid first name!');
-        return res.status(422).json({
-          message: "Invalid first name!"
-        });
-      }
-    }
-    if (req.body.lastName) {
-      if (!validator.string(req.body.lastName)) {
-        console.log('Invalid last name!');
-        return res.status(422).json({
-          message: "Invalid last name!"
-        });
-      }
-    }
-    const validFName = req.body.firstName;      //New first name of the User
-    const validLName = req.body.lastName;     //New last name of the User
+    const validName = req.body.name;      //New name of the User
     const validUserId = req.userData.userId;      //UserId of the User
     const now = new Date;     //Log time
     //Find and update User name
-    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set:{ firstName: validFName, lastName: validLName, updatedAt: now } }).exec();
+    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set:{ name: validName, updatedAt: now } }).exec();
 
     console.log('Name changed!');
     return res.status(201).json({

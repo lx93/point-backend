@@ -8,13 +8,14 @@ var balanceSchema = new Schema({
   phone: { type: Number, required: true },
   merchantId: { type: mongoose.Schema.Types.ObjectId, required: true },
   balance: { type: String, required: true },
+  hashId: { type: String, required: true },
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true }
 });
 
 /* INDEXES (used to speed up queries)
- * db.balances.createIndex({  isActive: -1, _id: 1 })
+ * db.balances.createIndex({  isActive: -1, hashId: 1 })
  */
 
 // the schema is useless so far
