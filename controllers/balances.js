@@ -66,44 +66,6 @@ async function userGetAll(req, res, next) {
   }
 };
 
-//userGetOne
-//GET api.pointup.io/users/balances/:balanceId
-/* Retrieve a specific balance involving this User. */
-async function userGetOne(req, res, next) {
-  try {
-    const validPhone = req.userData.phone     //Phone number of the User
-    const validBalanceId = req.balanceId      //Valid balanceId
-    //Find a real and active balance with this User
-    let balance = await Balance.findOne({ _id: validBalanceId, phone: validPhone, isActive: true }).exec();
-
-    //If no balance exists
-    if (!balance) {
-      console.log('Invalid balance!');
-      return res.status(422).json({
-        message: "Invalid balance!"
-      });
-    //Else balance must exist
-    } else {
-      //Find a real and active Merchant
-      let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
-
-      console.log(balance);
-      return res.status(200).json({
-        balanceId: balance.hashId,
-        name: merchant.name,
-        image: merchant.image,
-        phone: balance.phone,
-        merchantId: balance.merchantId,
-        balance: balance.balance,
-        createdAt: balance.createdAt,
-        updatedAt: balance.updatedAt
-      });
-    }
-  } catch (err) {
-    throwErr(res, err);
-  }
-};
-
 //userCreate
 //POST api.pointup.io/users/balances/
 /* Create a new balance of 0.00 with a specified Merchant. */
@@ -465,39 +427,6 @@ async function merchantGetAll(req, res, next) {
   }
 };
 
-//merchantGetOne
-//GET api.pointup.io/merchants/balances/:balanceId
-/* Retrieve a specific balance involving this Merchant. */
-async function merchantGetOne(req, res, next) {
-  try {
-    const validMerchantId = req.merchantData.merchantId;     //MerchantId of the Merchant
-    const validBalanceId = req.balanceId;      //Valid balanceId
-    //Find a real and active balance with this Merchant
-    let balance = await Balance.findOne({ _id: validBalanceId, merchantId: validMerchantId, isActive: true }).exec();
-
-    //If no balance exists
-    if (!balance) {
-      console.log('Invalid balance!');
-      return res.status(422).json({
-        message: "Invalid balance!"
-      });
-    //Else
-    } else {
-      console.log(balance);
-      return res.status(200).json({
-        balanceId: balance.hashId,
-        phone: balance.phone,
-        merchantId: balance.merchantId,
-        balance: balance.balance,
-        createdAt: balance.createdAt,
-        updatedAt: balance.updatedAt
-      });
-    }
-  } catch (err) {
-    throwErr(res, err);
-  }
-};
-
 //merchantCreate
 //POST api.pointup.io/merchants/balances/
 /* Create a new balance with a specified User. */
@@ -790,9 +719,6 @@ async function getBalance(req, res, next) {
     //Find a real and active balance
     let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
 
-    //Find a real and active Merchant
-    let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
-
     //If no balance exists
     if (!balance) {
       console.log('Balance doesn\'t exist!');
@@ -801,6 +727,9 @@ async function getBalance(req, res, next) {
       });
     //Else balance must exist
     } else {
+      //Find a real and active Merchant
+      let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
+
       console.log(balance);
       return res.status(200).json({
         balanceId: balance.hashId,
@@ -819,7 +748,6 @@ async function getBalance(req, res, next) {
 };
 
 exports.userGetAll = userGetAll;
-exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
 exports.userRegift = userRegift;
 exports.userDeleteAll = userDeleteAll;
@@ -827,7 +755,6 @@ exports.userDeleteOne = userDeleteOne;
 exports.userGetTransactions = userGetTransactions;
 
 exports.merchantGetAll = merchantGetAll;
-exports.merchantGetOne = merchantGetOne;
 exports.merchantCreate = merchantCreate;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantRestore = merchantRestore;
