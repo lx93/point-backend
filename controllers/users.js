@@ -120,7 +120,7 @@ async function signUp(req, res, next) {
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
     //If no verification exists
-    if (!verification && process.env.TEST === 'production') {
+    if (!verification && process.env.MODE === 'production') {
       console.log('Auth failed');
       return res.status(401).json({
         message: 'Auth failed'
@@ -260,9 +260,10 @@ async function fbAuth(req, res, next) {
         fields: userFieldSet
       }
     };
+    var response;
     //Authenticate Facebook user
     try {
-      let response = await request(options);
+      response = await request(options);
     } catch (err) {
       console.log('Invalid access token!');
       return res.status(422).json({
@@ -302,15 +303,14 @@ async function fbAuth(req, res, next) {
         //Find a real verification with this User
         let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
-        /* //<-- Delete "/*" for production
         //If no verification exists
-        if (!verification) {
+        if (!verification && process.env.TEST === 'production') {
           console.log('Auth failed');
           return res.status(401).json({
             message: 'Auth failed'
           });
         //Else
-        } else {    //Delete that ---> */
+        } else {
           //Find a real User
           let user = await User.findOne({ phone: validPhone }).exec();
 
@@ -387,7 +387,7 @@ async function fbAuth(req, res, next) {
             req.userData = user;
             sendToken(req, res);
           }
-        // } //Delete starting "// for production
+        }
       }
     //Else
     } else {
@@ -395,9 +395,11 @@ async function fbAuth(req, res, next) {
       let user = await User.findOne({ phone: fbUser.phone }).exec();
 
       if (!user) {
-        console.log('User doesn\'t exist!');
-        return res.status(500).json({
-          message: "User doesn't exist!"
+        //This should never happen. This will only occur if the Users table was deleted while the fbusers was not.
+        await FBUser.deleteOne({ fbId: validFBId }).exec();
+        console.log('FBId doesn\'t exist!');
+        return res.status(409).json({
+          message: "FBId doesn't exist!"
         });
       } else if (!user.isActive) {
         const now = new Date;     //Log time
