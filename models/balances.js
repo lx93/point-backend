@@ -15,7 +15,8 @@ var balanceSchema = new Schema({
 });
 
 /* INDEXES (used to speed up queries)
- * db.balances.createIndex({  isActive: -1, hashId: 1 })
+ * db.balances.createIndex({ isActive: -1, hashId: 1 })
+ * db.balances.createIndex({ isActive: -1, _id: 1 })
  */
 
 // the schema is useless so far
