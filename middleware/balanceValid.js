@@ -19,7 +19,7 @@ async function balanceValid(req, res, next) {
       validHashId = req.body.balanceId;
     }
     //Find a real and active balance
-    var balance = await Balance.findOne({ hashId: validHashId, isActive: true }).exec()
+    let balance = await Balance.findOne({ hashId: validHashId, isActive: true }).exec();
 
     if (!balance) {
       console.log('Invalid balanceId!');
