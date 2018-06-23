@@ -221,7 +221,8 @@ async function logIn(req, res, next) {
         sendToken(req, res);
       } else {
         //Check hashed password
-        await bcrypt.compare(validPassword, user.password);
+        var result = await bcrypt.compare(validPassword, user.password);
+        console.log(result);
         const now = new Date;     //Log time
         //Log in User
         await user.update({ $set: { lastLoginAt: now } }).exec();
@@ -230,7 +231,6 @@ async function logIn(req, res, next) {
         req.userData = user;
         sendToken(req, res);
       }
-
     }
   } catch (err) {
     console.log('Auth failed');

@@ -568,6 +568,7 @@ async function merchantCreate(req, res, next) {
     //Else
     } else {
       console.log('Balance exists!');
+      console.log(balance.hashId);
       return res.status(409).json({
         message: "Balance exists!",
         balanceId: balance.hashId
