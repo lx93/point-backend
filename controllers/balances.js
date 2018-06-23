@@ -180,6 +180,7 @@ async function userRegift(req, res, next) {
       var validHashId = hashBalance(validBalanceId);      //Create hashId
       //Update User's balance
       await balance.update({ $set: { balance: validNewBalance, hashId: validHashId, updatedAt: now } }).exec();
+      req.gifter = validHashId;     //Saves hashId
 
       const newValidAmount = "-" + (Number(validAmount)).toFixed(2)     //Gifted amount with "-" in front
       //Create transaction
@@ -228,7 +229,9 @@ async function userRegift(req, res, next) {
         /*TODO--notify user--*/
         console.log('Balance exchanged!');
         return res.status(201).json({
-          message: "Balance exchanged!"
+          message: "Balance exchanged!",
+          gifter: req.gifter,
+          recipient: validHashId
         });
       //If the balance exists but is inactive (it must have a value of 0.00)
       } else if (!balance.isActive) {
@@ -251,13 +254,16 @@ async function userRegift(req, res, next) {
         /*TODO--notify user--*/
         console.log('Balance exchanged!');
         return res.status(201).json({
-          message: "Balance exchanged!"
+          message: "Balance exchanged!",
+          gifter: req.gifter,
+          recipient: validHashId
         });
       //Else the balance must exist
       } else {
+        const validHashId = hashBalance(balance._id);      //Create hashId
         const validNewBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);     //Gift recipient's new balance
         //Add the gift to recipient's balance
-        await balance.update({ $set: { balance: validNewBalance, updatedAt: now } }).exec();
+        await balance.update({ $set: { balance: validNewBalance, hashId: validHashId, updatedAt: now } }).exec();
 
         //Create transaction
         const newTransaction = new Transaction({
@@ -274,7 +280,9 @@ async function userRegift(req, res, next) {
         /*TODO--notify user--*/
         console.log('Balance exchanged!');
         return res.status(201).json({
-          message: "Balance exchanged!"
+          message: "Balance exchanged!",
+          gifter: req.gifter,
+          recipient: validHashId
         });
       }
     }
