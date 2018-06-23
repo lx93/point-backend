@@ -119,15 +119,14 @@ async function signUp(req, res, next) {
     //Find a real verification with this User
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
-    /* //<-- Delete "/*" for production
     //If no verification exists
-    if (!verification) {
+    if (!verification && process.env.TEST === 'production') {
       console.log('Auth failed');
       return res.status(401).json({
         message: 'Auth failed'
       });
     //Else
-    } else {    //Delete that ---> */
+    } else {
       //Find a real User
       let user = await User.findOne({ phone: validPhone }).exec();
 
@@ -174,7 +173,7 @@ async function signUp(req, res, next) {
           message: "User exists!"
         });
       }
-    // } //Delete starting "// for production
+    }
   } catch (err) {
     throwErr(res, err);
   }

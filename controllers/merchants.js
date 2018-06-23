@@ -108,15 +108,14 @@ async function signUp(req, res, next) {
     //Find a real verification with this Merchant
     let verification = await Verification.findOne({ email: validEmail, code: validCode }).exec();
 
-    /* //<-- Delete "/*" for production
     //If no verification exists
-    if (!verification) {
+    if (!verification && process.env.TEST === 'production') {
       console.log('Auth failed');
       return res.status(401).json({
         message: 'Auth failed'
       });
     //Else
-    } else {    //Delete that ---> */
+    } else {
       //Find a Merchant with matching name or email
       let merchant = await Merchant.findOne({ $or:[{ name: validName }, { email: validEmail } ]} ).exec();
 
@@ -161,7 +160,7 @@ async function signUp(req, res, next) {
           message: "Merchant exists!"
         });
       }
-     //} //Delete starting "//" for production
+    }
   } catch (err) {
     throwErr(res, err);
   }

@@ -18,7 +18,7 @@ const app = express();
 
 //Set up mongoose connection
 const mongoose = require('mongoose');
-const mongoDB = 'mongodb://admin:' + process.env.MONGO_ATLAS_PW + '@ds255740.mlab.com:55740/pointdb-test';
+const mongoDB = process.env.MONGODB_URI
 mongoose.connect(mongoDB);
 mongoose.Promise = global.Promise;
 const db = mongoose.connection;
