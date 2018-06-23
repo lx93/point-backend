@@ -630,7 +630,8 @@ async function merchantUpdate(req, res, next) {
 
     console.log('Balance updated!');
     return res.status(201).json({
-      message: "Balance updated!"
+      message: "Balance updated!",
+      balanceId: balance.hashId
     });
   } catch (err) {
     throwErr(res, err);

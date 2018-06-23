@@ -221,15 +221,21 @@ async function logIn(req, res, next) {
         sendToken(req, res);
       } else {
         //Check hashed password
-        var result = await bcrypt.compare(validPassword, user.password);
-        console.log(result);
-        const now = new Date;     //Log time
-        //Log in User
-        await user.update({ $set: { lastLoginAt: now } }).exec();
+        let result = await bcrypt.compare(validPassword, user.password);
+        if (result) {
+          const now = new Date;     //Log time
+          //Log in User
+          await user.update({ $set: { lastLoginAt: now } }).exec();
 
-        //Save User information
-        req.userData = user;
-        sendToken(req, res);
+          //Save User information
+          req.userData = user;
+          sendToken(req, res);
+        } else {
+          console.log('Auth failed');
+          return res.status(401).json({
+            message: "Auth failed"
+          });
+        }
       }
     }
   } catch (err) {

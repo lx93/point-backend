@@ -196,32 +196,39 @@ async function logIn(req, res, next) {
     //Else
     } else {
       //Check hashed password
-      await bcrypt.compare(validPassword, merchant.password);
-      const now = new Date;     //Log time
-      //Log in Merchant
-      await merchant.update({ $set: { lastLoginAt: now } }).exec();
-      //Create JWT Token
-      const token = jwt.sign(
-        {
-          name: merchant.name,
-          email: merchant.email,
-          image: merchant.image,
-          lastLoginAt: merchant.lastLoginAt,
-          createdAt: merchant.createdAt,
-          merchantId: merchant._id
-        },
-        process.env.JWT_KEY,
-        {
-          expiresIn: "1y"
-        }
-      );
+      let result = await bcrypt.compare(validPassword, merchant.password);
+      if (result) {
+        const now = new Date;     //Log time
+        //Log in Merchant
+        await merchant.update({ $set: { lastLoginAt: now } }).exec();
+        //Create JWT Token
+        const token = jwt.sign(
+          {
+            name: merchant.name,
+            email: merchant.email,
+            image: merchant.image,
+            lastLoginAt: merchant.lastLoginAt,
+            createdAt: merchant.createdAt,
+            merchantId: merchant._id
+          },
+          process.env.JWT_KEY,
+          {
+            expiresIn: "1y"
+          }
+        );
 
-      //Pass JWT Token
-      console.log('Auth successful');
-      return res.status(201).json({
-        message: "Auth successful",
-        token: token
-      });
+        //Pass JWT Token
+        console.log('Auth successful');
+        return res.status(201).json({
+          message: "Auth successful",
+          token: token
+        });
+      } else {
+        console.log('Auth failed');
+        return res.status(401).json({
+          message: "Auth failed"
+        });
+      }
     }
   } catch (err) {
     console.log('Auth failed');
