@@ -293,7 +293,7 @@ async function fbAuth(req, res, next) {
       //If no phone is in the body
       if (!req.body.phone) {
         console.log('FBId doesn\'t exist!');
-        return res.status(204).json({
+        return res.status(409).json({
           message: "FBId doesn't exist!"
         });
       //Else
