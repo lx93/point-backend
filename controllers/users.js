@@ -293,7 +293,7 @@ async function fbAuth(req, res, next) {
       //If no phone is in the body
       if (!req.body.phone) {
         console.log('FBId doesn\'t exist!');
-        return res.status(409).json({
+        return res.status(202).json({
           message: "FBId doesn't exist!"
         });
       //Else
@@ -404,7 +404,7 @@ async function fbAuth(req, res, next) {
         //This should never happen. This will only occur if the Users table was deleted while the fbusers was not.
         await FBUser.deleteOne({ fbId: validFBId }).exec();
         console.log('FBId doesn\'t exist!');
-        return res.status(409).json({
+        return res.status(202).json({
           message: "FBId doesn't exist!"
         });
       } else if (!user.isActive) {
