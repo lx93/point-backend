@@ -1,7 +1,25 @@
 const plivo = require('plivo');
 const request = require('request');
 
-function sendText(dst, text) {
+function signup(merchantName, balance, balanceId, phone) {
+  var output = "";
+  output += "You just obtained a giftcard with " + merchantName + "!\n";
+  output += "Your balance with " + merchantName + " is now $" + balance + "!\n";
+  output += "View and redeem your Pointup Giftcard at app.point.io/" + balanceId + "!\n";
+  output += "Recipient: " + phone;
+  return ouput;
+}
+
+function updateCard(merchantName, balance, balanceId, phone) {
+  var output = "";
+  output += "Your balance with " + merchantName + " has been updated!\n";
+  output += "Your balance with " + merchantName + " is now $" + balance + "!\n";
+  output += "View and redeem your Pointup Giftcard at app.point.io/" + balanceId + "!\n";
+  output += "Recipient: " + phone;
+  return ouput;
+}
+
+async function sendText(res, dst, text) {
 
   const url = "https://api.plivo.com/v1/Account/" + process.env.PLIVO_AUTH_ID + "/Message/";
   const auth = process.env.PLIVO_AUTH_TOKEN;
@@ -22,10 +40,13 @@ function sendText(dst, text) {
       console.log('Message sent!');
     } else {
       console.log('Message failed to send!');
+      return res.status(409).json({
+        error: error
+      });
     }
   };
 
-  request(options, callback);
+  await request(options, callback);
 }
 
 function sendMessage(req, res, next) {

@@ -2,7 +2,7 @@ const Balance = require('../models/balances');
 const Hash = require('../models/hashes');
 const mongoose = require('mongoose');
 
-async function balanceValid(req, res, next) {
+async function balanceExist(req, res, next) {
   try {
     var validHashId;
     //If there is no balanceId field
@@ -19,14 +19,20 @@ async function balanceValid(req, res, next) {
     } else {
       validHashId = req.body.balanceId;
     }
-    //Find a real and active hash
-    let hash = await Hash.findOne({ hashId: validHashId, isActive: true }).exec();
+    //Find a real hash
+    let hash = await Hash.findOne({ hashId: validHashId }).exec();
 
     //If no hash exists
     if (!hash) {
       console.log('Invalid balanceId!');
       return res.status(422).json({
         message: "Invalid balanceId!"
+      });
+    //If hash exists but is inactive
+    } else if (!hash.isActive) {
+      console.log('Balance expired!');
+      return res.status(202).json({
+        message: "Balance expired!"
       });
     //Else
     } else {
@@ -58,4 +64,4 @@ async function balanceValid(req, res, next) {
   }
 };
 
-module.exports = balanceValid;
+module.exports = balanceExist;

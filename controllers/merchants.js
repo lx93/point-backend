@@ -149,7 +149,7 @@ async function signUp(req, res, next) {
         const now = new Date;     //Log time
         //Set Merchant to active
         await merchant.update({ $set: { isActive: true, updatedAt: now } });
-        res.merchantId = merchant._id;
+        req.merchantId = merchant._id;
         console.log('Merchant created!');
         res.message1 = "Merchant created!";
         next();
