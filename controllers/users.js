@@ -293,7 +293,7 @@ async function fbAuth(req, res, next) {
       //If no phone is in the body
       if (!req.body.phone) {
         console.log('FBId doesn\'t exist!');
-        return res.status(409).json({
+        return res.status(204).json({
           message: "FBId doesn't exist!"
         });
       //Else
@@ -310,7 +310,7 @@ async function fbAuth(req, res, next) {
         let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
         //If no verification exists
-        if (!verification && process.env.MODE === 'production') {
+        if (!verification && (process.env.MODE === 'production' || validCode)) {
           console.log('Auth failed');
           return res.status(401).json({
             message: 'Auth failed'
