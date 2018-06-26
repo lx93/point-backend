@@ -11,7 +11,7 @@ var hashSchema = new Schema({
 });
 
 /* INDEXES (used to speed up queries)
- * db.hashes.createIndex({ iSActive: -1, hashId: 1 })
+ * db.hashes.createIndex({ isActive: -1, balanceId: 1, hashId: 1 })
  */
 
 // the schema is useless so far
