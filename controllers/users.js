@@ -310,7 +310,7 @@ async function fbAuth(req, res, next) {
         let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
         //If no verification exists
-        if (!verification && process.env.TEST === 'production') {
+        if (!verification && process.env.MODE === 'production') {
           console.log('Auth failed');
           return res.status(401).json({
             message: 'Auth failed'

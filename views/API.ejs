@@ -64,6 +64,7 @@
 	- Get all Merchants
 	- Get a specific Merchant
 	- Verify as a User
+	- Authenticate with Facebook
 	- Sign up as a User
 	- Log in as a User
 	- Modify User password
@@ -249,6 +250,37 @@
 			HTTP Status Code: 201
 			{
 				"message": "Auth succeeded",
+				"token": "919Token"
+			}
+
+
+		<b>Authenticate with Facebook</b>
+		--------------------------
+		The following API enables you to log into your User Point account via Facebook. A token will be sent back in the response, enabling the User to store it for authorization.
+
+		POST api.pointup.io/users/fbAuth
+
+		<i>Arguments:</i>
+		---------
+		- accessToken: A valid Facebook User Authentication token. Ex. 919AccessToken
+		- phone (optional): A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- code (optional): A valid 6-digit verification code sent to the listed phone. Ex. 123456. Codes will expire within 5 minutes of creation.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"accessToken": "919AccessToken",
+				"phone": 19198229889,
+				"code": 123456
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Auth successful!",
 				"token": "919Token"
 			}
 

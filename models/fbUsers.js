@@ -8,7 +8,7 @@ var fbUserSchema = new Schema({
   phone: { type: Number, required: true, unique: true },
   fbId: { type: Number, required: true, unique: true },
   name: { type: String, required: true },
-  dob: { type: Date },
+  dob: { type: Date }
 });
 
 // the schema is useless so far
