@@ -12,7 +12,7 @@ const storage = multerS3({
     cb(null, {fieldName: file.fieldname});
   },
   key: function (req, file, cb) {
-    cb(null, new Date().toISOString() + file.originalname);
+    cb(null, new Date().toISOString() + "_" + file.originalname);
   }
 });
 
