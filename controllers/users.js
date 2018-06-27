@@ -58,7 +58,7 @@ async function verify(req, res, next) {
     });
     //Save verification
     await newVerification.save();
-    messenger.sendText(validPhone, "Pointup Verification code: " + x);
+    messenger.sendText(res, validPhone, "Pointup Verification code: " + x);
 
     console.log('Code sent!');
     return res.status(201).json({
