@@ -30,6 +30,8 @@ async function merchantValid(req, res, next) {
       });
     //Else
     } else {
+      //Save the Merchant
+      req.merchant = merchant;
       //Continue
       next();
     }

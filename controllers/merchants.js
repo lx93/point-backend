@@ -19,28 +19,18 @@ const emailer = require('../utils/emailer');
 async function getMerchant(req, res, next) {
   try {
     const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
-    //Find a real and active Merchant
-    let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+    const merchant = req.merchant;      //Merchant
 
-    //If no Merchant exists
-    if (!merchant) {
-      console.log('Merchant doesn\'t exist!');
-      return res.status(409).json({
-        message: "Merchant doesn't exist!"
-      });
-    //Else
-    } else {
-      console.log('\n'+merchant+'\n');
-      return res.status(200).json({
-        merchantId: merchant._id,
-        name: merchant.name,
-        image: merchant.image,
-        email: merchant.email,
-        lastLoginAt: merchant.lastLoginAt,
-        createdAt: merchant.createdAt,
-        updatedAt: merchant.updatedAt
-      });
-    }
+    console.log('\n'+merchant+'\n');
+    return res.status(200).json({
+      merchantId: merchant._id,
+      name: merchant.name,
+      image: merchant.image,
+      email: merchant.email,
+      lastLoginAt: merchant.lastLoginAt,
+      createdAt: merchant.createdAt,
+      updatedAt: merchant.updatedAt
+    });
   } catch (err) {
     throwErr(res, err);
   }
@@ -122,7 +112,7 @@ async function signUp(req, res, next) {
       //If no merchant exists
       if (!merchant) {
         //Hash password
-        let hash = await bcrypt.hash(validPassword, 10);
+        let hashPassword = await bcrypt.hash(validPassword, 10);
 
         const now = new Date;   //Log time
         //Create Merchant
@@ -130,7 +120,7 @@ async function signUp(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           name: validName,
           email: validEmail,
-          password: hash,
+          password: hashPassword,
           image: "DefaultMerchant.png",
           isActive: true,
           lastLoginAt: null,
@@ -250,21 +240,21 @@ async function updateName(req, res, next) {
       });
     }
     const validName = req.body.name;      //New name of the Merchant
-    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    const merchant = req.merchant;      //Merchant
+    const now = new Date;     //Log time
     //Find a Merchant with that name
-    let merchant = await Merchant.findOne({ name: validName }).exec();
+    let result = await Merchant.findOne({ name: validName }).exec();
 
     //If no merchant exists or is inactive
-    if (!merchant || !merchant.isActive) {
+    if (!result || !result.isActive) {
       console.log('Name already taken!');
       return res.status(409).json({
         message: "Name already taken!"
       });
     //Else
     } else {
-      const now = new Date;     //Log time
       //Find and update Merchant name
-      await Merchant.findOneAndUpdate({ _id: validMerchantId, isActive: true }, { $set:{ name: validName, updatedAt: now } }).exec();
+      await merchant.update({ $set:{ name: validName, updatedAt: now } }).exec();
 
       console.log('Name changed!');
       return res.status(201).json({
@@ -288,50 +278,39 @@ async function updateImage(req, res, next) {
       });
     }
     const validFile = req.file;     //Valid file
-    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
-    //Find a real and active Merchant
-    let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+    const merchant = req.merchant;      //Merchant
+    const now = new Date;     //Log time
 
-    //If no Merchant exists
-    if (!merchant) {
-      console.log('Merchant doesn\'t exist!');
-      return res.status(409).json({
-        message: "Merchant doesn't exist!"
-      });
-    //Else
-    } else {
-      //If Merchant does not have the default image
-      if (merchant.image != 'DefaultMerchant.png') {
-        //Find the Merchant's current image
-        const s3 = new aws.S3();
-        var params = {
-          Bucket: 'point-server',
-          Key: merchant.image
-        }
-        s3.headObject(params, function(err, data) {
-          if (!err) {
-            var params = {
-              Bucket: 'point-server',
-              Delete: {
-                Objects: [{ "Key": merchant.image }]
-              }
-            }
-            //Delete old image
-            s3.deleteObjects(params, function(err, data) {
-              if (err) throwErr(res, err);
-            });
-          }
-        });
+    //If Merchant does not have the default image
+    if (merchant.image != 'DefaultMerchant.png') {
+      //Find the Merchant's current image
+      const s3 = new aws.S3();
+      var params = {
+        Bucket: 'point-server',
+        Key: merchant.image
       }
-      const now = new Date;     //Log time
-      //Update Merchant image
-      await merchant.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
-
-      console.log('Image changed!');
-      return res.status(201).json({
-        message: "Image changed!"
+      s3.headObject(params, function(err, data) {
+        if (!err) {
+          var params = {
+            Bucket: 'point-server',
+            Delete: {
+              Objects: [{ "Key": merchant.image }]
+            }
+          }
+          //Delete old image
+          s3.deleteObjects(params, function(err, data) {
+            if (err) throwErr(res, err);
+          });
+        }
       });
     }
+    //Update Merchant image
+    await merchant.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
+
+    console.log('Image changed!');
+    return res.status(201).json({
+      message: "Image changed!"
+    });
   } catch (err) {
     throwErr(res, err);
   }
@@ -349,13 +328,13 @@ async function updatePassword(req, res, next) {
       });
     }
     const validPassword = req.body.password;      //New password of the Merchant
-    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    const merchant = req.merchant;      //Merchant
     const now = new Date;     //Log time
     //Hash password
-    let hash = await bcrypt.hash(validPassword, 10);
+    let hashPassword = await bcrypt.hash(validPassword, 10);
 
-    //Find and update Merchant password
-    await Merchant.findOneAndUpdate({ _id: validMerchantId, isActive: true }, { $set:{ password: hash, updatedAt: now } }).exec();
+    //Update Merchant password
+    await merchant.update({ $set:{ password: hashPassword, updatedAt: now } }).exec();
 
     console.log('Password changed!');
     return res.status(201).json({
@@ -371,27 +350,16 @@ async function updatePassword(req, res, next) {
 /* Completely delete the Merchant from the Point database. */
 async function deleteMerchant(req, res, next) {
   try {
-    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
-    //Find a real and active Merchant
-    let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+    const merchant = req.merchant;      //Merchant
+    const now = new Date;     //Log time
 
-    //If no Merchant exists
-    if (!merchant) {
-      console.log('Merchant doesn\'t exist!');
-      return res.status(409).json({
-        message: "Merchant doesn't exist!"
-      });
-    //Else
-    } else {
-      const now = new Date;     //Log time
-      //Deactivate Merchant
-      await merchant.update({ $set:{ isActive: false, updatedAt: now } }).exec();
+    //Deactivate Merchant
+    await merchant.update({ $set:{ isActive: false, updatedAt: now } }).exec();
 
-      console.log('Merchant deleted!');
-      res.message1 = "Merchant deleted!";
-      //Continue
-      next();
-    }
+    console.log('Merchant deleted!');
+    res.message1 = "Merchant deleted!";
+    //Continue
+    next();
   } catch (err) {
     throwErr(res, err);
   }
@@ -432,23 +400,15 @@ async function getMerchantAll(req, res, next) {
 //GET api.pointup.io/users/merchants/:merchantId
 /* Retreive information about a specific Merchant */
 async function getMerchantOne(req, res, next) {
-  const validMerchantId = req.params.merchantId;
-  let merchant = await Merchant.findOne({ _id: validMerchantId, isActive: true }).exec();
+  const merchant = req.merchant;      //Merchant
 
-  if (!merchant) {
-    console.log('Merchant doesn\'t exist!');
-    return res.status(409).json({
-      message: "Merchant doesn't exist!"
-    });
-  } else {
-    console.log(merchant);
-    return res.status(200).json({
-      merchantId: merchant._id,
-      name: merchant.name,
-      image: merchant.image,
-      createdAt: merchant.createdAt
-    });
-  }
+  console.log(merchant);
+  return res.status(200).json({
+    merchantId: merchant._id,
+    name: merchant.name,
+    image: merchant.image,
+    createdAt: merchant.createdAt
+  });
 };
 
 

@@ -18,29 +18,18 @@ const sendToken = require('../utils/sendToken');
 /* Retrieve information about your User Point account. */
 async function getUser(req, res, next) {
   try {
-    const validUserId = req.userData.userId;      //UserId of the User
-    //Find a real and active User
-    let user = await User.findOne({ _id: validUserId, isActive: true }).exec();
+    const user = req.user;      //User
 
-    //If no User exists or is inactive
-    if (!user || !user.isActive) {
-      console.log('User doesn\'t exist!');
-      return res.status(409).json({
-        message: "User doesn't exist!"
-      });
-    //Else
-    } else {
-      console.log('\n'+user+'\n');
-      return res.status(200).json({
-        name: user.name,
-        dob: user.dob,
-        phone: user.phone,
-        image: user.image,
-        lastLoginAt: user.lastLoginAt,
-        createdAt: user.createdAt,
-        userId: user._id
-      });
-    }
+    console.log('\n'+user+'\n');
+    return res.status(200).json({
+      name: user.name,
+      dob: user.dob,
+      phone: user.phone,
+      image: user.image,
+      lastLoginAt: user.lastLoginAt,
+      createdAt: user.createdAt,
+      userId: user._id
+    });
   } catch (err) {
     throwErr(res, err);
   }
@@ -446,10 +435,10 @@ async function updateName(req, res, next) {
       });
     }
     const validName = req.body.name;      //New name of the User
-    const validUserId = req.userData.userId;      //UserId of the User
+    const user = req.user;      //User
     const now = new Date;     //Log time
-    //Find and update User name
-    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set:{ name: validName, updatedAt: now } }).exec();
+    //Update User name
+    await user.update({ $set:{ name: validName, updatedAt: now } }).exec();
 
     console.log('Name changed!');
     return res.status(201).json({
@@ -472,50 +461,39 @@ async function updateImage(req, res, next) {
       });
     }
     const validFile = req.file;     //Valid file
-    const validUserId = req.userData.userId;      //UserId of the User
-    //Find a real and active User
-    let user = await User.findOne({ _id: validUserId, isActive: true }).exec();
+    const user = req.user;      //User
+    const now = new Date;     //Log time
 
-    //If no User exists
-    if (!user) {
-      console.log('User doesn\'t exist!');
-      return res.status(409).json({
-        message: "User doesn't exist!"
-      });
-    //Else
-    } else {
-      //If User does not have the default image
-      if (user.image != 'DefaultUser.png') {
-        //Find the User's current image
-        const s3 = new aws.S3();
-        var params = {
-          Bucket: 'point-server',
-          Key: user.image
-        }
-        s3.headObject(params, function(err, data) {
-          if (!err) {
-            var params = {
-              Bucket: 'point-server',
-              Delete: {
-                Objects: [{ "Key": user.image }]
-              }
-            }
-            //Delete old image
-            s3.deleteObjects(params, function(err, data) {
-              if (err) throwErr(res, err);
-            });
-          }
-        });
+    //If User does not have the default image
+    if (user.image != 'DefaultUser.png') {
+      //Find the User's current image
+      const s3 = new aws.S3();
+      var params = {
+        Bucket: 'point-server',
+        Key: user.image
       }
-      const now = new Date;     //Log time
-      //Update User image
-      await user.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
-
-      console.log('Image changed!');
-      return res.status(201).json({
-        message: "Image changed!"
+      s3.headObject(params, function(err, data) {
+        if (!err) {
+          var params = {
+            Bucket: 'point-server',
+            Delete: {
+              Objects: [{ "Key": user.image }]
+            }
+          }
+          //Delete old image
+          s3.deleteObjects(params, function(err, data) {
+            if (err) throwErr(res, err);
+          });
+        }
       });
     }
+    //Update User image
+    await user.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
+
+    console.log('Image changed!');
+    return res.status(201).json({
+      message: "Image changed!"
+    });
   } catch (err) {
     throwErr(res, err);
   }
@@ -533,13 +511,13 @@ async function updatePassword(req, res, next) {
       });
     }
     const validPassword = req.body.password;      //New password of the User
-    const validUserId = req.userData.userId;      //UserId of the User
+    const user = req.user      //User
     const now = new Date;     //Log time
     //Hash password
-    let hash = await bcrypt.hash(validPassword, 10);
+    let hashPassword = await bcrypt.hash(validPassword, 10);
 
-    //Find and update User password
-    let user = await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { password: hash, updatedAt: now } }).exec();
+    //Update User password
+    await user.update({ $set: { password: hashPassword, updatedAt: now } }).exec();
 
     console.log('Password changed!');
     return res.status(201).json({
@@ -555,10 +533,10 @@ async function updatePassword(req, res, next) {
 /* Completely delete the User from the Point database. */
 async function deleteUser(req, res, next) {
   try {
-    const validUserId = req.userData.userId;      //UserId of the User
+    const user = req.user;      //User
     const now = new Date;     //Log time
     //Find and deactive a real and active User
-    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { isActive: false, updatedAt: now } }).exec();
+    await user.update({ $set: { isActive: false, updatedAt: now } }).exec();
 
     console.log('User deleted!');
     return res.status(201).json({

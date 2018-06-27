@@ -193,7 +193,7 @@ async function userRegift(req, res, next) {
     const now = new Date;     //Log time
 
     //If the User owns the balance
-    var result = (balance.phone === validPhone);
+    var result = (balance.phone == validPhone);
 
     if (!result) {
       console.log('Invalid balance!');
@@ -405,7 +405,7 @@ async function userDeleteOne(req, res, next) {
     const balance = req.balance;      //Valid balance
     const now = new Date;     //Log time
 
-    var result = (balance.phone === validPhone);
+    var result = (balance.phone == validPhone);
 
     if (!result) {
       console.log('Invalid balance!');
@@ -636,7 +636,7 @@ async function merchantUpdate(req, res, next) {
     const hash = req.hash;     //Valid hash
     const now = new Date;     //Log time
 
-    var result = (balance.merchantId === validMerchantId);
+    var result = (balance.merchantId == validMerchantId);
 
     if (!result) {
       console.log('Invalid balance!');
@@ -767,7 +767,7 @@ async function merchantDeleteOne(req, res, next) {
     const balance = req.balance;      //Valid balance
     const now = new Date;     //Log time
 
-    var result = (balance.merchantId === validMerchantId);
+    var result = (balance.merchantId == validMerchantId);
 
     if (!result) {
       console.log('Invalid balance!');
