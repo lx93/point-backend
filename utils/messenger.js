@@ -1,22 +1,22 @@
 const plivo = require('plivo');
 const request = require('request');
 
-function signup(merchantName, balance, balanceId, phone) {
+function createCard(merchantName, balance, balanceId, phone) {
   var output = "";
   output += "You just obtained a giftcard with " + merchantName + "!\n";
-  output += "Your balance with " + merchantName + " is now $" + balance + "!\n";
-  output += "View and redeem your Pointup Giftcard at app.point.io/" + balanceId + "!\n";
+  output += "Your balance with " + merchantName + " is now $" + balance + ".\n";
+  output += "View and redeem your Pointup Giftcard at app.point.io/qr/" + balanceId + ".\n";
   output += "Recipient: " + phone;
-  return ouput;
+  return output;
 }
 
 function updateCard(merchantName, balance, balanceId, phone) {
   var output = "";
   output += "Your balance with " + merchantName + " has been updated!\n";
-  output += "Your balance with " + merchantName + " is now $" + balance + "!\n";
-  output += "View and redeem your Pointup Giftcard at app.point.io/" + balanceId + "!\n";
+  output += "Your balance with " + merchantName + " is now $" + balance + ".\n";
+  output += "View and redeem your Pointup Giftcard at app.point.io/qr/" + balanceId + ".\n";
   output += "Recipient: " + phone;
-  return ouput;
+  return output;
 }
 
 async function sendText(res, dst, text) {
@@ -82,5 +82,7 @@ function sendMessage(req, res, next) {
   request(options, callback);
 }
 
+exports.createCard = createCard;
+exports.updateCard = updateCard;
 exports.sendMessage = sendMessage;
 exports.sendText = sendText;

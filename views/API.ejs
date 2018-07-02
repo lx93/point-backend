@@ -456,20 +456,22 @@
 
 		<b>Create a new balance with a Merchant</b> (AUTH REQ)
 		------------------------------------
-		The following API enables you to create a new balance of 0.00 with a specified Merchant.
+		The following API enables you to create a new balance with a specified Merchant.
 
 		POST api.pointup.io/users/balances
 
 		<i>Arguments:</i>
 		---------
 		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
+		- balance: A valid string containing the balance held between the Merchant and User. Ex. "20.00". Must be fixed to two decimals.
 
 			Request
 			-------
 			Authorization: Bearer 919Token
 			Content-Type: application/json
 			{
-				"merchantId": "5afaffc015833716e170fe8f"
+				"merchantId": "5afaffc015833716e170fe8f",
+				"balance": "20.00"
 			}
 
 
@@ -482,11 +484,40 @@
 			}
 
 
-		<b>Regift a balance</b> (AUTH REQ)
+		<b>Update a balance</b> (AUTH REQ)
 		----------------
-		The following API enables you to Deduct a specified amount from a balance this User holds and give it to a specified phone number.
+		The following API enables you to update an existing balance involving this User.
 
 		PUT api.pointup.io/users/balances
+
+		<i>Arguments:</i>
+		---------
+		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
+		- amount: A valid string containing the change in the balance held between the Merchant and User. Ex. "10.00". Must be fixed to two decimals. Must be positive.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			Content-Type: application/json
+			{
+				"balanceId": "5afafff415833716e170fe92",
+				"amount": "5.00"
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance exchanged!"
+			}
+
+
+		<b>Regift a balance</b> (AUTH REQ)
+		----------------
+		The following API enables you to deduct a specified amount from a balance this User holds and give it to a specified phone number.
+
+		PUT api.pointup.io/users/balances/regift
 
 		<i>Arguments:</i>
 		---------
