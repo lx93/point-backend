@@ -17,7 +17,7 @@ const router = express.Router();
 router.get('/', userAuth, userExist, uController.getUser);
 
 //Get all Merchants
-router.get('/merchants', userAuth, userExist, mController.getMerchantAll);
+router.get('/merchants', mController.getMerchantAll);
 
 //Get one Merchant
 router.get('/merchants/:merchantId', userAuth, userExist, merchantValid, mController.getMerchantOne);
@@ -54,8 +54,11 @@ router.get('/balances', userAuth, userExist, bController.userGetAll);
 //Create Balance
 router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);
 
+//Update Balance
+router.put('/balances', userAuth, userExist, balanceValid, bController.userUpdate);
+
 //Regift Balance
-router.put('/balances', userAuth, userExist, balanceValid, bController.userRegift);
+router.put('/balances/regift', userAuth, userExist, balanceValid, bController.userRegift);
 
 //Delete Balance
 router.delete('/balances/:balanceId', userAuth, userExist, balanceValid, bController.userDeleteOne);

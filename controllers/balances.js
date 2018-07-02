@@ -84,24 +84,31 @@ async function userGetAll(req, res, next) {
 
 //userCreate
 //POST api.pointup.io/users/balances/
-/* Create a new balance of 0.00 with a specified Merchant. */
+/* Create a new balance with a specified Merchant. */
 async function userCreate(req, res, next) {
   try {
+    if(!validator.number(req.body.balance) || (req.body.balance < 0) ) {
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
+      });
+    }
+    const validBalance = Number(req.body.balance).toFixed(2);     //Balance amount to be issued
     const validPhone = req.userData.phone;      //Phone number of the User
     const validMerchantId = req.body.merchantId;      //MerchantId of the Merchant
+    const now = new Date;     //Log time
     //Find a balance with this User and Merchant
     let balance = await Balance.findOne({ phone: validPhone, merchantId: validMerchantId }).exec();
 
     //If no balance exists
     if (!balance) {
-      const now = new Date;     //Log time
       const mongoId = new mongoose.Types.ObjectId;     //Create balanceId
       //Create balance
       const newBalance = new Balance({
         _id: mongoId,
         phone: validPhone,
         merchantId: validMerchantId,
-        balance: "0.00",
+        balance: validBalance,
         isActive: true,
         createdAt: now,
         updatedAt: now
@@ -126,7 +133,7 @@ async function userCreate(req, res, next) {
         balanceId: newBalance._id,
         phone: validPhone,
         merchantId: validMerchantId,
-        amount: "0.00",
+        amount: validBalance,
         timestamp: now
       });
       //Save transaction
@@ -139,9 +146,8 @@ async function userCreate(req, res, next) {
       });
     //If the balance exists but is not active
     } else if (!balance.isActive) {
-      const now = new Date;     //Log time
       //Activate the balance
-      await balance.update({ $set: { isActive: true, updatedAt: now }}).exec();
+      await balance.update({ $set: { balance: validBalance, isActive: true, updatedAt: now }}).exec();
 
       //Find a real and active hash of this balance
       let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
@@ -167,8 +173,78 @@ async function userCreate(req, res, next) {
   }
 };
 
-//userRegift
+//userUpdate
 //PUT api.pointup.io/users/balances/
+/* Update an existing balance involving this User. */
+async function userUpdate(req, res, next) {
+  try {
+    if (!validator.number(req.body.amount)) {
+      console.log('Invalid amount!');
+      return res.status(422).json({
+        message: "Invalid amount!"
+      });
+    }
+    const validAmount = Number(req.body.amount).toFixed(2);     //Amount of the change in balance
+    const validPhone = req.userData.phone;      //Phone number of the User
+    const balance = req.balance;      //Valid balance
+    const hash = req.hash;     //Valid hash
+    const now = new Date;     //Log time
+
+    var result = (balance.phone == validPhone);
+
+    if (!result) {
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
+      });
+    } else if (Number(validAmount) < 0) {
+      console.log('Invalid amount!');
+      return res.status(422).json({
+        message: "Invalid amount!"
+      });
+    }
+    //Else
+    const newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);      //New balance
+    //Set the new balance
+    await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
+
+    //Expire hash
+    await hash.update({ $set: { isActive: false } }).exec();
+    const validHashId = hashBalance(hash.hashId);      //Create hashId
+    //Create hash
+    const newHash = new Hash({
+      _id: new mongoose.Types.ObjectId,
+      balanceId: balance._id,
+      hashId: validHashId,
+      isActive: true
+    });
+    //Save hash
+    await newHash.save();
+
+    //Create transaction
+    const newTransaction = new Transaction({
+      _id: new mongoose.Types.ObjectId,
+      balanceId: balance._id,
+      phone: validPhone,
+      merchantId: balance.merchantId,
+      amount: validAmount,
+      timestamp: now
+    });
+    //Save transaction
+    await newTransaction.save();
+
+    console.log('Balance updated!');
+    return res.status(201).json({
+      message: "Balance updated!",
+      balanceId: validHashId
+    });
+  } catch (err) {
+    throwErr(res, err);
+  }
+}
+
+//userRegift
+//PUT api.pointup.io/users/balances/regift
 /* Deduct a specified amount from a balance this User holds and give it to a specified phone number */
 async function userRegift(req, res, next) {
   try {
@@ -593,7 +669,7 @@ async function merchantCreate(req, res, next) {
     //If the balance exists but is inactive
     } else if (!balance.isActive) {
       //Activate and set the balance
-      await balance.update({ $set: { balance: validBalance, isActive: true }}).exec();
+      await balance.update({ $set: { balance: validBalance, isActive: true, updatedAt: now }}).exec();
 
       //Find a real and active hash of this balance
       let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
@@ -862,6 +938,7 @@ async function getBalance(req, res, next) {
 
 exports.userGetAll = userGetAll;
 exports.userCreate = userCreate;
+exports.userUpdate = userUpdate;
 exports.userRegift = userRegift;
 exports.userDeleteAll = userDeleteAll;
 exports.userDeleteOne = userDeleteOne;

@@ -11,9 +11,8 @@ async function balanceExist(req, res, next) {
       return res.status(422).json({
         message: "Invalid balanceId!"
       });
-    }
     //If the balanceId is in the params
-    else if (req.params.balanceId) {
+    } else if (req.params.balanceId) {
       validHashId = req.params.balanceId;
     //Else
     } else {
