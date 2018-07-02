@@ -7,9 +7,8 @@ var fbUserSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
   phone: { type: Number, required: true, unique: true },
   fbId: { type: Number, required: true, unique: true },
-  firstName: { type: String },
-  lastName: { type: String },
-  dob: { type: Date },
+  name: { type: String, required: true },
+  dob: { type: Date }
 });
 
 // the schema is useless so far

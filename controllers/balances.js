@@ -1,12 +1,13 @@
 const Balance = require('../models/balances');
 const Merchant = require('../models/merchants');
 const Transaction = require('../models/transactions');
+const Hash = require('../models/hashes');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const validator = require('../utils/validator');
 const throwErr = require('../utils/throwErr');
-const QRCode = require('qrcode');
+const hashBalance = require('../utils/hashBalance');
 
 //Users
 
@@ -27,26 +28,39 @@ async function userGetAll(req, res, next) {
       });
     // Else balances must exist
     } else {
-      var ids = [];     //Array of merchantIds mentioned in the balances
+      var balanceIds = [];     //Array of balanceIds mentioned in the balances
       for (var i = 0; i < balance.length; i++) {
-        ids[i] = balance[i].merchantId;
+        balanceIds[i] = balance[i]._id;
+      }
+      //Find real and active balanceIds mentioned in the balances
+      let hash = await Hash.find({ balanceId: { $in: balanceIds }, isActive: true }).exec();
+
+      var merchantIds = [];     //Array of merchantIds mentioned in the balances
+      for (var i = 0; i < balance.length; i++) {
+        merchantIds[i] = balance[i].merchantId;
       }
       //Find real and active Merchants mentioned in the balances
-      let merchant = await Merchant.find({ _id: { $in: ids }, isActive: true }).exec();
+      let merchant = await Merchant.find({ _id: { $in: merchantIds }, isActive: true }).exec();
 
       var balances = [];      //Array of balances
       for (var i = 0; i < balance.length; i++) {
-        for (var x = 0; x < merchant.length; x++) {
+        for (var x = 0; x < hash.length; x++) {
+          //If the hash's balanceId is the same as the _id in the balance
+          if (hash[x].balanceId.equals(balance[i]._id)) {
+            break;
+          }
+        }
+        for (var y = 0; y < merchant.length; y++) {
           //If the Merchant's id is the same as the merchantId in the balance
-          if (merchant[x]._id.equals(balance[i].merchantId)) {
+          if (merchant[y]._id.equals(balance[i].merchantId)) {
             break;
           }
         }
         //Save balance
         balances[i] = {
-          balanceId: balance[i]._id,
-          name: merchant[x].name,
-          image: merchant[x].image,
+          balanceId: hash[x].hashId,
+          name: merchant[y].name,
+          image: merchant[y].image,
           phone: balance[i].phone,
           merchantId: balance[i].merchantId,
           balance: balance[i].balance,
@@ -54,49 +68,13 @@ async function userGetAll(req, res, next) {
           updatedAt: balance[i].updatedAt
         };
         //Remove that Merchant from the list of Merchants
-        merchant.splice(x,1);
+        hash.splice(x,1);
+        //Remove that Merchant from the list of Merchants
+        merchant.splice(y,1);
       }
       console.log("\n"+JSON.stringify(balances, ",", " ")+"\n");
       return res.status(200).json({
         balances
-      });
-    }
-  } catch (err) {
-    throwErr(res, err);
-  }
-};
-
-//userGetOne
-//GET api.pointup.io/users/balances/:balanceId
-/* Retrieve a specific balance involving this User. */
-async function userGetOne(req, res, next) {
-  try {
-    const validPhone = req.userData.phone     //Phone number of the User
-    const validBalanceId = req.params.balanceId;      //Valid balanceId
-    //Find a real and active balance with this User
-    let balance = await Balance.findOne({ _id: validBalanceId, phone: validPhone, isActive: true }).exec();
-
-    //If no balance exists
-    if (!balance) {
-      console.log('Invalid balance!');
-      return res.status(422).json({
-        message: "Invalid balance!"
-      });
-    //Else balance must exist
-    } else {
-      //Find a real and active Merchant
-      let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
-
-      console.log(balance);
-      return res.status(200).json({
-        balanceId: balance._id,
-        name: merchant.name,
-        image: merchant.image,
-        phone: balance.phone,
-        merchantId: balance.merchantId,
-        balance: balance.balance,
-        createdAt: balance.createdAt,
-        updatedAt: balance.updatedAt
       });
     }
   } catch (err) {
@@ -117,9 +95,10 @@ async function userCreate(req, res, next) {
     //If no balance exists
     if (!balance) {
       const now = new Date;     //Log time
+      const mongoId = new mongoose.Types.ObjectId;     //Create balanceId
       //Create balance
       const newBalance = new Balance({
-        _id: new mongoose.Types.ObjectId,
+        _id: mongoId,
         phone: validPhone,
         merchantId: validMerchantId,
         balance: "0.00",
@@ -129,6 +108,18 @@ async function userCreate(req, res, next) {
       });
       //Save balance
       await newBalance.save();
+
+      const validHashId = hashBalance(mongoId);      //Create hashId
+      //Create hash
+      var newHash = new Hash({
+        _id: new mongoose.Types.ObjectId,
+        balanceId: newBalance._id,
+        hashId: validHashId,
+        isActive: true
+      });
+      //Save hash
+      await newHash.save();
+
       //Create transaction
       const newTransaction = new Transaction({
         _id: new mongoose.Types.ObjectId,
@@ -144,24 +135,31 @@ async function userCreate(req, res, next) {
       console.log('Balance created!');
       return res.status(201).json({
         message: "Balance created!",
-        balanceId: newBalance._id
+        balanceId: newHash.hashId
       });
     //If the balance exists but is not active
     } else if (!balance.isActive) {
+      const now = new Date;     //Log time
       //Activate the balance
-      await balance.update({ $set: { isActive: true }}).exec();
+      await balance.update({ $set: { isActive: true, updatedAt: now }}).exec();
+
+      //Find a real and active hash of this balance
+      let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
 
       console.log('Balance created!');
       return res.status(201).json({
         message: "Balance created!",
-        balanceId: balance._id
+        balanceId: hash.hashId
       });
     //Else
     } else {
+      //Find a real and active hash of this balance
+      let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
+
       console.log('Balance exists!');
       return res.status(409).json({
         message: "Balance exists!",
-        balanceId: balance._id
+        balanceId: hash.hashId
       });
     }
   } catch (err) {
@@ -190,17 +188,18 @@ async function userRegift(req, res, next) {
     }
     const validAmount = Number(req.body.amount).toFixed(2);     //Amount to be gifted (Taken from giver, given to receiver)
     const validPhone = req.userData.phone;      //Phone number of the User (gift giver)
-    const validBalanceId = req.body.balanceId;      //BalanceId of the User's balance
-    //Find a real balance with the User
-    let balance = await Balance.findOne({ _id: validBalanceId, phone: validPhone}).exec();
+    var balance = req.balance;      //The User's balance
+    var hash = req.hash;     //The User's hash
+    const now = new Date;     //Log time
 
-    //If no balance exists
-    if (!balance || !balance.isActive) {
+    //If the User owns the balance
+    var result = (balance.phone == validPhone);
+
+    if (!result) {
       console.log('Invalid balance!');
       return res.status(422).json({
         message: "Invalid balance!"
       });
-    //If the gifted amount exceeds the User's balance
     } else if (Number(validAmount) > Number(balance.balance)) {
       console.log('Invalid amount!');
       return res.status(422).json({
@@ -210,9 +209,23 @@ async function userRegift(req, res, next) {
     } else {
       const validNewBalance = (Number(balance.balance) - Number(validAmount)).toFixed(2);     //User's new balance
       const validMerchantId = balance.merchantId;     //MerchantId of the gifted balance
-      const now = new Date;     //Log time
+
       //Update User's balance
       await balance.update({ $set: { balance: validNewBalance, updatedAt: now } }).exec();
+
+      //Expire hash
+      await hash.update({ $set: { isActive: false } }).exec();
+      var validHashId = hashBalance(hash.hashId);      //Create hashId
+      req.gifter = validHashId;     //Saves hashId
+      //Create hash
+      var newHash = new Hash({
+        _id: new mongoose.Types.ObjectId,
+        balanceId: balance._id,
+        hashId: validHashId,
+        isActive: true
+      });
+      //Save hash
+      await newHash.save();
 
       const newValidAmount = "-" + (Number(validAmount)).toFixed(2)     //Gifted amount with "-" in front
       //Create transaction
@@ -231,9 +244,10 @@ async function userRegift(req, res, next) {
 
       //If no balance exists
       if (!balance) {
+        const mongoId = new mongoose.Types.ObjectId;     //Create balanceId
         //Create balance
         const newBalance = new Balance({
-          _id: new mongoose.Types.ObjectId,
+          _id: mongoId,
           phone: validNewPhone,
           merchantId: validMerchantId,
           balance: validAmount,
@@ -243,6 +257,18 @@ async function userRegift(req, res, next) {
         });
         //Save balance
         await newBalance.save();
+
+        validHashId = hashBalance(mongoId);      //Create hashId
+        //Create hash
+        var newHash = new Hash({
+          _id: new mongoose.Types.ObjectId,
+          balanceId: newBalance._id,
+          hashId: validHashId,
+          isActive: true
+        });
+        //Save hash
+        await newHash.save();
+
         //Create transaction
         const newTransaction = new Transaction({
           _id: new mongoose.Types.ObjectId,
@@ -258,12 +284,25 @@ async function userRegift(req, res, next) {
         /*TODO--notify user--*/
         console.log('Balance exchanged!');
         return res.status(201).json({
-          message: "Balance exchanged!"
+          message: "Balance exchanged!",
+          gifter: req.gifter,
+          recipient: validHashId
         });
       //If the balance exists but is inactive (it must have a value of 0.00)
       } else if (!balance.isActive) {
         //Reactivate and initialize the balance
         await balance.update({ $set: { balance: validAmount, isActive: true, updatedAt: now } }).exec();
+
+        validHashId = hashBalance(balance._id);      //Create hashId
+        //Create hash
+        var newHash = new Hash({
+          _id: new mongoose.Types.ObjectId,
+          balanceId: balance._id,
+          hashId: validHashId,
+          isActive: true
+        });
+        //Save hash
+        await newHash.save();
 
         //Create transaction
         const newTransaction = new Transaction({
@@ -280,13 +319,26 @@ async function userRegift(req, res, next) {
         /*TODO--notify user--*/
         console.log('Balance exchanged!');
         return res.status(201).json({
-          message: "Balance exchanged!"
+          message: "Balance exchanged!",
+          gifter: req.gifter,
+          recipient: validHashId
         });
       //Else the balance must exist
       } else {
         const validNewBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);     //Gift recipient's new balance
         //Add the gift to recipient's balance
         await balance.update({ $set: { balance: validNewBalance, updatedAt: now } }).exec();
+
+        validHashId = hashBalance(balance._id);      //Create hashId
+        //Create hash
+        var newHash = new Hash({
+          _id: new mongoose.Types.ObjectId,
+          balanceId: balance._id,
+          hashId: validHashId,
+          isActive: true
+        });
+        //Save hash
+        await newHash.save();
 
         //Create transaction
         const newTransaction = new Transaction({
@@ -303,7 +355,9 @@ async function userRegift(req, res, next) {
         /*TODO--notify user--*/
         console.log('Balance exchanged!');
         return res.status(201).json({
-          message: "Balance exchanged!"
+          message: "Balance exchanged!",
+          gifter: req.gifter,
+          recipient: validHashId
         });
       }
     }
@@ -347,25 +401,23 @@ async function userDeleteAll(req, res, next) {
 /* Delete a specific balance involving this User. This balance must be empty with 0.00. */
 async function userDeleteOne(req, res, next) {
   try {
-    const validBalanceId = req.params.balanceId;      //Valid balanceId
-    //Find a real and active balance
-    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+    const validPhone = req.userData.phone;      //Phone number of the User
+    const balance = req.balance;      //Valid balance
+    const now = new Date;     //Log time
 
-    //If no balance exists
-    if (!balance) {
-      console.log('Balance doesn\'t exist!');
-      return res.status(409).json({
-        message: "Balance doesn't exist!"
+    var result = (balance.phone == validPhone);
+
+    if (!result) {
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
       });
-    //If the balance is not 0.00
     } else if (balance.balance != 0.00) {
       console.log('Cannot delete active balance!');
       return res.status(409).json({
         message: "Cannot delete active balance!"
       });
-    //Else
     } else {
-      const now = new Date;     //Log time
       //Set balance as inactive
       await balance.update({ $set: { isActive: false, updatedAt: now } })
 
@@ -400,7 +452,6 @@ async function userGetTransactions(req, res, next) {
       for (var i = 0; i < transaction.length; i++) {
         transactions[i] = {
           transactionId: transaction[i]._id,
-          balanceId: transaction[i].balanceId,
           phone: transaction[i].phone,
           merchantId: transaction[i].merchantId,
           amount: transaction[i].amount,
@@ -436,53 +487,35 @@ async function merchantGetAll(req, res, next) {
       });
     //Else
     } else {
-      var balances = [];
+      var ids = [];     //Array of balanceIds mentioned in the balances
       for (var i = 0; i < balance.length; i++) {
+        ids[i] = balance[i]._id;
+      }
+      //Find real and active Merchants mentioned in the balances
+      let hash = await Hash.find({ balanceId: { $in: ids }, isActive: true }).exec();
+
+      var balances = [];      //Array of balances
+      for (var i = 0; i < balance.length; i++) {
+        for (var x = 0; x < hash.length; x++) {
+          //If the hash's balanceId is the same as the _id in the balance
+          if (hash[x].balanceId.equals(balance[i]._id)) {
+            break;
+          }
+        }
         balances[i] = {
-          balanceId: balance[i]._id,
+          balanceId: hash[x].hashId,
           phone: balance[i].phone,
           merchantId: balance[i].merchantId,
           balance: balance[i].balance,
           createdAt: balance[i].createdAt,
           updatedAt: balance[i].updatedAt
         }
+        //Remove that Merchant from the list of Merchants
+        hash.splice(x,1);
       }
       console.log("\n"+JSON.stringify(balances, ",", " ")+"\n");
       return res.status(200).json({
         balances
-      });
-    }
-  } catch (err) {
-    throwErr(res, err);
-  }
-};
-
-//merchantGetOne
-//GET api.pointup.io/merchants/balances/:balanceId
-/* Retrieve a specific balance involving this Merchant. */
-async function merchantGetOne(req, res, next) {
-  try {
-    const validMerchantId = req.merchantData.merchantId;     //MerchantId of the Merchant
-    const validBalanceId = req.params.balanceId;      //Valid balanceId
-    //Find a real and active balance with this Merchant
-    let balance = await Balance.findOne({ _id: validBalanceId, merchantId: validMerchantId, isActive: true }).exec();
-
-    //If no balance exists
-    if (!balance) {
-      console.log('Invalid balance!');
-      return res.status(422).json({
-        message: "Invalid balance!"
-      });
-    //Else
-    } else {
-      console.log(balance);
-      return res.status(200).json({
-        balanceId: balance._id,
-        phone: balance.phone,
-        merchantId: balance.merchantId,
-        balance: balance.balance,
-        createdAt: balance.createdAt,
-        updatedAt: balance.updatedAt
       });
     }
   } catch (err) {
@@ -515,9 +548,10 @@ async function merchantCreate(req, res, next) {
 
     //If no balance exists
     if (!balance) {
+      const mongoId = new mongoose.Types.ObjectId;     //Create balanceId
       //Create balance
       const newBalance = new Balance({
-        _id: new mongoose.Types.ObjectId,
+        _id: mongoId,
         phone: validPhone,
         merchantId: validMerchantId,
         balance: validBalance,
@@ -527,6 +561,18 @@ async function merchantCreate(req, res, next) {
       });
       //Save balance
       await newBalance.save();
+
+      const validHashId = hashBalance(mongoId);      //Create hashId
+      //Create hash
+      const newHash = new Hash({
+        _id: new mongoose.Types.ObjectId,
+        balanceId: newBalance._id,
+        hashId: validHashId,
+        isActive: true
+      });
+      //Save hash
+      await newHash.save();
+
       //Create transaction
       const newTransaction = new Transaction({
         _id: new mongoose.Types.ObjectId,
@@ -542,24 +588,30 @@ async function merchantCreate(req, res, next) {
       console.log('Balance created!');
       return res.status(201).json({
         message: "Balance created!",
-        balanceId: newBalance._id
+        balanceId: newHash.hashId
       });
     //If the balance exists but is inactive
     } else if (!balance.isActive) {
       //Activate and set the balance
       await balance.update({ $set: { balance: validBalance, isActive: true }}).exec();
 
+      //Find a real and active hash of this balance
+      let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
+
       console.log('Balance created!');
       return res.status(201).json({
         message: "Balance created!",
-        balanceId: balance._id
+        balanceId: hash.hashId
       });
     //Else
     } else {
+      //Find a real and active hash of this balance
+      let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
+
       console.log('Balance exists!');
       return res.status(409).json({
         message: "Balance exists!",
-        balanceId: balance._id
+        balanceId: hash.hashId
       });
     }
   } catch (err) {
@@ -579,18 +631,18 @@ async function merchantUpdate(req, res, next) {
       });
     }
     const validAmount = Number(req.body.amount).toFixed(2);     //Amount of the change in balance
-    const validBalanceId = req.body.balanceId;      //Valid balanceId
     const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
-    //Find a real balance with the Merchant
-    let balance = await Balance.findOne({ _id: validBalanceId, merchantId: validMerchantId }).exec();
+    const balance = req.balance;      //Valid balance
+    const hash = req.hash;     //Valid hash
+    const now = new Date;     //Log time
 
-    //If no balance exists or is inactive
-    if (!balance || !balance.isActive) {
-      console.log('Balance doesn\'t! exist');
-      return res.status(409).json({
-        message: "Balance doesn't exist!"
+    var result = (balance.merchantId == validMerchantId);
+
+    if (!result) {
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
       });
-    //If the amount to be deducted is greater than the balance
     } else if (Number(validAmount) < 0) {
       if (Math.abs(Number(validAmount)) > Number(balance.balance)) {
         console.log('Insufficient balance!');
@@ -601,9 +653,22 @@ async function merchantUpdate(req, res, next) {
     }
     //Else
     const newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);      //New balance
-    const now = new Date;     //Log time
     //Set the new balance
     await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
+
+    //Expire hash
+    await hash.update({ $set: { isActive: false } }).exec();
+    const validHashId = hashBalance(hash.hashId);      //Create hashId
+    //Create hash
+    const newHash = new Hash({
+      _id: new mongoose.Types.ObjectId,
+      balanceId: balance._id,
+      hashId: validHashId,
+      isActive: true
+    });
+    //Save hash
+    await newHash.save();
+
     //Create transaction
     const newTransaction = new Transaction({
       _id: new mongoose.Types.ObjectId,
@@ -618,7 +683,8 @@ async function merchantUpdate(req, res, next) {
 
     console.log('Balance updated!');
     return res.status(201).json({
-      message: "Balance updated!"
+      message: "Balance updated!",
+      balanceId: validHashId
     });
   } catch (err) {
     throwErr(res, err);
@@ -630,7 +696,7 @@ async function merchantUpdate(req, res, next) {
 /* Reactive inactive balances with this Merchant */
 async function merchantRestore(req, res, next) {
   try {
-    const validMerchantId = res.merchantId;      //MerchantId of the Merchant
+    const validMerchantId = req.merchantId;      //MerchantId of the Merchant
     //Find a real inactive balance with the Merchant with a balance other than 0.00
     let balance = await Balance.findOne({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }).exec();
 
@@ -645,7 +711,7 @@ async function merchantRestore(req, res, next) {
     } else {
       const now = new Date;     //Log time
       //Reactivate inactive balances
-      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }, { $set: { isActive: true, updatedAt: now }}).exec();
+      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }, { $set: { isActive: true, updatedAt: now } }).exec();
 
       console.log('Balances restored!');
       return res.status(201).json({
@@ -676,8 +742,9 @@ async function merchantDeleteAll(req, res, next) {
       });
     //Else
     } else {
+      const now = new Date;     //Log time
       //Set all balances with this Merchant as inactive
-      await Balance.updateMany({ merchantId: validMerchantId }, { $set: { isActive: false } }).exec();
+      await Balance.updateMany({ merchantId: validMerchantId }, { $set: { isActive: false, updatedAt: now } }).exec();
 
       /*TO-DO--notify all users associated that this merchant is no longer supported by our service.*/
       console.log('Balances deleted!');
@@ -696,17 +763,17 @@ async function merchantDeleteAll(req, res, next) {
 /* Delete a specific balance involving this Merchant. This balance must be empty with 0.00. */
 async function merchantDeleteOne(req, res, next) {
   try {
-    const validBalanceId = req.params.balanceId;      //Valid balanceId
-    //Find a real and active balance
-    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
+    const balance = req.balance;      //Valid balance
+    const now = new Date;     //Log time
 
-    //If no balance exists
-    if (!balance) {
-      console.log('Balance doesn\'t exist!');
-      return res.status(409).json({
-        message: "Balance doesn't exist!"
+    var result = (balance.merchantId == validMerchantId);
+
+    if (!result) {
+      console.log('Invalid balance!');
+      return res.status(422).json({
+        message: "Invalid balance!"
       });
-    //If the balance is not 0.00
     } else if (balance.balance != 0.00) {
       console.log('Cannot delete active balance!');
       return res.status(409).json({
@@ -715,7 +782,7 @@ async function merchantDeleteOne(req, res, next) {
     //Else
     } else {
       //Set balance as inactives
-      await balance.update({ $set: { isActive: false } }).exec();
+      await balance.update({ $set: { isActive: false, updatedAt: now } }).exec();
 
       console.log('Balance deleted!');
       return res.status(201).json({
@@ -748,7 +815,6 @@ async function merchantGetTransactions(req, res, next) {
       for (var i = 0; i < transaction.length; i++) {
         transactions[i] = {
           transactionId: transaction[i]._id,
-          balanceId: transaction[i].balanceId,
           phone: transaction[i].phone,
           merchantId: transaction[i].merchantId,
           amount: transaction[i].amount,
@@ -772,40 +838,29 @@ async function merchantGetTransactions(req, res, next) {
 /* Retrieve a specific balance. */
 async function getBalance(req, res, next) {
   try {
-    const validBalanceId = req.params.balanceId;      //Valid balanceId
-    //Find a real and active balance
-    let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+    const balance = req.balance;      //Valid balance
+    const hash = req.hash;     //Valid hash
 
     //Find a real and active Merchant
     let merchant = await Merchant.findOne({ _id: balance.merchantId, isActive: true }).exec();
 
-    //If no balance exists
-    if (!balance) {
-      console.log('Balance doesn\'t exist!');
-      return res.status(409).json({
-        message: "Balance doesn't exist!"
-      });
-    //Else balance must exist
-    } else {
-      console.log(balance);
-      return res.status(200).json({
-        balanceId: balance._id,
-        name: merchant.name,
-        image: merchant.image,
-        phone: balance.phone,
-        merchantId: balance.merchantId,
-        balance: balance.balance,
-        createdAt: balance.createdAt,
-        updatedAt: balance.updatedAt
-      });
-    }
+    console.log(balance);
+    return res.status(200).json({
+      balanceId: hash.hashId,
+      name: merchant.name,
+      image: merchant.image,
+      phone: balance.phone,
+      merchantId: balance.merchantId,
+      balance: balance.balance,
+      createdAt: balance.createdAt,
+      updatedAt: balance.updatedAt
+    });
   } catch (err) {
     throwErr(res, err);
   }
 };
 
 exports.userGetAll = userGetAll;
-exports.userGetOne = userGetOne;
 exports.userCreate = userCreate;
 exports.userRegift = userRegift;
 exports.userDeleteAll = userDeleteAll;
@@ -813,7 +868,6 @@ exports.userDeleteOne = userDeleteOne;
 exports.userGetTransactions = userGetTransactions;
 
 exports.merchantGetAll = merchantGetAll;
-exports.merchantGetOne = merchantGetOne;
 exports.merchantCreate = merchantCreate;
 exports.merchantUpdate = merchantUpdate;
 exports.merchantRestore = merchantRestore;

@@ -18,30 +18,18 @@ const sendToken = require('../utils/sendToken');
 /* Retrieve information about your User Point account. */
 async function getUser(req, res, next) {
   try {
-    const validUserId = req.userData.userId;      //UserId of the User
-    //Find a real and active User
-    let user = await User.findOne({ _id: validUserId, isActive: true }).exec();
+    const user = req.user;      //User
 
-    //If no User exists or is inactive
-    if (!user || !user.isActive) {
-      console.log('User doesn\'t exist!');
-      return res.status(409).json({
-        message: "User doesn't exist!"
-      });
-    //Else
-    } else {
-      console.log('\n'+user+'\n');
-      return res.status(200).json({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        dob: user.dob,
-        phone: user.phone,
-        image: user.image,
-        lastLoginAt: user.lastLoginAt,
-        createdAt: user.createdAt,
-        userId: user._id
-      });
-    }
+    console.log('\n'+user+'\n');
+    return res.status(200).json({
+      name: user.name,
+      dob: user.dob,
+      phone: user.phone,
+      image: user.image,
+      lastLoginAt: user.lastLoginAt,
+      createdAt: user.createdAt,
+      userId: user._id
+    });
   } catch (err) {
     throwErr(res, err);
   }
@@ -70,7 +58,7 @@ async function verify(req, res, next) {
     });
     //Save verification
     await newVerification.save();
-    messenger.sendText(validPhone, "Pointup Verification code: " + x);
+    messenger.sendText(res, validPhone, "Pointup Verification code: " + x);
 
     console.log('Code sent!');
     return res.status(201).json({
@@ -98,48 +86,36 @@ async function signUp(req, res, next) {
       return res.status(422).json({
         message: "Invalid password!"
       });
-    }
-    if (req.body.firstName) {
-      if (!validator.string(req.body.firstName)) {
-        console.log('Invalid first name!');
-        return res.status(422).json({
-          message: "Invalid first name!"
-        });
-      }
-    }
-    if (req.body.lastName) {
-      if (!validator.string(req.body.lastName)) {
-        console.log('Invalid last name!');
-        return res.status(422).json({
-          message: "Invalid last name!"
-        });
-      }
+    } else if (!validator.string(req.body.name)) {
+      console.log('Invalid name!');
+      return res.status(422).json({
+        message: "Invalid name!"
+      });
     }
     if (req.body.dob) {
-      if (!validator.dob(req.body.dob)) {
+      validDOB = dob[2]+"-"+dob[0]+"-"+dob[1];      //Date Of Birth of Facebook User
+      if (!validator.dob(validDOB)) {
         console.log('Invalid date!');
         return res.status(422).json({
           message: "Invalid date!"
         });
       }
-      validDOB = new Date(req.body.dob);      //Date Of Birth of the User
+      validDOB = new Date(validDOB);      //Date Of Birth of the User
     }
     const validPassword = req.body.password;      //Password of the User
     const validCode = req.body.code;      //Verification code
-    const validFName = req.body.firstName;      //First name of the User
-    const validLName = req.body.lastName;      //Last name of the User
+    const validName = req.body.name;      //Name of the User
     //Find a real verification with this User
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
-    /* //<-- Delete "/*" for production
     //If no verification exists
-    if (!verification) {
+    if (!verification && (process.env.MODE === 'production' || validCode)) {
       console.log('Auth failed');
       return res.status(401).json({
         message: 'Auth failed'
       });
     //Else
-    } else {    //Delete that ---> */
+    } else {
       //Find a real User
       let user = await User.findOne({ phone: validPhone }).exec();
 
@@ -154,8 +130,7 @@ async function signUp(req, res, next) {
           _id: new mongoose.Types.ObjectId,
           phone: validPhone,
           password: hash,
-          firstName: validFName,
-          lastName: validLName,
+          name: validName,
           dob: validDOB,
           image: 'DefaultUser.png',
           isActive: true,
@@ -187,7 +162,7 @@ async function signUp(req, res, next) {
           message: "User exists!"
         });
       }
-    // } //Delete starting "// for production
+    }
   } catch (err) {
     throwErr(res, err);
   }
@@ -235,16 +210,22 @@ async function logIn(req, res, next) {
         sendToken(req, res);
       } else {
         //Check hashed password
-        await bcrypt.compare(validPassword, user.password);
-        const now = new Date;     //Log time
-        //Log in User
-        await user.update({ $set: { lastLoginAt: now } }).exec();
+        let result = await bcrypt.compare(validPassword, user.password);
+        if (result) {
+          const now = new Date;     //Log time
+          //Log in User
+          await user.update({ $set: { lastLoginAt: now } }).exec();
 
-        //Save User information
-        req.userData = user;
-        sendToken(req, res);
+          //Save User information
+          req.userData = user;
+          sendToken(req, res);
+        } else {
+          console.log('Auth failed');
+          return res.status(401).json({
+            message: "Auth failed"
+          });
+        }
       }
-
     }
   } catch (err) {
     console.log('Auth failed');
@@ -274,28 +255,24 @@ async function fbAuth(req, res, next) {
         fields: userFieldSet
       }
     };
+    var response;
     //Authenticate Facebook user
-    let response = await request(options);
-    const fbRes = JSON.parse(response);
-
-    if (fbRes.error) {
+    try {
+      response = await request(options);
+    } catch (err) {
       console.log('Invalid access token!');
       return res.status(422).json({
         message: "Invalid access token!"
       });
     }
+    const fbRes = JSON.parse(response);
+
     const validFBId = fbRes.id;     //Facebook User Id
-    var validFName;
-    var validLName;
+    const validName = fbRes.name;     //Name of the Facebook User
     var validDOB;
-    if (fbRes.name) {
-      const name = fbRes.name.split(" ");
-      validFName = name[0];     //First name of the Facebook User
-      validLName = name[1];     //Last name of the Facebook User
-    }
     if (fbRes.birthday) {
       const dob = fbRes.birthday.split("/");
-      validDOB = new Dage(dob[2]+"-"+dob[0]+"-"+dob[1]);      //Date Of Birth of Facebook User
+      validDOB = new Date(dob[2]+"-"+dob[0]+"-"+dob[1]);      //Date Of Birth of Facebook User
     }
     //Find a real Facebook User ID
     let fbUser = await FBUser.findOne({ fbId: validFBId }).exec();
@@ -305,7 +282,7 @@ async function fbAuth(req, res, next) {
       //If no phone is in the body
       if (!req.body.phone) {
         console.log('FBId doesn\'t exist!');
-        return res.status(409).json({
+        return res.status(202).json({
           message: "FBId doesn't exist!"
         });
       //Else
@@ -321,15 +298,14 @@ async function fbAuth(req, res, next) {
         //Find a real verification with this User
         let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
-        /* //<-- Delete "/*" for production
         //If no verification exists
-        if (!verification) {
+        if (!verification && (process.env.MODE === 'production' || validCode)) {
           console.log('Auth failed');
           return res.status(401).json({
             message: 'Auth failed'
           });
         //Else
-        } else {    //Delete that ---> */
+        } else {
           //Find a real User
           let user = await User.findOne({ phone: validPhone }).exec();
 
@@ -340,8 +316,7 @@ async function fbAuth(req, res, next) {
             var newUser = new User({
               _id: new mongoose.Types.ObjectId,
               phone: validPhone,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB,
               image: 'DefaultUser.png',
               isActive: true,
@@ -357,8 +332,7 @@ async function fbAuth(req, res, next) {
               _id: new mongoose.Types.ObjectId,
               phone: validPhone,
               fbId: validFBId,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB
             });
             //Save fbUser
@@ -378,8 +352,7 @@ async function fbAuth(req, res, next) {
               _id: new mongoose.Types.ObjectId,
               phone: user.phone,
               fbId: validFBId,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB
             });
             //Save fbUser
@@ -399,8 +372,7 @@ async function fbAuth(req, res, next) {
               _id: new mongoose.Types.ObjectId,
               phone: user.phone,
               fbId: validFBId,
-              firstName: validFName,
-              lastName: validLName,
+              name: validName,
               dob: validDOB
             });
             //Save fbUser
@@ -410,7 +382,7 @@ async function fbAuth(req, res, next) {
             req.userData = user;
             sendToken(req, res);
           }
-        // } //Delete starting "// for production
+        }
       }
     //Else
     } else {
@@ -418,14 +390,16 @@ async function fbAuth(req, res, next) {
       let user = await User.findOne({ phone: fbUser.phone }).exec();
 
       if (!user) {
-        console.log('User doesn\'t exist!');
-        return res.status(500).json({
-          message: "User doesn't exist!"
+        //This should never happen. This will only occur if the Users table was deleted while the fbusers was not.
+        await FBUser.deleteOne({ fbId: validFBId }).exec();
+        console.log('FBId doesn\'t exist!');
+        return res.status(202).json({
+          message: "FBId doesn't exist!"
         });
       } else if (!user.isActive) {
         const now = new Date;     //Log time
         //Update FB information
-        await fbUser.update({ $set: { firstName: validFName, lastName: validLName, dob: validDOB }}).exec();
+        await fbUser.update({ $set: { name: validName, dob: validDOB }}).exec();
         //Log in the User
         await user.update({ $set: { isActive: true, updatedAt: now, lastLoginAt: now } }).exec();
 
@@ -434,10 +408,10 @@ async function fbAuth(req, res, next) {
         sendToken(req, res);
       } else {
         const now = new Date;     //Log time
+        //Update FB information
+        await fbUser.update({ $set: { name: validName, dob: validDOB }}).exec();
         //Log in the User
         await user.update({ $set: { lastLoginAt: now } }).exec();
-        //Update FB information
-        await fbUser.update({ $set: { firstName: validFName, lastName: validLName, dob: validDOB }}).exec();
 
         //Save User information
         req.userData = user;
@@ -454,39 +428,17 @@ async function fbAuth(req, res, next) {
 /* Change the name to your User Point account. */
 async function updateName(req, res, next) {
   try {
-    if (!validator.string(req.body.firstName)) {
-      console.log('Invalid first name!');
+    if (!validator.string(req.body.name)) {
+      console.log('Invalid name!');
       return res.status(422).json({
-        message: "Invalid first name!"
-      });
-    } else if (!validator.string(req.body.lastName)) {
-      console.log('Invalid last name!');
-      return res.status(422).json({
-        message: "Invalid last name!"
+        message: "Invalid name!"
       });
     }
-    if (req.body.firstName) {
-      if (!validator.string(req.body.firstName)) {
-        console.log('Invalid first name!');
-        return res.status(422).json({
-          message: "Invalid first name!"
-        });
-      }
-    }
-    if (req.body.lastName) {
-      if (!validator.string(req.body.lastName)) {
-        console.log('Invalid last name!');
-        return res.status(422).json({
-          message: "Invalid last name!"
-        });
-      }
-    }
-    const validFName = req.body.firstName;      //New first name of the User
-    const validLName = req.body.lastName;     //New last name of the User
-    const validUserId = req.userData.userId;      //UserId of the User
+    const validName = req.body.name;      //New name of the User
+    const user = req.user;      //User
     const now = new Date;     //Log time
-    //Find and update User name
-    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set:{ firstName: validFName, lastName: validLName, updatedAt: now } }).exec();
+    //Update User name
+    await user.update({ $set:{ name: validName, updatedAt: now } }).exec();
 
     console.log('Name changed!');
     return res.status(201).json({
@@ -509,50 +461,39 @@ async function updateImage(req, res, next) {
       });
     }
     const validFile = req.file;     //Valid file
-    const validUserId = req.userData.userId;      //UserId of the User
-    //Find a real and active User
-    let user = await User.findOne({ _id: validUserId, isActive: true }).exec();
+    const user = req.user;      //User
+    const now = new Date;     //Log time
 
-    //If no User exists
-    if (!user) {
-      console.log('User doesn\'t exist!');
-      return res.status(409).json({
-        message: "User doesn't exist!"
-      });
-    //Else
-    } else {
-      //If User does not have the default image
-      if (user.image != 'DefaultUser.png') {
-        //Find the User's current image
-        const s3 = new aws.S3();
-        var params = {
-          Bucket: 'point-server',
-          Key: user.image
-        }
-        s3.headObject(params, function(err, data) {
-          if (!err) {
-            var params = {
-              Bucket: 'point-server',
-              Delete: {
-                Objects: [{ "Key": user.image }]
-              }
-            }
-            //Delete old image
-            s3.deleteObjects(params, function(err, data) {
-              if (err) throwErr(res, err);
-            });
-          }
-        });
+    //If User does not have the default image
+    if (user.image != 'DefaultUser.png') {
+      //Find the User's current image
+      const s3 = new aws.S3();
+      var params = {
+        Bucket: 'point-server',
+        Key: user.image
       }
-      const now = new Date;     //Log time
-      //Update User image
-      await user.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
-
-      console.log('Image changed!');
-      return res.status(201).json({
-        message: "Image changed!"
+      s3.headObject(params, function(err, data) {
+        if (!err) {
+          var params = {
+            Bucket: 'point-server',
+            Delete: {
+              Objects: [{ "Key": user.image }]
+            }
+          }
+          //Delete old image
+          s3.deleteObjects(params, function(err, data) {
+            if (err) throwErr(res, err);
+          });
+        }
       });
     }
+    //Update User image
+    await user.update({ $set:{ image: validFile.key, updatedAt: now } }).exec();
+
+    console.log('Image changed!');
+    return res.status(201).json({
+      message: "Image changed!"
+    });
   } catch (err) {
     throwErr(res, err);
   }
@@ -570,13 +511,13 @@ async function updatePassword(req, res, next) {
       });
     }
     const validPassword = req.body.password;      //New password of the User
-    const validUserId = req.userData.userId;      //UserId of the User
+    const user = req.user      //User
     const now = new Date;     //Log time
     //Hash password
-    let hash = await bcrypt.hash(validPassword, 10);
+    let hashPassword = await bcrypt.hash(validPassword, 10);
 
-    //Find and update User password
-    let user = await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { password: hash, updatedAt: now } }).exec();
+    //Update User password
+    await user.update({ $set: { password: hashPassword, updatedAt: now } }).exec();
 
     console.log('Password changed!');
     return res.status(201).json({
@@ -592,10 +533,10 @@ async function updatePassword(req, res, next) {
 /* Completely delete the User from the Point database. */
 async function deleteUser(req, res, next) {
   try {
-    const validUserId = req.userData.userId;      //UserId of the User
+    const user = req.user;      //User
     const now = new Date;     //Log time
     //Find and deactive a real and active User
-    await User.findOneAndUpdate({ _id: validUserId, isActive: true }, { $set: { isActive: false, updatedAt: now } }).exec();
+    await user.update({ $set: { isActive: false, updatedAt: now } }).exec();
 
     console.log('User deleted!');
     return res.status(201).json({

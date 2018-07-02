@@ -15,6 +15,9 @@ async function merchantExist(req, res, next) {
       });
     //Else
     } else {
+      //Save the Merchant
+      req.merchant = merchant;
+      //Continue
       next();
     }
   } catch (err) {

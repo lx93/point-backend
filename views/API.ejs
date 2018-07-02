@@ -40,6 +40,7 @@
 
 	200 - OK, The request has succeeded. Resource has not been modified.
 	201 - Created, The request has succeeded. Resource has been modified.
+	204 - No Content, The server has successfully fulfilled the request and that there is no additional content to send in the response payload body.
 	401 - Unauthorized, The request requires authentication. The Authentication header field must contain a valid Bearer token in order to be authenticated.
 	409 - Conflict, The request could not be completed due to a conflict with the current state of the target resource.
 	413 - Entity too large, The server is refusing to process a request because the request payload is larger than the server is willing or able to process.
@@ -63,6 +64,7 @@
 	- Get all Merchants
 	- Get a specific Merchant
 	- Verify as a User
+	- Authenticate with Facebook
 	- Sign up as a User
 	- Log in as a User
 	- Modify User password
@@ -200,8 +202,7 @@
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
 		- password: A valid string containing your password. Ex. verygoodpassword. Hashed password will be stored.
-		- firstName (optional): A valid string containing the User's first name. Ex. John.
-		- lastName (optional): A valid string containing the User's last name. Ex. Doe.
+		- name: A valid string containing the User's name. Ex. John Doe.
 		- dob (optional): A valid string containing the User's date of birth in yyyy-mm-dd format. Ex. 2000-01-01.
 		- code: A valid 6-digit verification code sent to the listed phone. Ex. 123456. Codes will expire within 5 minutes of creation.
 
@@ -211,8 +212,7 @@
 			{
 				"phone": 19198229889,
 				"password": "verygoodpassword",
-				"firstName": "John",
-				"lastName": "Doe",
+				"name": "John Doe",
 				"dob": "2000-01-01",
 				"code": 123456
 			}
@@ -254,6 +254,37 @@
 			}
 
 
+		<b>Authenticate with Facebook</b>
+		--------------------------
+		The following API enables you to log into your User Point account via Facebook. A token will be sent back in the response, enabling the User to store it for authorization.
+
+		POST api.pointup.io/users/fbAuth
+
+		<i>Arguments:</i>
+		---------
+		- accessToken: A valid Facebook User Authentication token. Ex. 919AccessToken
+		- phone (optional): A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- code (optional): A valid 6-digit verification code sent to the listed phone. Ex. 123456. Codes will expire within 5 minutes of creation.
+
+			Request
+			-------
+			Content-Type: application/json
+			{
+				"accessToken": "919AccessToken",
+				"phone": 19198229889,
+				"code": 123456
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Auth successful!",
+				"token": "919Token"
+			}
+
+
 		<b>Modify User name</b> (AUTH REQ)
 		----------------
 		The following API enables you to change the name to your User Point account.
@@ -262,16 +293,14 @@
 
 		<i>Arguments:</i>
 		---------
-		- firstName (optional): A valid string containing the User's first name. Ex. Bob.
-		- lastName (optional): A valid string containing the User's last name. Ex. Ross.
+		- name: A valid string containing the User's name. Ex. Bob Ross.
 
 			Request
 			-------
 			Authorization: Bearer 919Token
 			Content-Type: application/json
 			{
-				"firstName": "Bob",
-				"lastName": "Ross"
+				"name": "Bob Ross"
 			}
 
 			Response
@@ -422,38 +451,6 @@
 						"updatedAt": "2018-06-13T15:14:05.629Z"
 					}
 				]
-			}
-
-
-		<b>Get a specific balance with this User</b> (AUTH REQ)
-		-------------------------------------
-		The following API enables you to retrieve a specific balance involving this User.
-
-		GET api.pointup.io/merchants/balances/:balanceId
-
-		<i>Arguments:</i>
-		---------
-		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
-
-			Request
-			-------
-			Authorization: Bearer 919Token
-			{
-			}
-
-
-			Response
-			--------
-			HTTP Status Code: 200
-			{
-				"balanceId": "5afafff415833716e170fe92",
-				"name": "Merchant A",
-				"image": "Default.png",
-				"phone": 19198229889,
-				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": "0.00",
-				"createdAt": "2018-06-13T15:10:52.272Z",
-				"updatedAt": "2018-06-13T15:10:52.272Z"
 			}
 
 
@@ -926,36 +923,6 @@
 						"updatedAt": "2018-06-13T15:30:32.222Z"
 					}
 				]
-			}
-
-
-		<b>Get a specific balance with this Merchant</b> (AUTH REQ)
-		-----------------------------------------
-		The following API enables you to retrieve a specific balance involving this Merchant.
-
-		GET api.pointup.io/merchants/balances/:balanceId
-
-		<i>Arguments:</i>
-		---------
-		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
-
-			Request
-			-------
-			Authorization: Bearer AToken
-			{
-			}
-
-
-			Response
-			--------
-			HTTP Status Code: 200
-			{
-				"balanceId": "5afb04ef15833716e170fe9a",
-				"phone": 19198229889,
-				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": "10.00",
-				"createdAt": "2018-06-13T15:10:52.272Z",
-				"updatedAt": "2018-06-13T15:30:35.654Z"
 			}
 
 

@@ -15,6 +15,8 @@ async function userExist(req, res, next) {
       });
     //Else
     } else {
+      //Save the User
+      req.user = user;
       //Continue
       next();
     }
