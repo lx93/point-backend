@@ -11,7 +11,6 @@ const balances = require('./routes/balances');
 const index = require('./routes/index');
 const merchants = require('./routes/merchants');
 const messaging = require('./routes/messaging');
-const stripe = require('./routes/stripe');
 const users = require('./routes/users');
 
 const app = express();
@@ -70,7 +69,6 @@ app.use('/merchants', merchants);
 app.use('/users', users);
 app.use('/balances', balances);
 app.use('/messaging', messaging);
-app.use('/stripe', stripe);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

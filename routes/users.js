@@ -7,6 +7,7 @@ const uController = require('../controllers/users');
 const balanceValid = require('../middleware/balanceValid');
 const imageValid = require('../middleware/imageValid');
 const merchantValid = require('../middleware/merchantValid');
+const paymentValid = require('../middleware/paymentValid');
 const userAuth = require('../middleware/userAuth');
 const userExist = require('../middleware/userExist');
 
@@ -54,10 +55,10 @@ router.delete('/', userAuth, userExist, uController.deleteUser/*, bController.us
 router.get('/balances', userAuth, userExist, bController.userGetAll);
 
 //Create Balance
-router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate, bController.userUpdate);
+router.post('/balances', userAuth, userExist, merchantValid, paymentValid, bController.userCreate, bController.userUpdate);
 
 //Update Balance
-router.put('/balances', userAuth, userExist, balanceValid, bController.userUpdate);
+router.put('/balances', userAuth, userExist, balanceValid, paymentValid, bController.userUpdate);
 
 //Regift Balance
 router.put('/balances/regift', userAuth, userExist, balanceValid, bController.userRegift);

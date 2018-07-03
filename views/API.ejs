@@ -463,7 +463,7 @@
 		<i>Arguments:</i>
 		---------
 		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
-		- balance: A valid string containing the balance held between the Merchant and User. Ex. "20.00". Must be fixed to two decimals.
+		- amount: A valid string containing the balance held between the Merchant and User. Ex. "20.00". Must be fixed to two decimals.
 
 			Request
 			-------
@@ -471,7 +471,7 @@
 			Content-Type: application/json
 			{
 				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": "20.00"
+				"amount": "20.00"
 			}
 
 
@@ -509,7 +509,7 @@
 			--------
 			HTTP Status Code: 201
 			{
-				"message": "Balance exchanged!"
+				"message": "Balance updated!"
 			}
 
 
@@ -625,19 +625,12 @@
 			{
 				"transactions": [
 					{
-						"transactionId": "5b2134868f8e3f1722cd0bfb",
-						"balanceId": "5afafff415833716e170fe92",
-						"phone": 19198229889,
-						"merchantId": "5afaffc015833716e170fe8f",
-						"amount": "0.00",
-						"timestamp": "2018-06-13T15:13:10.277Z"
-					},
-					{
 						"transactionId": "5b2134928f8e3f1722cd0bfe",
 						"balanceId": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
 						"amount": "20.00",
+						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:13:22.299Z"
 					},
 					{
@@ -646,6 +639,7 @@
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
 						"amount": "-7.89",
+						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:14:09.596Z"
 					},
 					{
@@ -654,6 +648,7 @@
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe91",
 						"amount": "37.35",
+						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:14:27.464Z"
 					}
 				]
@@ -966,7 +961,7 @@
 		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- balance: A valid string containing the balance held between the Merchant and User. Ex. "30.17". Must be fixed to two decimals.
+		- amount: A valid string containing the balance held between the Merchant and User. Ex. "30.17". Must be fixed to two decimals.
 
 			Request
 			-------
@@ -974,7 +969,7 @@
 			Content-Type: application/json
 			{
 				"phone": 16177635369,
-				"balance": "30.17"
+				"amount": "30.17"
 			}
 
 
@@ -1097,19 +1092,12 @@
 			{
 				"transactions": [
 					{
-						"transactionId": "5b2134868f8e3f1722cd0bfb",
-						"balanceId": "5afb04ef15833716e170fe9a",
-						"phone": 19198229889,
-						"merchantId": "5afaffc015833716e170fe8f",
-						"amount": "0.00",
-						"timestamp": "2018-06-13T15:13:10.277Z"
-					},
-					{
 						"transactionId": "5b213705b6a97118343fdffb",
 						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"amount": "25.56",
+						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:23:49.156Z"
 					},
 					{
@@ -1118,6 +1106,7 @@
 						"phone": 19802160745,
 						"merchantId": "5afaffc015833716e170fe8f",
 						"amount": "10.00",
+						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:30:35.697Z"
 					},
 					{
@@ -1126,6 +1115,7 @@
 						"phone": 16177635369,
 						"merchantId": "5b2134388f8e3f1722cd0bea",
 						"amount": "30.17",
+						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:31:04.539Z"
 					}
 				]
@@ -1182,7 +1172,7 @@
 
 		<b>Get a balance</b>
 		-------------
-		The following API enables you to view a generated QR code
+		The following API enables you to get information on a specified balance.
 
 		GET api.pointup.io/balances/:balanceId
 
@@ -1208,6 +1198,33 @@
 				"balance": "0.00",
 				"createdAt": "2018-06-13T15:10:52.272Z",
 				"updatedAt": "2018-06-13T15:10:52.272Z"
+			}
+
+
+		<b>Issue a balance</b>
+		---------------
+		The following API enables you to issue a balance.
+
+		POST api.pointup.io/balances/
+
+		<i>Arguments:</i> None
+		---------
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+				"phone": 19198229889,
+				"merchantId": "5afaffc015833716e170fe8f",
+				"amount": "5.00"
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"message": "Balance issued!"
 			}
 </pre>
 </body>

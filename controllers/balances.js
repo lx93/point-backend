@@ -667,7 +667,7 @@ async function merchantUpdate(req, res, next) {
       });
     }
     const validAmount = Number(req.body.amount).toFixed(2);     //Amount of the change in balance
-    const merchant = req.merchant;
+    const merchant = req.merchant;      //Merchant
     const validMerchantId = merchant._id;      //MerchantId of the Merchant
     const balance = req.balance;      //Valid balance
     const hash = req.hash;     //Valid hash
