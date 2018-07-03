@@ -14,6 +14,6 @@ module.exports = async (balanceId, phone, merchantId, balance, now) => {
     updatedAt: now
   });
   //Save transaction
-  await newTransaction.save();
+  await newBalance.save();
   return newBalance;
 }
