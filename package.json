@@ -27,7 +27,8 @@
     "plivo": "^4.0.0",
     "qrcode": "^1.2.0",
     "request": "^2.87.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "stripe": "^6.2.0"
   },
   "description": "Point Payment back-end",
   "main": "app.js",
