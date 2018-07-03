@@ -103,7 +103,8 @@ async function userCreate(req, res, next) {
     }
     const validAmount = Number(req.body.amount).toFixed(2);     //Balance amount to be issued
     const validPhone = req.user.phone;      //Phone number of the User
-    const validMerchantId = req.merchant._id      //MerchantId of the Merchant
+    const merchant = req.merchant;      //Merchant
+    const validMerchantId = merchant._id      //MerchantId of the Merchant
     const now = new Date;     //Log time
 
     //Find a balance with this User and Merchant
