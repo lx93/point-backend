@@ -54,7 +54,7 @@ router.delete('/', userAuth, userExist, uController.deleteUser/*, bController.us
 router.get('/balances', userAuth, userExist, bController.userGetAll);
 
 //Create Balance
-router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate);
+router.post('/balances', userAuth, userExist, merchantValid, bController.userCreate, bController.userUpdate);
 
 //Update Balance
 router.put('/balances', userAuth, userExist, balanceValid, bController.userUpdate);

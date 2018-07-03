@@ -144,7 +144,7 @@ async function signUp(req, res, next) {
       } else if (!merchant.isActive) {
         //Set Merchant to active
         await merchant.update({ $set: { isActive: true, updatedAt: now } });
-        req.merchantId = merchant._id;
+        req.merchant = merchant;
         console.log('Merchant created!');
         res.message1 = "Merchant created!";
         next();

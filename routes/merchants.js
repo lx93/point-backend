@@ -40,7 +40,7 @@ router.delete('/', merchantAuth, merchantExist, mController.deleteMerchant, bCon
 router.get('/balances', merchantAuth, merchantExist, bController.merchantGetAll);
 
 //Create Balance
-router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate);
+router.post('/balances', merchantAuth, merchantExist, bController.merchantCreate, bController.merchantUpdate);
 
 //Update Balance
 router.put('/balances', merchantAuth, merchantExist, balanceValid, bController.merchantUpdate);

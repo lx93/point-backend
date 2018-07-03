@@ -30,9 +30,9 @@ async function balanceExist(req, res, next) {
       });
     //If hash exists but is inactive
     } else if (!hash.isActive) {
-      console.log('Balance expired!');
+      console.log('This giftcard is expired!');
       return res.status(202).json({
-        message: "Balance expired!"
+        message: "This giftcard is expired!"
       });
     //Else
     } else {
@@ -40,13 +40,18 @@ async function balanceExist(req, res, next) {
       //Save the actual hashId
       req.hash = hash;
       //Find a real and active balance
-      let balance = await Balance.findOne({ _id: validBalanceId, isActive: true }).exec();
+      let balance = await Balance.findOne({ _id: validBalanceId }).exec();
 
       //If no balance exists
       if (!balance) {
         console.log('Balance doesn\'t exist!');
         return res.status(409).json({
           message: "Balance doesn't exist!"
+        });
+      } else if (!balance.isActive) {
+        console.log('This giftcard is inactive!');
+        return res.status(202).json({
+          message: "This giftcard is inactive!"
         });
       //Else
       } else {
