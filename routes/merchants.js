@@ -1,10 +1,12 @@
 const express = require('express');
-const mController = require('../controllers/merchants');
+
 const bController = require('../controllers/balances');
-const merchantAuth = require('../middleware/merchantAuth');
-const merchantExist = require('../middleware/merchantExist');
+const mController = require('../controllers/merchants');
+
 const balanceValid = require('../middleware/balanceValid');
 const imageValid = require('../middleware/imageValid');
+const merchantAuth = require('../middleware/merchantAuth');
+const merchantExist = require('../middleware/merchantExist');
 
 //api.pointup.io/merchants
 const router = express.Router();

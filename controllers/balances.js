@@ -1,14 +1,19 @@
 const Balance = require('../models/balances');
+const Hash = require('../models/hashes');
 const Merchant = require('../models/merchants');
 const Transaction = require('../models/transactions');
-const Hash = require('../models/hashes');
-const mongoose = require('mongoose');
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const validator = require('../utils/validator');
-const messenger = require('../utils/messenger');
-const throwErr = require('../utils/throwErr');
+const mongoose = require('mongoose');
+
 const hashBalance = require('../utils/hashBalance');
+const messenger = require('../utils/messenger');
+const saveBalance = require('../utils/saveBalance');
+const saveHash = require('../utils/saveHash');
+const saveTransaction = require('../utils/saveTransaction');
+const throwErr = require('../utils/throwErr');
+const validator = require('../utils/validator');
 
 //Users
 
@@ -68,7 +73,7 @@ async function userGetAll(req, res, next) {
           createdAt: balance[i].createdAt,
           updatedAt: balance[i].updatedAt
         };
-        //Remove that Merchant from the list of Merchants
+        //Remove that Hash from the list of Hashes
         hash.splice(x,1);
         //Remove that Merchant from the list of Merchants
         merchant.splice(y,1);
@@ -589,7 +594,7 @@ async function merchantGetAll(req, res, next) {
       for (var i = 0; i < balance.length; i++) {
         ids[i] = balance[i]._id;
       }
-      //Find real and active Merchants mentioned in the balances
+      //Find real and active hashes mentioned in the balances
       let hash = await Hash.find({ balanceId: { $in: ids }, isActive: true }).exec();
 
       var balances = [];      //Array of balances
@@ -728,6 +733,7 @@ async function merchantCreate(req, res, next) {
 /* Update an existing balance. */
 async function merchantUpdate(req, res, next) {
   try {
+    //If the amount isn't valid
     if (!validator.number(req.body.amount)) {
       console.log('Invalid amount!');
       return res.status(422).json({

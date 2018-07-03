@@ -1,16 +1,18 @@
-const Merchant = require('../models/merchants');
 const Balance = require('../models/balances');
+const Merchant = require('../models/merchants');
 const Verification = require('../models/verifications');
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
+
 const aws = require('aws-sdk');
+const bcrypt = require('bcrypt');
+const fs = require('fs');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const multer = require('multer');
-const validator = require('../utils/validator');
-const throwErr = require('../utils/throwErr');
-const RNG = require('../utils/RNG');
+
 const emailer = require('../utils/emailer');
+const RNG = require('../utils/RNG');
+const throwErr = require('../utils/throwErr');
+const validator = require('../utils/validator');
 
 
 //Get Merchant info
@@ -18,7 +20,6 @@ const emailer = require('../utils/emailer');
 /* Retrieve information about your Merchant Point account. */
 async function getMerchant(req, res, next) {
   try {
-    const validMerchantId = req.merchantData.merchantId;      //MerchantId of the Merchant
     const merchant = req.merchant;      //Merchant
 
     console.log('\n'+merchant+'\n');
@@ -49,6 +50,7 @@ async function verify(req, res, next) {
     }
     const validEmail = req.body.email;      //Email of the Merchant
     const now = new Date;     //Log time
+
     var x = RNG();    //Randomly generated code
     //Create verification
     var newVerification = new Verification({
@@ -75,16 +77,19 @@ async function verify(req, res, next) {
 /* Sign up and create a Merchant Point account. */
 async function signUp(req, res, next) {
   try {
+    //If the name isn't valid
     if (!validator.string(req.body.name)) {
       console.log('Invalid name!');
       return res.status(422).json({
         message: "Invalid name!"
       });
+    //If the email isn't valid
     } else if (!validator.email(req.body.email)) {
       console.log('Invalid email!');
       return res.status(422).json({
         message: "Invalid email!"
       });
+    //If the password isn't valid
     } else if (!validator.string(req.body.password)) {
       console.log('Invalid password!');
       return res.status(422).json({
@@ -95,10 +100,12 @@ async function signUp(req, res, next) {
     const validEmail = req.body.email;      //Email of the Merchant
     const validPassword = req.body.password;    //Password of the Merchant
     const validCode = req.body.code;    //Verification code
+    const now = new Date;     //Log time
+
     //Find a real verification with this Merchant
     let verification = await Verification.findOne({ email: validEmail, code: validCode }).exec();
 
-    //If no verification exists
+    //If no verification exists and (mode is production or code exists)
     if (!verification && (process.env.MODE === 'production' || validCode)) {
       console.log('Auth failed');
       return res.status(401).json({
@@ -114,7 +121,6 @@ async function signUp(req, res, next) {
         //Hash password
         let hashPassword = await bcrypt.hash(validPassword, 10);
 
-        const now = new Date;   //Log time
         //Create Merchant
         var newMerchant = new Merchant({
           _id: new mongoose.Types.ObjectId,
@@ -136,7 +142,6 @@ async function signUp(req, res, next) {
         });
       //If Merchant exists but is not active
       } else if (!merchant.isActive) {
-        const now = new Date;     //Log time
         //Set Merchant to active
         await merchant.update({ $set: { isActive: true, updatedAt: now } });
         req.merchantId = merchant._id;
@@ -174,6 +179,8 @@ async function logIn(req, res, next) {
     }
     const validEmail = req.body.email;      //Email of the Merchant
     const validPassword = req.body.password;      //Password of the Merchant
+    const now = new Date;     //Log time
+
     //Find a real and active Merchant with this email
     let merchant = await Merchant.findOne({ email: validEmail, isActive: true }).exec();
 
@@ -188,7 +195,6 @@ async function logIn(req, res, next) {
       //Check hashed password
       let result = await bcrypt.compare(validPassword, merchant.password);
       if (result) {
-        const now = new Date;     //Log time
         //Log in Merchant
         await merchant.update({ $set: { lastLoginAt: now } }).exec();
         //Create JWT Token
@@ -242,6 +248,7 @@ async function updateName(req, res, next) {
     const validName = req.body.name;      //New name of the Merchant
     const merchant = req.merchant;      //Merchant
     const now = new Date;     //Log time
+
     //Find a Merchant with that name
     let result = await Merchant.findOne({ name: validName }).exec();
 
@@ -330,6 +337,7 @@ async function updatePassword(req, res, next) {
     const validPassword = req.body.password;      //New password of the Merchant
     const merchant = req.merchant;      //Merchant
     const now = new Date;     //Log time
+
     //Hash password
     let hashPassword = await bcrypt.hash(validPassword, 10);
 

@@ -1,5 +1,6 @@
 const Balance = require('../models/balances');
 const Hash = require('../models/hashes');
+
 const mongoose = require('mongoose');
 
 async function balanceExist(req, res, next) {

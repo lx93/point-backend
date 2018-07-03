@@ -1,9 +1,8 @@
-// grab the things we need
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-// create a schema
-var hashSchema = new Schema({
+//Create a schema
+const hashSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
   balanceId: mongoose.Schema.Types.ObjectId,
   hashId: { type: String, required: true },
@@ -14,9 +13,7 @@ var hashSchema = new Schema({
  * db.hashes.createIndex({ isActive: -1, balanceId: 1, hashId: 1 })
  */
 
-// the schema is useless so far
-// we need to create a model using it
-var Hash = mongoose.model('hashes', hashSchema);
+//Create a model using the schema
+const Hash = mongoose.model('hashes', hashSchema);
 
-// make this available to our users in our Node applications
 module.exports = Hash;

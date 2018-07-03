@@ -1,9 +1,8 @@
-// grab the things we need
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-// create a schema
-var transactionSchema = new Schema({
+//Create a schema
+const transactionSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
   balanceId: { type: mongoose.Schema.Types.ObjectId, required: true },
   phone: { type: Number, required: true },
@@ -16,9 +15,7 @@ var transactionSchema = new Schema({
  * db.transactions.createIndex({ timestamp: 1 })
  */
 
-// the schema is useless so far
-// we need to create a model using it
-var Transaction = mongoose.model('transactions', transactionSchema);
+//Create a model using the schema
+const Transaction = mongoose.model('transactions', transactionSchema);
 
-// make this available to our users in our Node applications
 module.exports = Transaction;

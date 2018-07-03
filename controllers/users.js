@@ -2,15 +2,17 @@ const User = require('../models/users');
 const Balance = require('../models/balances');
 const Verification = require('../models/verifications');
 const FBUser = require('../models/fbUsers');
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const request = require('request-promise');
-const validator = require('../utils/validator');
-const throwErr = require('../utils/throwErr');
-const RNG = require('../utils/RNG');
+
 const messenger = require('../utils/messenger');
+const RNG = require('../utils/RNG');
 const sendToken = require('../utils/sendToken');
+const throwErr = require('../utils/throwErr');
+const validator = require('../utils/validator');
 
 
 //Get User info
@@ -48,6 +50,7 @@ async function verify(req, res, next) {
       });
     }
     const now = new Date;     //Log time
+
     var x = RNG();      //Randomly generated code
     //Create verification
     var newVerification = new Verification({
@@ -105,10 +108,12 @@ async function signUp(req, res, next) {
     const validPassword = req.body.password;      //Password of the User
     const validCode = req.body.code;      //Verification code
     const validName = req.body.name;      //Name of the User
+    const now = new Date;     //Log time
+
     //Find a real verification with this User
     let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
-    //If no verification exists
+    //If no verification exists and (mode is production or code exists)
     if (!verification && (process.env.MODE === 'production' || validCode)) {
       console.log('Auth failed');
       return res.status(401).json({
@@ -124,7 +129,6 @@ async function signUp(req, res, next) {
         //Hash password
         let hash = await bcrypt.hash(validPassword, 10);
 
-        const now = new Date;     //Log time
         //Create User
         var newUser = new User({
           _id: new mongoose.Types.ObjectId,
@@ -147,7 +151,6 @@ async function signUp(req, res, next) {
         });
       //If the User exists but is inactive
       } else if (!user.isActive) {
-        const now = new Date;     //Log time
         //Reactivate the User
         await user.update({ $set: { isActive: true, updatedAt: now } }).exec();
 
@@ -186,6 +189,8 @@ async function logIn(req, res, next) {
       });
     }
     const validPassword = req.body.password;    //Password of the User
+    const now = new Date;     //Log time
+
     //Find a real User with that phone
     let user = await User.findOne({ phone: validPhone }).exec();
 
@@ -201,7 +206,6 @@ async function logIn(req, res, next) {
         //Hash password
         let hash = await bcrypt.hash(validPassword, 10);
 
-        const now = new Date;     //Log time
         //Log in User
         await user.update({ $set: { password: hash, lastLoginAt: now } }).exec();
 
@@ -212,7 +216,6 @@ async function logIn(req, res, next) {
         //Check hashed password
         let result = await bcrypt.compare(validPassword, user.password);
         if (result) {
-          const now = new Date;     //Log time
           //Log in User
           await user.update({ $set: { lastLoginAt: now } }).exec();
 
@@ -274,6 +277,8 @@ async function fbAuth(req, res, next) {
       const dob = fbRes.birthday.split("/");
       validDOB = new Date(dob[2]+"-"+dob[0]+"-"+dob[1]);      //Date Of Birth of Facebook User
     }
+    const now = new Date;     //Log time
+
     //Find a real Facebook User ID
     let fbUser = await FBUser.findOne({ fbId: validFBId }).exec();
 
@@ -298,7 +303,7 @@ async function fbAuth(req, res, next) {
         //Find a real verification with this User
         let verification = await Verification.findOne({ phone: validPhone, code: validCode }).exec();
 
-        //If no verification exists
+        //If no verification exists and (mode is production or code exists)
         if (!verification && (process.env.MODE === 'production' || validCode)) {
           console.log('Auth failed');
           return res.status(401).json({
@@ -311,7 +316,6 @@ async function fbAuth(req, res, next) {
 
           //If no User exists
           if (!user) {
-            const now = new Date;     //Log time
             //Create User
             var newUser = new User({
               _id: new mongoose.Types.ObjectId,
@@ -343,7 +347,6 @@ async function fbAuth(req, res, next) {
             sendToken(req, res);
           //If the User exists but is inactive
           } else if (!user.isActive) {
-            const now = new Date;     //Log time
             //Reactivate the User
             await user.update({ $set: { isActive: true, updatedAt: now, lastLoginAt: now } }).exec();
 
@@ -363,7 +366,6 @@ async function fbAuth(req, res, next) {
             sendToken(req, res);
           //Else
           } else {
-            const now = new Date;     //Log time
             //Log in the User
             await user.update({ $set: { lastLoginAt: now } }).exec();
 
@@ -397,7 +399,6 @@ async function fbAuth(req, res, next) {
           message: "FBId doesn't exist!"
         });
       } else if (!user.isActive) {
-        const now = new Date;     //Log time
         //Update FB information
         await fbUser.update({ $set: { name: validName, dob: validDOB }}).exec();
         //Log in the User
@@ -407,7 +408,6 @@ async function fbAuth(req, res, next) {
         req.userData = user;
         sendToken(req, res);
       } else {
-        const now = new Date;     //Log time
         //Update FB information
         await fbUser.update({ $set: { name: validName, dob: validDOB }}).exec();
         //Log in the User
@@ -437,6 +437,7 @@ async function updateName(req, res, next) {
     const validName = req.body.name;      //New name of the User
     const user = req.user;      //User
     const now = new Date;     //Log time
+
     //Update User name
     await user.update({ $set:{ name: validName, updatedAt: now } }).exec();
 
@@ -513,6 +514,7 @@ async function updatePassword(req, res, next) {
     const validPassword = req.body.password;      //New password of the User
     const user = req.user      //User
     const now = new Date;     //Log time
+
     //Hash password
     let hashPassword = await bcrypt.hash(validPassword, 10);
 
@@ -535,6 +537,7 @@ async function deleteUser(req, res, next) {
   try {
     const user = req.user;      //User
     const now = new Date;     //Log time
+
     //Find and deactive a real and active User
     await user.update({ $set: { isActive: false, updatedAt: now } }).exec();
 

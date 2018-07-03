@@ -1,4 +1,4 @@
-function RNG() {
+module.exports = () => {
 
   Number.prototype.pad = function(size) {
     var s = String(this);
@@ -9,5 +9,3 @@ function RNG() {
   var x = Number(Math.floor(Math.random() * Math.floor(999999)).pad(6));
   return x;
 }
-
-module.exports = RNG;

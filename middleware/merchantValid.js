@@ -1,4 +1,5 @@
 const Merchant = require('../models/merchants');
+
 const mongoose = require('mongoose');
 
 async function merchantValid(req, res, next) {

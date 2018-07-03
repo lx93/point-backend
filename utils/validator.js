@@ -1,6 +1,7 @@
-const User = require('../models/users');
-const Merchant = require('../models/merchants');
 const Balance = require('../models/balances');
+const Merchant = require('../models/merchants');
+const User = require('../models/users');
+
 const mongoose = require('mongoose');
 
 function validateEmail(email) {

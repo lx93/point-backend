@@ -1,9 +1,8 @@
-// grab the things we need
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// create a schema
-var verificationSchema = new Schema({
+//Create a schema
+const verificationSchema = new Schema({
   _id: mongoose.Schema.Types.ObjectId,
   phone: { type: Number },
   email: { type: String },
@@ -11,9 +10,7 @@ var verificationSchema = new Schema({
   createdAt: { type: Date, expires: 300, required: true }
 });
 
-// the schema is useless so far
-// we need to create a model using it
-var Verification = mongoose.model('verifications', verificationSchema);
+//Create a model using the schema
+const Verification = mongoose.model('verifications', verificationSchema);
 
-// make this available to our users in our Node applications
 module.exports = Verification;

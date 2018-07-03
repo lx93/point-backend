@@ -1,18 +1,18 @@
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const createError = require('http-errors');
 const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
 const logger = require('morgan');
+const path = require('path');
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
-const routes = require('./routes');
+const balances = require('./routes/balances');
 const index = require('./routes/index');
-const users = require('./routes/users');
 const merchants = require('./routes/merchants');
 const messaging = require('./routes/messaging');
-const balances = require('./routes/balances');
+const stripe = require('./routes/stripe');
+const users = require('./routes/users');
 
 const app = express();
 
@@ -27,7 +27,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 //Redirect HTTP to HTTPS
 app.use(redirectToHTTPS([/localhost:(\d{4})/]));
 
-// view engine setup
+//View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -62,10 +62,10 @@ app.use((req, res, next) => {
 
 //Routes
 app.use('/', index);
-app.use('/users', users);
 app.use('/merchants', merchants);
-app.use('/messaging', messaging);
+app.use('/users', users);
 app.use('/balances', balances);
+app.use('/messaging', messaging);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
