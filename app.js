@@ -60,12 +60,17 @@ app.use((req, res, next) => {
   next();
 });
 
+//const updateTable = require('./utils/updateTable');
+//updateTable.pruneHashes();
+//updateTable.addFields();
+
 //Routes
 app.use('/', index);
 app.use('/merchants', merchants);
 app.use('/users', users);
 app.use('/balances', balances);
 app.use('/messaging', messaging);
+app.use('/stripe', stripe);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
