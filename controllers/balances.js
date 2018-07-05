@@ -209,6 +209,7 @@ async function userCreate(req, res, next) {
       }
     //Else
     } else {
+      /*
       //Find a real and active hash of this balance
       let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
 
@@ -217,6 +218,25 @@ async function userCreate(req, res, next) {
         message: "Balance exists!",
         balanceId: hash.hashId
       });
+      */
+      //If amount is not 0
+      if (validAmount != 0) {
+        //Find a real and active hash of this balance
+        let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
+
+        //Save info
+        req.balance = balance;
+        req.hash = hash;
+
+        //Continue
+        next();
+      } else {
+        console.log('Invalid amount!');
+        return res.status(201).json({
+          message: "Invalid amount!",
+          balanceId: hash.hashId
+        });
+      }
     }
   } catch (err) {
     throwErr(res, err);
