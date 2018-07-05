@@ -31,7 +31,7 @@ function validateString(string) {
 };
 
 function validateNumber(number) {
-  if (typeof parseFloat(number) == 'number') {
+  if (typeof parseFloat(number) === 'number') {
     return true;
   } else {
     return false;
