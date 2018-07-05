@@ -55,10 +55,10 @@ router.delete('/', userAuth, userExist, uController.deleteUser/*, bController.us
 router.get('/balances', userAuth, userExist, bController.userGetAll);
 
 //Create Balance
-router.post('/balances', userAuth, userExist, merchantValid, /*paymentValid,*/ bController.userCreate, bController.userUpdate);
+router.post('/balances', userAuth, userExist, merchantValid, paymentValid, bController.userCreate, bController.userUpdate);
 
 //Update Balance
-router.put('/balances', userAuth, userExist, balanceValid, /*paymentValid,*/ bController.userUpdate);
+router.put('/balances', userAuth, userExist, balanceValid, paymentValid, bController.userUpdate);
 
 //Regift Balance
 router.put('/balances/regift', userAuth, userExist, balanceValid, bController.userRegift);

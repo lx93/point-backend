@@ -15,6 +15,6 @@ const router = express.Router();
 router.get('/:balanceId', balanceExist, bController.getBalance);
 
 //Issue Balance
-router.post('/', merchantValid, /*paymentValid,*/ bController.issueBalance);
+router.post('/', merchantValid, paymentValid, bController.issueBalance);
 
 module.exports = router;
