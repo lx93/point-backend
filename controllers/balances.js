@@ -151,7 +151,7 @@ async function userCreate(req, res, next) {
     if (!balance) {
       const validBalanceId = new mongoose.Types.ObjectId;     //Create balanceId
       //Create and save balance
-      const newBalance = await saveBalance(validBalanceId, validPhone, validMerchantId, "0.00", now);
+      const newBalance = await saveBalance(validBalanceId, validPhone, validMerchantId, 0, now);
 
       const validHashId = hashBalance(validBalanceId);      //Create hashId
       //Create and save hash
@@ -659,7 +659,7 @@ async function merchantCreate(req, res, next) {
     if (!balance) {
       const validBalanceId = new mongoose.Types.ObjectId;     //Create balanceId
       //Create and save balance
-      const newBalance = await saveBalance(validBalanceId, validPhone, validMerchantId, "0.00", now);
+      const newBalance = await saveBalance(validBalanceId, validPhone, validMerchantId, 0, now);
 
       const validHashId = hashBalance(validBalanceId);      //Create hashId
       //Create and save hash
@@ -923,7 +923,7 @@ async function merchantDeleteOne(req, res, next) {
       return res.status(422).json({
         message: "Invalid balance!"
       });
-    } else if (balance.balance != 0.00) {
+    } else if (balance.balance != 0) {
       console.log('Cannot delete active balance!');
       return res.status(409).json({
         message: "Cannot delete active balance!"
