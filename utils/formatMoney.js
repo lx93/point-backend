@@ -1,5 +1,5 @@
 module.exports = (input) => {
-  if (input) {
+  if (typeof input == 'number') {
     try {
       var money = String(input);
       let match = money.match(/^(\-)?(\d*?)(\d{1})?(\d{1})$/);
