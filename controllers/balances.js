@@ -101,7 +101,7 @@ async function userCreate(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = Number(req.body.amount).toFixed(2);     //Balance amount to be issued
+    const validAmount = req.body.amount;     //Balance amount to be issued
     const validPhone = req.user.phone;      //Phone number of the User
     const merchant = req.merchant;      //Merchant
     const validMerchantId = merchant._id      //MerchantId of the Merchant
@@ -194,7 +194,7 @@ async function userUpdate(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = Number(req.body.amount).toFixed(2);     //Amount of the change in balance
+    const validAmount = req.body.amount;     //Amount of the change in balance
     const user = req.user;      //User
     const validPhone = user.phone;      //Phone number of the User
     const balance = req.balance;      //Valid balance
@@ -213,7 +213,7 @@ async function userUpdate(req, res, next) {
       });
     } else {
       //Else
-      const newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);      //New balance
+      const newBalance = (balance.balance + validAmount);      //New balance
       //Set the new balance
       await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
 
@@ -270,7 +270,7 @@ async function userRegift(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = Number(req.body.amount).toFixed(2);     //Amount to be gifted (Taken from giver, given to receiver)
+    const validAmount = req.body.amount;     //Amount to be gifted (Taken from giver, given to receiver)
     const validPhone = req.user.phone;      //Phone number of the User (gift giver)
     var balance = req.balance;      //The User's balance
     var hash = req.hash;     //The User's hash
@@ -284,14 +284,14 @@ async function userRegift(req, res, next) {
       return res.status(422).json({
         message: "Invalid balance!"
       });
-    } else if (Number(validAmount) > Number(balance.balance)) {
+    } else if (validAmount > balance.balance) {
       console.log('Invalid amount!');
       return res.status(422).json({
         message: "Invalid amount!"
       });
     //Else
     } else {
-      const validNewBalance = (Number(balance.balance) - Number(validAmount)).toFixed(2);     //User's new balance
+      const validNewBalance = (balance.balance - validAmount);     //User's new balance
       const validMerchantId = balance.merchantId;     //MerchantId of the gifted balance
       //Find a real Merchant
       let merchant = await Merchant.findOne({ _id: validMerchantId }).exec();
@@ -306,9 +306,8 @@ async function userRegift(req, res, next) {
       //Create and save hash
       await saveHash(balance._id, validHashId);
 
-      const newValidAmount = "-" + (Number(validAmount)).toFixed(2)     //Gifted amount with "-" in front
       //Create and save transaction
-      await saveTransaction(balance._id, validPhone, validMerchantId, newValidAmount, "none", now);
+      await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, "none", now);
 
       const text = await messenger.updateCard(merchant.name, validNewBalance, validHashId, validPhone);
       await messenger.sendText(res, validPhone, text);
@@ -366,7 +365,7 @@ async function userRegift(req, res, next) {
         });
       //Else the balance must exist
       } else {
-        const validNewBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);     //Gift recipient's new balance
+        const validNewBalance = (balance.balance + validAmount);     //Gift recipient's new balance
         //Add the gift to recipient's balance
         await balance.update({ $set: { balance: validNewBalance, updatedAt: now } }).exec();
 
@@ -660,13 +659,13 @@ async function merchantCreate(req, res, next) {
 async function merchantUpdate(req, res, next) {
   try {
     //If the amount isn't valid
-    if (!validator.number(req.body.amount)) {
+    if (!validator.number(req.body.amount) || (req.body.amount == 0)) {
       console.log('Invalid amount!');
       return res.status(422).json({
         message: "Invalid amount!"
       });
     }
-    const validAmount = Number(req.body.amount).toFixed(2);     //Amount of the change in balance
+    const validAmount = req.body.amount;     //Amount of the change in balance
     const merchant = req.merchant;      //Merchant
     const validMerchantId = merchant._id;      //MerchantId of the Merchant
     const balance = req.balance;      //Valid balance
@@ -681,8 +680,8 @@ async function merchantUpdate(req, res, next) {
       return res.status(422).json({
         message: "Invalid balance!"
       });
-    } else if (Number(validAmount) < 0) {
-      if (Math.abs(Number(validAmount)) > Number(balance.balance)) {
+    } else if (validAmount < 0) {
+      if (Math.abs(validAmount) > balance.balance) {
         console.log('Insufficient balance!');
         return res.status(422).json({
           message: "Insufficient balance!"
@@ -692,7 +691,7 @@ async function merchantUpdate(req, res, next) {
       var sale = "none";
     }
     //Else
-    const newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);      //New balance
+    const newBalance = (balance.balance + validAmount);      //New balance
     //Set the new balance
     await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
 
@@ -926,7 +925,7 @@ async function issueBalance(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = Number(req.body.amount).toFixed(2);     //Balance amount to be issued
+    const validAmount = req.body.amount;     //Balance amount to be issued
     const merchant = req.merchant;      //Merchant
     const validMerchantId = merchant._id;     //MerchantId of the Merchant
     const now = new Date;     //Log time
@@ -998,7 +997,7 @@ async function issueBalance(req, res, next) {
         });
       //Else
       } else {
-        const newBalance = (Number(balance.balance) + Number(validAmount)).toFixed(2);      //New balance
+        const newBalance = (balance.balance + validAmount);      //New balance
         //Set the new balance
         await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
 

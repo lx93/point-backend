@@ -8,13 +8,13 @@ function paymentValid(req, res, next) {
     return res.status(422).json({
       message: "Invalid stripe token!"
     });
-  } else if (!validator.number(req.body.amount)) {
+  } else if (!validator.number(req.body.amount) || (req.body.amount < 0)) {
     console.log('Invalid amount!');
     return res.status(422).json({
       message: "Invalid amount!"
     });
   } else {
-    const validAmount = Number((req.body.amount))*100;
+    const validAmount = req.body.amount;
     if (validAmount != 0) {
       //Token is created using Checkout or Elements!
       //Get the payment token ID submitted by the form:

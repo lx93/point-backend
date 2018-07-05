@@ -38,14 +38,22 @@ async function pruneHashes() {
 
 async function addFields() {
   try {
-    let transaction = await Transaction.find({ saleMethod: { $exists: false }}).exec();
+    let transaction = await Transaction.find().exec();
 
     if (!transaction.length) {
-      console.log("No transactions!");
+      console.log("No balances!");
     } else {
       for (var i = 0; i < transaction.length; i++) {
-        console.log("Transaction " + transaction[i]._id + " has no sale method!");
-        await transaction[i].update({ $set: { saleMethod: "direct" } });
+        if (typeof transaction[i].amount === 'string') {
+          console.log("Balance " + transaction[i]._id + " has a string balance!");
+        } else {
+          console.log(typeof transaction[i].amount + " " + transaction[i].amount);
+          if (transaction[i].amount == 0) {
+            //await Transaction.findOneAndRemove({_id: transaction[i]._id}).exec();
+          }
+          //var num = transaction[i].amount * 100;
+          //await transaction[i].update({ $set: { amount: num } });
+        }
       }
     }
   } catch (err) {

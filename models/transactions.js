@@ -7,7 +7,7 @@ const transactionSchema = new Schema({
   balanceId: { type: mongoose.Schema.Types.ObjectId, required: true },
   phone: { type: Number, required: true },
   merchantId: { type: mongoose.Schema.Types.ObjectId, required: true },
-  amount: { type: String, required: true },
+  amount: { type: Number, required: true },
   saleMethod: { type: String, required: true },
   timestamp: { type: Date, required: true }
 });
