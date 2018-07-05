@@ -39,7 +39,7 @@ async function userGetAll(req, res, next) {
       for (var i = 0; i < balance.length; i++) {
         balanceIds[i] = balance[i]._id;
       }
-      //Find real and active balanceIds mentioned in the balances
+      //Find real and active hashes mentioned in the balances
       let hash = await Hash.find({ balanceId: { $in: balanceIds }, isActive: true }).exec();
 
       var merchantIds = [];     //Array of merchantIds mentioned in the balances
@@ -137,8 +137,8 @@ async function userCreate(req, res, next) {
 
         console.log('Balance created!');
         return res.status(201).json({
-          message: "Balance created!",
-          balanceId: validHashId
+          message: "Balance created!"
+          //balanceId: validHashId
         });
       }
     //If the balance exists but is not active
@@ -166,8 +166,8 @@ async function userCreate(req, res, next) {
 
         console.log('Balance created!');
         return res.status(201).json({
-          message: "Balance created!",
-          balanceId: hash.hashId
+          message: "Balance created!"
+          //balanceId: hash.hashId
         });
       }
     //Else
@@ -177,8 +177,8 @@ async function userCreate(req, res, next) {
 
       console.log('Balance exists!');
       return res.status(409).json({
-        message: "Balance exists!",
-        balanceId: hash.hashId
+        message: "Balance exists!"
+        //balanceId: hash.hashId
       });
     }
   } catch (err) {
@@ -238,8 +238,8 @@ async function userUpdate(req, res, next) {
 
         console.log('Balance created!');
         return res.status(201).json({
-          message: "Balance created!",
-          balanceId: validHashId
+          message: "Balance created!"
+          //balanceId: validHashId
         });
       } else {
         //Create a message for the created card
@@ -249,8 +249,8 @@ async function userUpdate(req, res, next) {
 
         console.log('Balance updated!');
         return res.status(201).json({
-          message: "Balance updated!",
-          balanceId: validHashId
+          message: "Balance updated!"
+          //balanceId: validHashId
         });
       }
     }
@@ -346,8 +346,8 @@ async function userRegift(req, res, next) {
         console.log('Balance exchanged!');
         return res.status(201).json({
           message: "Balance exchanged!",
-          gifter: req.gifter,
-          recipient: validHashId
+          //gifter: req.gifter,
+          //recipient: validHashId
         });
       //If the balance exists but is inactive (it must have a value of 0)
       } else if (!balance.isActive) {
@@ -374,8 +374,8 @@ async function userRegift(req, res, next) {
         console.log('Balance exchanged!');
         return res.status(201).json({
           message: "Balance exchanged!",
-          gifter: req.gifter,
-          recipient: validHashId
+          //gifter: req.gifter,
+          //recipient: validHashId
         });
       //Else the balance must exist
       } else {
@@ -403,8 +403,8 @@ async function userRegift(req, res, next) {
         console.log('Balance exchanged!');
         return res.status(201).json({
           message: "Balance exchanged!",
-          gifter: req.gifter,
-          recipient: validHashId
+          //gifter: req.gifter,
+          //recipient: validHashId
         });
       }
     }
@@ -626,8 +626,8 @@ async function merchantCreate(req, res, next) {
 
         console.log('Balance created!');
         return res.status(201).json({
-          message: "Balance created!",
-          balanceId: validHashId
+          message: "Balance created!"
+          //balanceId: validHashId
         });
       }
     //If the balance exists but is inactive
@@ -656,8 +656,8 @@ async function merchantCreate(req, res, next) {
 
         console.log('Balance created!');
         return res.status(201).json({
-          message: "Balance created!",
-          balanceId: hash.hashId
+          message: "Balance created!"
+          //balanceId: hash.hashId
         });
       }
     //Else
@@ -667,8 +667,8 @@ async function merchantCreate(req, res, next) {
 
       console.log('Balance exists!');
       return res.status(409).json({
-        message: "Balance exists!",
-        balanceId: hash.hashId
+        message: "Balance exists!"
+        //balanceId: hash.hashId
       });
     }
   } catch (err) {
@@ -741,8 +741,8 @@ async function merchantUpdate(req, res, next) {
 
       console.log('Balance created!');
       return res.status(201).json({
-        message: "Balance created!",
-        balanceId: validHashId
+        message: "Balance created!"
+        //balanceId: validHashId
       });
     //Else
     } else {
@@ -753,8 +753,8 @@ async function merchantUpdate(req, res, next) {
 
       console.log('Balance updated!');
       return res.status(201).json({
-        message: "Balance updated!",
-        balanceId: validHashId
+        message: "Balance updated!"
+        //balanceId: validHashId
       });
     }
   } catch (err) {
@@ -985,8 +985,8 @@ async function issueBalance(req, res, next) {
 
       console.log('Balance issued!');
       return res.status(201).json({
-        message: "Balance issued!",
-        balanceId: validHashId
+        message: "Balance issued!"
+        //balanceId: validHashId
       });
     //If the balance exists but is inactive
     } else if (!balance.isActive) {
@@ -1017,8 +1017,8 @@ async function issueBalance(req, res, next) {
 
       console.log('Balance issued!');
       return res.status(201).json({
-        message: "Balance issued!",
-        balanceId: validHashId
+        message: "Balance issued!"
+        //balanceId: validHashId
       });
     //Else
     } else {
@@ -1053,8 +1053,8 @@ async function issueBalance(req, res, next) {
 
         console.log('Balance issued!');
         return res.status(201).json({
-          message: "Balance issued!",
-          balanceId: validHashId
+          message: "Balance issued!"
+          //balanceId: validHashId
         });
       }
     }

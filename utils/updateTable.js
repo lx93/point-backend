@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 async function pruneHashes() {
   try {
-    let hash = await Hash.find().exec();
+    let hash = await Hash.find().sort({ balanceId: 1, isActive: 1 }).exec();
     let balance = await Balance.find().exec();
 
     if (!balance.length) {

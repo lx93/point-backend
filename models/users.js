@@ -16,7 +16,7 @@ const userSchema = new Schema({
 });
 
 /* INDEXES (used to speed up queries)
- * db.users.createIndex({ isActive: -1, _id: 1 })
+ * db.users.createIndex({ isActive: 1, _id: 1 })
  */
 
 //Create a model using the schema

@@ -15,7 +15,7 @@ const merchantSchema = new Schema({
 });
 
 /* INDEXES (used to speed up queries)
- * db.merchants.createIndex({ isActive: -1, _id: 1 })
+ * db.merchants.createIndex({ isActive: 1, _id: 1 })
  * db.merchants.createIndex({ _id: 1, merchantId: 1 })
  */
 
