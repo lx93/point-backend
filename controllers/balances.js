@@ -729,7 +729,7 @@ async function merchantCreate(req, res, next) {
         balanceId: hash.hashId
       });
       */
-      if (validAmount !<= 0) {
+      if (validAmount != 0) {
         //Find a real and active hash of this balance
         let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
 
