@@ -343,7 +343,7 @@ async function userRegift(req, res, next) {
         await balance.update({ $set: { balance: validAmount, isActive: true, updatedAt: now } }).exec();
 
         //Find a real and active hash
-        hash = await Hash.findOne({ balanceId: balance_id }).exec();
+        hash = await Hash.findOne({ balanceId: balance._id }).exec();
 
         validHashId = hashBalance(hash.hashId);      //Create hashId
         //Expire hash
@@ -370,7 +370,7 @@ async function userRegift(req, res, next) {
         await balance.update({ $set: { balance: validNewBalance, updatedAt: now } }).exec();
 
         //Find a real and active hash
-        hash = await Hash.findOne({ balanceId: balance_id }).exec();
+        hash = await Hash.findOne({ balanceId: balance._id }).exec();
 
         validHashId = hashBalance(hash.hashId);      //Create hashId
         //Expire hash
