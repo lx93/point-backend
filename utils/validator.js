@@ -32,8 +32,7 @@ function validateString(string) {
 
 function validateNumber(number) {
   if (typeof parseFloat(number) == 'number') {
-    var re = /^(\-)?(\d+)(\.)(\d{2})$/;
-    return re.test(number);
+    return true;
   } else {
     return false;
   }
