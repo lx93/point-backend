@@ -130,7 +130,9 @@ async function userCreate(req, res, next) {
         //Continue
         next();
       } else {
+        //Create a message for the created card
         const text = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
+        //Notify the User
         await messenger.sendText(res, validPhone, text);
 
         console.log('Balance created!');
@@ -157,7 +159,9 @@ async function userCreate(req, res, next) {
         //Continue
         next();
       } else {
+        //Create a message for the created card
         const text = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
+        //Notify the User
         await messenger.sendText(res, validPhone, text);
 
         console.log('Balance created!');
@@ -211,8 +215,8 @@ async function userUpdate(req, res, next) {
       return res.status(422).json({
         message: "Invalid balanceId!"
       });
+    //Else
     } else {
-      //Else
       const newBalance = (balance.balance + validAmount);      //New balance
       //Set the new balance
       await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
@@ -227,7 +231,9 @@ async function userUpdate(req, res, next) {
       await saveTransaction(balance._id, validPhone, balance.merchantId, validAmount, "app", now);
 
       if (req.created) {
+        //Create a message for the created card
         const text = await messenger.createCard(merchant.name, newBalance, validHashId, validPhone);
+        //Notify the User
         await messenger.sendText(res, validPhone, text);
 
         console.log('Balance created!');
@@ -236,7 +242,9 @@ async function userUpdate(req, res, next) {
           balanceId: validHashId
         });
       } else {
+        //Create a message for the created card
         const text = await messenger.updateCard(merchant.name, newBalance, validHashId, validPhone);
+        //Notify the User
         await messenger.sendText(res, validPhone, text);
 
         console.log('Balance updated!');
@@ -309,7 +317,9 @@ async function userRegift(req, res, next) {
       //Create and save transaction
       await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, "none", now);
 
+      //Create a message for the updated card
       const text = await messenger.updateCard(merchant.name, validNewBalance, validHashId, validPhone);
+      //Notify the User
       await messenger.sendText(res, validPhone, text);
 
       //Check if recipient has a balance with the Merchant
@@ -328,7 +338,9 @@ async function userRegift(req, res, next) {
         //Create and save transaction
         await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, "none", now);
 
-        const text = await messenger.updateCard(merchant.name, validAmount, validHashId, validNewPhone);
+        //Create a message for the created card
+        const text = await messenger.createCard(merchant.name, validAmount, validHashId, validNewPhone);
+        //Notify the User
         await messenger.sendText(res, validNewPhone, text);
 
         console.log('Balance exchanged!');
@@ -337,7 +349,7 @@ async function userRegift(req, res, next) {
           gifter: req.gifter,
           recipient: validHashId
         });
-      //If the balance exists but is inactive (it must have a value of 0.00)
+      //If the balance exists but is inactive (it must have a value of 0)
       } else if (!balance.isActive) {
         //Reactivate and initialize the balance
         await balance.update({ $set: { balance: validAmount, isActive: true, updatedAt: now } }).exec();
@@ -354,7 +366,9 @@ async function userRegift(req, res, next) {
         //Create and save transaction
         await saveTransaction(balance._id, validNewPhone, validMerchantId, validAmount, "none", now);
 
-        const text = await messenger.updateCard(merchant.name, validAmount, validHashId, validNewPhone);
+        //Create a message for the created card
+        const text = await messenger.createCard(merchant.name, validAmount, validHashId, validNewPhone);
+        //Notify the User
         await messenger.sendText(res, validNewPhone, text);
 
         console.log('Balance exchanged!');
@@ -381,7 +395,9 @@ async function userRegift(req, res, next) {
         //Create and save transaction
         await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, "none", now);
 
+        //Create a message for the updated card
         const text = await messenger.updateCard(merchant.name, validNewBalance, validHashId, validNewPhone);
+        //Notify the User
         await messenger.sendText(res, validNewPhone, text);
 
         console.log('Balance exchanged!');
@@ -468,7 +484,7 @@ async function userDeleteOne(req, res, next) {
 /* View all transactions to the balances your User Point account holds. */
 async function userGetTransactions(req, res, next) {
   try {
-    const validPhone = req.userData.phone;      //Phone number of the User
+    const validPhone = req.user.phone;      //Phone number of the User
     //Find transactions with this User
     let transaction = await Transaction.find({ phone: validPhone }).sort({ timestamp: 1}).exec();
 
@@ -601,8 +617,11 @@ async function merchantCreate(req, res, next) {
 
         //Continue
         next();
+      //Else
       } else {
+        //Create a message for the created card
         const text = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
+        //Notify the User
         await messenger.sendText(res, validPhone, text);
 
         console.log('Balance created!');
@@ -628,8 +647,11 @@ async function merchantCreate(req, res, next) {
 
         //Continue
         next();
+      //Else
       } else {
+        //Create a message for the created card
         const text = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
+        //Notify the User
         await messenger.sendText(res, validPhone, text);
 
         console.log('Balance created!');
@@ -677,9 +699,9 @@ async function merchantUpdate(req, res, next) {
     var result = (balance.merchantId.equals(validMerchantId));
 
     if (!result) {
-      console.log('Invalid balance!');
+      console.log('This Merchant does not own this giftcard!');
       return res.status(422).json({
-        message: "Invalid balance!"
+        message: "This Merchant does not own this giftcard!"
       });
     } else if (validAmount < 0) {
       if (Math.abs(validAmount) > balance.balance) {
@@ -689,7 +711,7 @@ async function merchantUpdate(req, res, next) {
         });
       }
       //Create sale method
-      var sale = "none";
+      var sale = "redeem";
     }
     //Else
     const newBalance = (balance.balance + validAmount);      //New balance
@@ -704,13 +726,17 @@ async function merchantUpdate(req, res, next) {
 
     //If no sale method exists
     if (!sale) {
+      //Create sale method
       var sale = "direct";
     }
     //Create and save transaction
     await saveTransaction(balance._id, balance.phone, validMerchantId, validAmount, sale, now);
 
+    //If the balance is new
     if (req.created) {
+      //Create a message for the created card
       const text = await messenger.createCard(merchant.name, newBalance, validHashId, balance.phone);
+      //Notify the User
       await messenger.sendText(res, balance.phone, text);
 
       console.log('Balance created!');
@@ -718,9 +744,11 @@ async function merchantUpdate(req, res, next) {
         message: "Balance created!",
         balanceId: validHashId
       });
-
+    //Else
     } else {
+      //Create a message for the updated card
       const text = await messenger.updateCard(merchant.name, newBalance, validHashId, balance.phone);
+      //Notify the User
       await messenger.sendText(res, balance.phone, text);
 
       console.log('Balance updated!');
@@ -742,8 +770,8 @@ async function merchantRestore(req, res, next) {
     const validMerchantId = req.merchant._id;      //MerchantId of the Merchant
     const now = new Date;     //Log time
 
-    //Find a real inactive balance with the Merchant with a balance other than 0.00
-    let balance = await Balance.findOne({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }).exec();
+    //Find a real inactive balance with the Merchant with a balance other than 0
+    let balance = await Balance.findOne({ merchantId: validMerchantId, isActive: false, balance: { $ne: 0 } }).exec();
 
     //If no balance exists
     if (!balance) {
@@ -755,7 +783,7 @@ async function merchantRestore(req, res, next) {
     //Else
     } else {
       //Reactivate inactive balances
-      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: '0.00' } }, { $set: { isActive: true, updatedAt: now } }).exec();
+      await Balance.updateMany({ merchantId: validMerchantId, isActive: false, balance: { $ne: 0 } }, { $set: { isActive: true, updatedAt: now } }).exec();
 
       console.log('Balances restored!');
       return res.status(201).json({
@@ -950,8 +978,10 @@ async function issueBalance(req, res, next) {
         await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, "website", now);
       }
 
-      const message = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
-      await messenger.sendText(res, validPhone, message);
+      //Create a message for the created card
+      const text = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
+      //Notify the User
+      await messenger.sendText(res, validPhone, text);
 
       console.log('Balance issued!');
       return res.status(201).json({
@@ -980,8 +1010,10 @@ async function issueBalance(req, res, next) {
         await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, "website", now);
       }
 
-      const message = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
-      await messenger.sendText(res, validPhone, message);
+      //Create a message for the created card
+      const text = await messenger.createCard(merchant.name, validAmount, validHashId, validPhone);
+      //Notify the User
+      await messenger.sendText(res, validPhone, text);
 
       console.log('Balance issued!');
       return res.status(201).json({
@@ -1011,8 +1043,10 @@ async function issueBalance(req, res, next) {
         //Create and save transaction
         await saveTransaction(balance._id, validPhone, balance.merchantId, validAmount, "website", now);
 
-        const message = await messenger.updateCard(merchant.name, newBalance, validHashId, validPhone);
-        await messenger.sendText(res, validPhone, message);
+        //Create a message for the updated card
+        const text = await messenger.updateCard(merchant.name, newBalance, validHashId, validPhone);
+        //Notify the User
+        await messenger.sendText(res, validPhone, text);
 
         console.log('Balance issued!');
         return res.status(201).json({

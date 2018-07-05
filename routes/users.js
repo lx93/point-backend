@@ -23,7 +23,7 @@ router.get('/', userAuth, userExist, uController.getUser);
 router.get('/merchants', mController.getMerchantAll);
 
 //Get one Merchant
-router.get('/merchants/:merchantId', userAuth, userExist, merchantValid, mController.getMerchantOne);
+router.get('/merchants/:merchantId', merchantValid, mController.getMerchantOne);
 
 //Verify
 router.post('/verify', uController.verify);
