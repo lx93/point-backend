@@ -381,7 +381,7 @@ async function userRegift(req, res, next) {
         //Create and save transaction
         await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, "none", now);
 
-        const text = await messenger.updateCard(merchant.name, validAmount, validHashId, validNewPhone);
+        const text = await messenger.updateCard(merchant.name, validNewBalance, validHashId, validNewPhone);
         await messenger.sendText(res, validNewPhone, text);
 
         console.log('Balance exchanged!');
