@@ -232,7 +232,7 @@ async function userCreate(req, res, next) {
         next();
       } else {
         console.log('Invalid amount!');
-        return res.status(201).json({
+        return res.status(422).json({
           message: "Invalid amount!",
           balanceId: hash.hashId
         });
