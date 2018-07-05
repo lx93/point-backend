@@ -32,6 +32,7 @@ async function pruneHashes() {
           //await Hash.remove({_id: hash[y]._id}).exec();
         } else if (!active) {
           console.log("Hash " + hash[y].hashId + " is true to an inactive balance!");
+          //await Hash.remove({_id: hash[y]._id}).exec();
         } else {
           console.log("Hash " + hash[y].hashId + " is " + hash[y].isActive + " to " + balance[x]._id);
         }

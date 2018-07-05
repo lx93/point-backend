@@ -49,7 +49,7 @@ router.put('/balances', merchantAuth, merchantExist, balanceValid, bController.m
 router.delete('/balances/:balanceId', merchantAuth, merchantExist, balanceValid, bController.merchantDeleteOne);
 
 //(Debug)
-router.delete('/balances', merchantAuth, merchantAuth, bController.merchantDeleteAll);
+router.delete('/balances', merchantAuth, merchantExist, bController.merchantDeleteAll);
 
 
 //Transactions
