@@ -428,7 +428,7 @@
 						"image": "Default.png",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": "0.00",
+						"balance": 0,
 						"createdAt": "2018-06-13T15:10:52.272Z",
 						"updatedAt": "2018-06-13T15:10:52.272Z",
 					},
@@ -437,7 +437,7 @@
 						"name": "Merchant B",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
-						"balance": "12.11",
+						"balance": 1211,
 						"createdAt": "2018-06-13T15:14:05.629Z",
 						"updatedAt": "2018-06-13T15:14:05.629Z"
 					},
@@ -446,7 +446,7 @@
 						"name": "Merchant C",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe91",
-						"balance": "37.35",
+						"balance": 3735,
 						"createdAt": "2018-06-13T15:14:05.629Z",
 						"updatedAt": "2018-06-13T15:14:05.629Z"
 					}
@@ -463,7 +463,7 @@
 		<i>Arguments:</i>
 		---------
 		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
-		- amount: A valid string containing the balance held between the Merchant and User. Ex. "20.00". Must be fixed to two decimals.
+		- amount: A valid number containing the balance held between the Merchant and User. Ex. 2000. This is in terms of cents. Must be positive.
 
 			Request
 			-------
@@ -471,7 +471,7 @@
 			Content-Type: application/json
 			{
 				"merchantId": "5afaffc015833716e170fe8f",
-				"amount": "20.00"
+				"amount": 2000
 			}
 
 
@@ -493,7 +493,7 @@
 		<i>Arguments:</i>
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
-		- amount: A valid string containing the change in the balance held between the Merchant and User. Ex. "10.00". Must be fixed to two decimals. Must be positive.
+		- amount: A valid number containing the change in the balance held between the Merchant and User. Ex. 1000. This is in terms of cents. Must be positive.
 
 			Request
 			-------
@@ -501,7 +501,7 @@
 			Content-Type: application/json
 			{
 				"balanceId": "5afafff415833716e170fe92",
-				"amount": "5.00"
+				"amount": 500
 			}
 
 
@@ -523,7 +523,7 @@
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
 		- newPhone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- amount: A valid string containing the change in the balance held between the Merchant and User. Ex. "10.00". Must be fixed to two decimals.
+		- amount: A valid number containing the change in the balance held between the Merchant and User. Ex. 1000. This is in terms of cents. Must be fixed to two decimals.
 
 			Request
 			-------
@@ -532,7 +532,7 @@
 			{
 				"balanceId": "5afafff415833716e170fe92",
 				"newPhone": 16177635369,
-				"amount": "5.00"
+				"amount": 500
 			}
 
 
@@ -629,7 +629,7 @@
 						"balanceId": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
-						"amount": "20.00",
+						"amount": 2000,
 						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:13:22.299Z"
 					},
@@ -638,7 +638,7 @@
 						"balanceId": "5afb028615833716e170fe95",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe90",
-						"amount": "-7.89",
+						"amount": -789,
 						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:14:09.596Z"
 					},
@@ -647,7 +647,7 @@
 						"balanceId": "5afb028615833716e170fe96",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe91",
-						"amount": "37.35",
+						"amount": 3735,
 						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:14:27.464Z"
 					}
@@ -928,7 +928,7 @@
 						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": "10.00",
+						"balance": 1000,
 						"createdAt": "2018-06-13T15:10:52.272Z",
 						"updatedAt": "2018-06-13T15:30:35.654Z"
 					},
@@ -936,7 +936,7 @@
 						"balanceId": "5afb04f115833716e170fe9b",
 						"phone": 19802160745,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": "25.56",
+						"balance": 2556,
 						"createdAt": "2018-06-13T15:14:05.629Z",
 						"updatedAt": "2018-06-13T15:14:05.629Z"
 					},
@@ -944,7 +944,7 @@
 						"balanceId": "5afb04f715833716e170fe9c",
 						"phone": 16177635369,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"balance": "30.17",
+						"balance": 3017,
 						"createdAt": "2018-06-13T15:30:32.222Z",
 						"updatedAt": "2018-06-13T15:30:32.222Z"
 					}
@@ -961,7 +961,7 @@
 		<i>Arguments:</i>
 		---------
 		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
-		- amount: A valid string containing the balance held between the Merchant and User. Ex. "30.17". Must be fixed to two decimals.
+		- amount: A valid number containing the balance held between the Merchant and User. Ex. 3017. This is in terms of cents. Must be fixed to two decimals.
 
 			Request
 			-------
@@ -969,7 +969,7 @@
 			Content-Type: application/json
 			{
 				"phone": 16177635369,
-				"amount": "30.17"
+				"amount": 3017
 			}
 
 
@@ -991,7 +991,7 @@
 		<i>Arguments:</i>
 		---------
 		- balanceId: This is a unique number associated to each balance held. This is a Mongoose.Schema.Types.ObjectId object located in the _id collumn.
-		- amount: A valid string containing the change in the balance held between the Merchant and User. Ex. "10.00". Must be fixed to two decimals.
+		- amount: A valid number containing the change in the balance held between the Merchant and User. Ex. 1000. This is in terms of cents. Must be fixed to two decimals.
 
 			Request
 			-------
@@ -999,7 +999,7 @@
 			Content-Type: application/json
 			{
 				"balanceId": "5afb04ef15833716e170fe9a",
-				"amount": "10.00"
+				"amount": 1000
 			}
 
 
@@ -1037,7 +1037,7 @@
 
 		<b>Delete a specific balance with this Merchant</b> (AUTH REQ)
 		--------------------------------------------
-		The following API enables you to delete a specific balance involving this Merchant. This balance must be empty with 0.00.
+		The following API enables you to delete a specific balance involving this Merchant. This balance must be empty with 0.
 
 		DELETE api.pointup.io/merchants/balances/:balanceId
 
@@ -1096,7 +1096,7 @@
 						"balanceId": "5afb04ef15833716e170fe9a",
 						"phone": 19198229889,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"amount": "25.56",
+						"amount": 2556,
 						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:23:49.156Z"
 					},
@@ -1105,7 +1105,7 @@
 						"balanceId": "5afb04ef15833716e170fe9b",
 						"phone": 19802160745,
 						"merchantId": "5afaffc015833716e170fe8f",
-						"amount": "10.00",
+						"amount": 1000,
 						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:30:35.697Z"
 					},
@@ -1114,7 +1114,7 @@
 						"balanceId": "5afb04f715833716e170fe9c",
 						"phone": 16177635369,
 						"merchantId": "5b2134388f8e3f1722cd0bea",
-						"amount": "30.17",
+						"amount": 3017,
 						"saleMethod": "direct",
 						"timestamp": "2018-06-13T15:31:04.539Z"
 					}
@@ -1195,7 +1195,7 @@
 				"image": "Default.png",
 				"phone": 19198229889,
 				"merchantId": "5afaffc015833716e170fe8f",
-				"balance": "0.00",
+				"balance": 0,
 				"createdAt": "2018-06-13T15:10:52.272Z",
 				"updatedAt": "2018-06-13T15:10:52.272Z"
 			}
@@ -1207,8 +1207,11 @@
 
 		POST api.pointup.io/balances/
 
-		<i>Arguments:</i> None
+		<i>Arguments:</i>
 		---------
+		- phone: A valid 10-digit phone number beginning with 1. Ex. 19198229889. Can be String or Number.
+		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
+		- amount: A valid number containing the balance held between the Merchant and User. Ex. 500. This is in terms of cents. Must be positive.
 
 			Request
 			-------
@@ -1216,7 +1219,7 @@
 			{
 				"phone": 19198229889,
 				"merchantId": "5afaffc015833716e170fe8f",
-				"amount": "5.00"
+				"amount": 500
 			}
 
 
