@@ -31,7 +31,6 @@ function validateString(string) {
 };
 
 function validateNumber(number) {
-  console.log(typeof number);
   if (typeof number === 'number') {
     return true;
   } else {
