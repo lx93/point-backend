@@ -14,21 +14,29 @@ async function pruneHashes() {
       console.log("No balances have hashes!");
     } else {
       var real = false;
+      var active = false;
       for (var y = hash.length-1; y >= 0; y--) {
         for (var x = balance.length-1; x >= 0; x--) {
           //console.log((hash[y].balanceId.equals(balance[x]._id)) + " " + balance[x]._id);
           if (balance[x]._id.equals(hash[y].balanceId)) {
             real = true;
+            if (balance[x].isActive) {
+              active = true;
+              break;
+            }
             break;
           }
         }
         if (!real) {
           console.log("Hash " + hash[y].hashId + " is not real!");
           //await Hash.remove({_id: hash[y]._id}).exec();
+        } else if (!active) {
+          console.log("Hash " + hash[y].hashId + " is true to an inactive balance!");
         } else {
           console.log("Hash " + hash[y].hashId + " is " + hash[y].isActive + " to " + balance[x]._id);
         }
         real = false;
+        active = false;
       }
     }
   } catch (err) {

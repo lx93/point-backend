@@ -53,6 +53,7 @@ router.delete('/', userAuth, userExist, uController.deleteUser/*, bController.us
 
 //Get Balances
 router.get('/balances', userAuth, userExist, bController.userGetAll);
+router.get('/balances/:merchantId', userAuth, userExist, merchantValid, bController.userGetOne);
 
 //Create Balance
 router.post('/balances', userAuth, userExist, merchantValid, paymentValid, bController.userCreate, bController.userUpdate);
