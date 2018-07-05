@@ -31,7 +31,8 @@ function validateString(string) {
 };
 
 function validateNumber(number) {
-  if (typeof parseFloat(number) === 'number') {
+  console.log(typeof number);
+  if (typeof number === 'number') {
     return true;
   } else {
     return false;

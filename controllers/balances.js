@@ -101,7 +101,7 @@ async function userCreate(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = req.body.amount;     //Balance amount to be issued
+    const validAmount = parseInt(req.body.amount);     //Balance amount to be issued
     const validPhone = req.user.phone;      //Phone number of the User
     const merchant = req.merchant;      //Merchant
     const validMerchantId = merchant._id      //MerchantId of the Merchant
@@ -194,7 +194,7 @@ async function userUpdate(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = req.body.amount;     //Amount of the change in balance
+    const validAmount = parseInt(req.body.amount);     //Amount of the change in balance
     const user = req.user;      //User
     const validPhone = user.phone;      //Phone number of the User
     const balance = req.balance;      //Valid balance
@@ -270,7 +270,7 @@ async function userRegift(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = req.body.amount;     //Amount to be gifted (Taken from giver, given to receiver)
+    const validAmount = parseInt(req.body.amount);     //Amount to be gifted (Taken from giver, given to receiver)
     const validPhone = req.user.phone;      //Phone number of the User (gift giver)
     var balance = req.balance;      //The User's balance
     var hash = req.hash;     //The User's hash
@@ -575,6 +575,7 @@ async function merchantCreate(req, res, next) {
         message: "Invalid amount!"
       });
     }
+    const validAmount = parseInt(req.body.amount);     //Balance amount to be issued
     const validMerchantId = req.merchant._id;      //MerchantId of the Merchant
     const now = new Date;     //Log time
 
@@ -665,7 +666,7 @@ async function merchantUpdate(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = req.body.amount;     //Amount of the change in balance
+    const validAmount = parseInt(req.body.amount);     //Amount of the change in balance
     const merchant = req.merchant;      //Merchant
     const validMerchantId = merchant._id;      //MerchantId of the Merchant
     const balance = req.balance;      //Valid balance
@@ -925,7 +926,7 @@ async function issueBalance(req, res, next) {
         message: "Invalid amount!"
       });
     }
-    const validAmount = req.body.amount;     //Balance amount to be issued
+    const validAmount = parseInt(req.body.amount);     //Balance amount to be issued
     const merchant = req.merchant;      //Merchant
     const validMerchantId = merchant._id;     //MerchantId of the Merchant
     const now = new Date;     //Log time

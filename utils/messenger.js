@@ -1,10 +1,12 @@
 const plivo = require('plivo');
 const request = require('request');
 
+const formatMoney = require('./formatMoney');
+
 function createCard(merchantName, balance, balanceId, phone) {
   var output = "";
   output += "You just obtained a giftcard with " + merchantName + "!\n";
-  output += "Your balance with " + merchantName + " is now $" + balance + ".\n";
+  output += "Your balance with " + merchantName + " is now " + formatMoney(balance) + ".\n";
   output += "View and redeem your Pointup Giftcard at app.point.io/qr/" + balanceId + ".\n";
   output += "Recipient: " + phone;
   return output;
@@ -13,7 +15,7 @@ function createCard(merchantName, balance, balanceId, phone) {
 function updateCard(merchantName, balance, balanceId, phone) {
   var output = "";
   output += "Your balance with " + merchantName + " has been updated!\n";
-  output += "Your balance with " + merchantName + " is now $" + balance + ".\n";
+  output += "Your balance with " + merchantName + " is now " + formatMoney(balance) + ".\n";
   output += "View and redeem your Pointup Giftcard at app.point.io/qr/" + balanceId + ".\n";
   output += "Recipient: " + phone;
   return output;
