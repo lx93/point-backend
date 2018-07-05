@@ -430,7 +430,7 @@
 						"merchantId": "5afaffc015833716e170fe8f",
 						"balance": 0,
 						"createdAt": "2018-06-13T15:10:52.272Z",
-						"updatedAt": "2018-06-13T15:10:52.272Z",
+						"updatedAt": "2018-06-13T15:10:52.272Z"
 					},
 					{
 						"balanceId": "5afb028615833716e170fe95",
@@ -451,6 +451,39 @@
 						"updatedAt": "2018-06-13T15:14:05.629Z"
 					}
 				]
+			}
+
+
+		<b>Get a specific balance with this user</b> (AUTH REQ)
+		-------------------------------------
+		The following API enables you to retrieve all balances involving this User, given a Merchant.
+
+		GET api.pointup.io/users/balances/:merchantId
+
+		<i>Arguments:</i>
+		---------
+		- merchantId: This is a unique number associated to each Merchant. This is a Mongoose.Schemta.Types.ObjectId object located in the _id collumn of Merchants.
+
+			Request
+			-------
+			Authorization: Bearer 919Token
+			Content-Type: application/json
+			{
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 200
+			{
+				"balanceId": "5afafff415833716e170fe92",
+				"name": "Merchant A",
+				"image": "Default.png",
+				"phone": 19198229889,
+				"merchantId": "5afaffc015833716e170fe8f",
+				"balance": 0,
+				"createdAt": "2018-06-13T15:10:52.272Z",
+				"updatedAt": "2018-06-13T15:10:52.272Z"
 			}
 
 
