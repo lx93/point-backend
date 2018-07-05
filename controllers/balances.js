@@ -1034,6 +1034,9 @@ async function issueBalance(req, res, next) {
         //Set the new balance
         await balance.update({ $set: { balance: newBalance, updatedAt: now } }).exec();
 
+        //Find a real and active hash of this balance
+        let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
+
         //Expire hash
         await hash.update({ $set: { isActive: false } }).exec();
         const validHashId = hashBalance(hash.hashId);      //Create hashId
