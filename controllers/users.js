@@ -43,6 +43,7 @@ async function getUser(req, res, next) {
 async function verify(req, res, next) {
   try {
     const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+    //If the phone isn't valid
     if (!validator.phone(validPhone)) {
       console.log('Invalid phone!');
       return res.status(422).json({
@@ -61,6 +62,7 @@ async function verify(req, res, next) {
     });
     //Save verification
     await newVerification.save();
+    //Send verification code
     messenger.sendText(res, validPhone, "Pointup Verification code: " + x);
 
     console.log('Code sent!');
@@ -79,24 +81,29 @@ async function signUp(req, res, next) {
   try {
     const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
     var validDOB;
+    //If the phone isn't valid
     if (!validator.phone(validPhone)) {
       console.log('Invalid phone!');
       return res.status(422).json({
         message: "Invalid phone!"
       });
+    //If the password isn't valid
     } else if (!validator.string(req.body.password)) {
       console.log('Invalid password!');
       return res.status(422).json({
         message: "Invalid password!"
       });
+    //If the name isn't valid
     } else if (!validator.string(req.body.name)) {
       console.log('Invalid name!');
       return res.status(422).json({
         message: "Invalid name!"
       });
     }
+    //If the date of birth is present
     if (req.body.dob) {
       validDOB = dob[2]+"-"+dob[0]+"-"+dob[1];      //Date Of Birth of Facebook User
+      //If the dob isn't valid
       if (!validator.dob(validDOB)) {
         console.log('Invalid date!');
         return res.status(422).json({
@@ -177,11 +184,13 @@ async function signUp(req, res, next) {
 async function logIn(req, res, next) {
   try {
     const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+    //If the phone isn't valid
     if (!validator.phone(validPhone)) {
       console.log('Invalid phone!');
       return res.status(422).json({
         message: "Invalid phone!"
       });
+    //If the password isn't valid
     } else if (!validator.string(req.body.password)) {
       console.log('Invalid password!');
       return res.status(422).json({
@@ -202,6 +211,7 @@ async function logIn(req, res, next) {
       });
     //Else
     } else {
+      //If no password exists
       if (!user.password) {
         //Hash password
         let hash = await bcrypt.hash(validPassword, 10);
@@ -212,6 +222,7 @@ async function logIn(req, res, next) {
         //Save User information
         req.userData = user;
         sendToken(req, res);
+      //Else
       } else {
         //Check hashed password
         let result = await bcrypt.compare(validPassword, user.password);
@@ -243,6 +254,7 @@ async function logIn(req, res, next) {
 /* Log into your User Point account via Facebook. A token will be sent back in the response, enabling the User to store it for authorization. */
 async function fbAuth(req, res, next) {
   try {
+    //If the access token isn't present
     if (!req.body.accessToken) {
       console.log('Invalid access token!');
       return res.status(422).json({
@@ -268,7 +280,7 @@ async function fbAuth(req, res, next) {
         message: "Invalid access token!"
       });
     }
-    const fbRes = JSON.parse(response);
+    const fbRes = JSON.parse(response);     //Authentic response
 
     const validFBId = fbRes.id;     //Facebook User Id
     const validName = fbRes.name;     //Name of the Facebook User
@@ -293,6 +305,7 @@ async function fbAuth(req, res, next) {
       //Else
       } else {
         const validPhone = String(req.body.phone).replace(/[^0-9]/g, "");     //Phone number of the User
+        //If the phone isn't valid
         if (!validator.phone(validPhone)) {
           console.log('Invalid phone!');
           return res.status(422).json({
@@ -428,6 +441,7 @@ async function fbAuth(req, res, next) {
 /* Change the name to your User Point account. */
 async function updateName(req, res, next) {
   try {
+    //If the name isn't valid
     if (!validator.string(req.body.name)) {
       console.log('Invalid name!');
       return res.status(422).json({
@@ -455,6 +469,7 @@ async function updateName(req, res, next) {
 /* Change the image to your User Point account. */
 async function updateImage(req, res, next) {
   try {
+    //If the file isn't valid
     if (!req.file) {
       console.log('Image invalid!');
       return res.status(422).json({
@@ -505,6 +520,7 @@ async function updateImage(req, res, next) {
 /* Change the password to your User Point account. */
 async function updatePassword(req, res, next) {
   try {
+    //If the password isn't valid
     if (!validator.string(req.body.password)) {
       console.log('Invalid password!');
       return res.status(422).json({

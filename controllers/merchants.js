@@ -42,6 +42,7 @@ async function getMerchant(req, res, next) {
 /* Verify a Merchant Point account. A verification code will be sent to the listed email. */
 async function verify(req, res, next) {
   try {
+    //If the email isn't valid
     if (!validator.email(req.body.email)) {
       console.log('Invalid email!');
       return res.status(422).json({
@@ -142,11 +143,14 @@ async function signUp(req, res, next) {
         });
       //If Merchant exists but is not active
       } else if (!merchant.isActive) {
-        //Set Merchant to active
+        //Reactivate Merchant
         await merchant.update({ $set: { isActive: true, updatedAt: now } });
+        //Save Merchant
         req.merchant = merchant;
+
         console.log('Merchant created!');
         res.message1 = "Merchant created!";
+        //Continue
         next();
       //Else
       } else {
@@ -166,11 +170,13 @@ async function signUp(req, res, next) {
 /* Log into your Merchant Point account. A token will be sent back in the response, enabling the Merchant to store it for authorization. */
 async function logIn(req, res, next) {
   try {
+    //If the email isn't valid
     if (!validator.email(req.body.email)) {
       console.log('Invalid email!');
       return res.status(422).json({
         message: "Invalid email!"
       });
+    //If the password isn't valid
     } else if (!validator.string(req.body.password)) {
       console.log('Invalid password!');
       return res.status(422).json({
@@ -239,6 +245,7 @@ async function logIn(req, res, next) {
 /* Change the name to your Merchant Point account. */
 async function updateName(req, res, next) {
   try {
+    //If the name isn't valid
     if (!validator.string(req.body.name)) {
       console.log('Invalid name!');
       return res.status(422).json({
@@ -278,6 +285,7 @@ async function updateName(req, res, next) {
 /* Change the image to your Merchant Point account. */
 async function updateImage(req, res, next) {
   try {
+    //If the file isn't valid
     if (!req.file) {
       console.log('Image invalid!');
       return res.status(422).json({
@@ -328,6 +336,7 @@ async function updateImage(req, res, next) {
 /* Change the password to your Merchant Point account. */
 async function updatePassword(req, res, next) {
   try {
+    //If the password isn't valid
     if (!validator.string(req.body.password)) {
       console.log('Invalid password!');
       return res.status(422).json({
@@ -389,7 +398,7 @@ async function getMerchantAll(req, res, next) {
     });
   //Else
   } else {
-    var merchants = [];
+    var merchants = [];     //Array of Merchants
     for (var i = 0; i < merchant.length; i++) {
       merchants[i] = {
         merchantId: merchant[i]._id,
