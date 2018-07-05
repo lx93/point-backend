@@ -132,7 +132,7 @@ async function userGetOne(req, res, next) {
 async function userCreate(req, res, next) {
   try {
     //If the amount isn't valid
-    if (!validator.number(req.body.amount) || (req.body.amount < 0) ) {
+    if (!validator.number(req.body.amount) ) {
       console.log('Invalid amount!');
       return res.status(422).json({
         message: "Invalid amount!"
@@ -642,7 +642,7 @@ async function merchantCreate(req, res, next) {
         message: "Invalid phone!"
       });
     //If the amount isn't valid
-    } else if(!validator.number(req.body.amount) || (req.body.amount < 0) ) {
+    } else if (!validator.number(req.body.amount)) {
       console.log('Invalid amount!');
       return res.status(422).json({
         message: "Invalid amount!"
@@ -729,10 +729,10 @@ async function merchantCreate(req, res, next) {
         balanceId: hash.hashId
       });
       */
-      if (validAmount != 0) {
+      if (validAmount !<= 0) {
         //Find a real and active hash of this balance
         let hash = await Hash.findOne({ balanceId: balance._id, isActive: true }).exec();
-        
+
         //Save info
         req.balance = balance;
         req.hash = hash;
