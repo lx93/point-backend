@@ -14,7 +14,7 @@ function paymentValid(req, res, next) {
       message: "Invalid amount!"
     });
   } else {
-    const validAmount = req.body.amount;
+    const validAmount = parseInt(req.body.amount);
     if (validAmount != 0) {
       //Token is created using Checkout or Elements!
       //Get the payment token ID submitted by the form:
