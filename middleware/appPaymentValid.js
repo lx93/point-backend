@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+const getDiscount = require('../utils/getDiscount');
 const validator = require('../utils/validator');
 
 function paymentValid(req, res, next) {
@@ -9,7 +10,7 @@ function paymentValid(req, res, next) {
       message: "Invalid amount!"
     });
   } else {
-    const validAmount = parseInt(req.body.amount);
+    var validAmount = parseInt(req.body.amount);
     if (validAmount != 0) {
       if (!req.body.stripeToken) {
         console.log('Invalid stripe token!');
@@ -17,6 +18,8 @@ function paymentValid(req, res, next) {
           message: "Invalid stripe token!"
         });
       }
+      const discount = getDiscount.calculate(validAmount);
+      validAmount = parseInt(validAmount * discount);
       //Token is created using Checkout or Elements!
       //Get the payment token ID submitted by the form:
       const token = req.body.stripeToken;     //Using Express
@@ -29,14 +32,16 @@ function paymentValid(req, res, next) {
       }, (err, charge) => {
         if (err) {
           console.log('Charge attempt failed!');
-          return res.status(409).json({
+          return res.status(422).json({
             message: "Charge attempt failed!"
           });
         } else {
+          req.discount = discount;
           next();
         }
       });
     } else {
+      req.discount = null;
       next();
     }
   }

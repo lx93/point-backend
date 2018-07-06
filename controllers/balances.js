@@ -285,7 +285,7 @@ async function userUpdate(req, res, next) {
       await saveHash(balance._id, validHashId);
 
       //Create and save transaction
-      await saveTransaction(balance._id, validPhone, balance.merchantId, validAmount, "app", now);
+      await saveTransaction(balance._id, validPhone, balance.merchantId, validAmount, req.discount, "app", now);
 
       if (req.created) {
         //Create a message for the created card
@@ -372,7 +372,7 @@ async function userRegift(req, res, next) {
       await saveHash(balance._id, validHashId);
 
       //Create and save transaction
-      await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, "none", now);
+      await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, null, "none", now);
 
       //Create a message for the updated card
       const text = await messenger.updateCard(merchant.name, validNewBalance, validHashId, validPhone);
@@ -393,7 +393,7 @@ async function userRegift(req, res, next) {
         await saveHash(validBalanceId, validHashId);
 
         //Create and save transaction
-        await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, "none", now);
+        await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, null, "none", now);
 
         //Create a message for the created card
         const text = await messenger.createCard(merchant.name, validAmount, validHashId, validNewPhone);
@@ -421,7 +421,7 @@ async function userRegift(req, res, next) {
         await saveHash(balance._id, validHashId);
 
         //Create and save transaction
-        await saveTransaction(balance._id, validNewPhone, validMerchantId, validAmount, "none", now);
+        await saveTransaction(balance._id, validNewPhone, validMerchantId, validAmount, null, "none", now);
 
         //Create a message for the created card
         const text = await messenger.createCard(merchant.name, validAmount, validHashId, validNewPhone);
@@ -450,7 +450,7 @@ async function userRegift(req, res, next) {
         await saveHash(balance._id, validHashId);
 
         //Create and save transaction
-        await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, "none", now);
+        await saveTransaction(balance._id, validPhone, validMerchantId, validAmount, null, "none", now);
 
         //Create a message for the updated card
         const text = await messenger.updateCard(merchant.name, validNewBalance, validHashId, validNewPhone);
@@ -805,7 +805,7 @@ async function merchantUpdate(req, res, next) {
       var sale = "direct";
     }
     //Create and save transaction
-    await saveTransaction(balance._id, balance.phone, validMerchantId, validAmount, sale, now);
+    await saveTransaction(balance._id, balance.phone, validMerchantId, validAmount, null, sale, now);
 
     //If the balance is new
     if (req.created) {
@@ -1050,7 +1050,7 @@ async function issueBalance(req, res, next) {
       //If amount is not 0
       if (validAmount != 0) {
         //Create and save transaction
-        await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, "website", now);
+        await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, null, "website", now);
       }
 
       //Create a message for the created card
@@ -1082,7 +1082,7 @@ async function issueBalance(req, res, next) {
         await saveHash(balance._id, validHashId);
 
         //Create and save transaction
-        await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, "website", now);
+        await saveTransaction(validBalanceId, validPhone, validMerchantId, validAmount, null, "website", now);
       }
 
       //Create a message for the created card
@@ -1119,7 +1119,7 @@ async function issueBalance(req, res, next) {
         await saveHash(balance._id, validHashId);
 
         //Create and save transaction
-        await saveTransaction(balance._id, validPhone, balance.merchantId, validAmount, "website", now);
+        await saveTransaction(balance._id, validPhone, balance.merchantId, validAmount, null, "website", now);
 
         //Create a message for the updated card
         const text = await messenger.updateCard(merchant.name, newBalance, validHashId, validPhone);

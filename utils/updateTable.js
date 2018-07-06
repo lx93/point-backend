@@ -5,6 +5,8 @@ const Hash = require('../models/hashes');
 
 const mongoose = require('mongoose');
 
+const getDiscount = require('../utils/getDiscount');
+
 async function pruneHashes() {
   try {
     let hash = await Hash.find().sort({ balanceId: 1, isActive: 1 }).exec();
@@ -47,21 +49,19 @@ async function pruneHashes() {
 
 async function addFields() {
   try {
-    let transaction = await Transaction.find().exec();
+    let transaction = await Transaction.find({ discountFactor: { $exists: false }}).exec();
 
     if (!transaction.length) {
-      console.log("No balances!");
+      console.log("No transactions!");
     } else {
       for (var i = 0; i < transaction.length; i++) {
-        if (typeof transaction[i].amount === 'string') {
-          console.log("Balance " + transaction[i]._id + " has a string balance!");
+        if (transaction[i].saleMethod == "app") {
+          const discount = getDiscount.calculate(transaction[i].amount);
+          console.log(transaction[i]._id + " should have a discountFactor of " + discount + "!");
+          await transaction[i].update({ $set: { discountFactor: discount } });
         } else {
-          console.log(typeof transaction[i].amount + " " + transaction[i].amount);
-          if (transaction[i].amount == 0) {
-            //await Transaction.findOneAndRemove({_id: transaction[i]._id}).exec();
-          }
-          //var num = transaction[i].amount * 100;
-          //await transaction[i].update({ $set: { amount: num } });
+          console.log(transaction[i]._id + " should have a discountFactor of null!");
+          await transaction[i].update({ $set: { discountFactor: null } });
         }
       }
     }

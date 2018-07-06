@@ -8,6 +8,7 @@ const transactionSchema = new Schema({
   phone: { type: Number, required: true },
   merchantId: { type: mongoose.Schema.Types.ObjectId, required: true },
   amount: { type: Number, required: true },
+  discountFactor: { type: Number },
   saleMethod: { type: String, required: true },
   timestamp: { type: Date, required: true }
 });

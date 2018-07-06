@@ -2,7 +2,7 @@ const Transaction = require('../models/transactions');
 
 const mongoose = require('mongoose');
 
-module.exports = async (balanceId, phone, merchantId, amount, saleMethod, timestamp) => {
+module.exports = async (balanceId, phone, merchantId, amount, discountFactor, saleMethod, timestamp) => {
   //Create transaction
   const newTransaction = new Transaction({
     _id: new mongoose.Types.ObjectId,
@@ -10,6 +10,7 @@ module.exports = async (balanceId, phone, merchantId, amount, saleMethod, timest
     phone: phone,
     merchantId: merchantId,
     amount: amount,
+    discountFactor: discountFactor,
     saleMethod: saleMethod,
     timestamp: timestamp
   });

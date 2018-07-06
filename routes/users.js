@@ -7,7 +7,7 @@ const uController = require('../controllers/users');
 const balanceValid = require('../middleware/balanceValid');
 const imageValid = require('../middleware/imageValid');
 const merchantValid = require('../middleware/merchantValid');
-const paymentValid = require('../middleware/paymentValid');
+const paymentValid = require('../middleware/appPaymentValid');
 const userAuth = require('../middleware/userAuth');
 const userExist = require('../middleware/userExist');
 

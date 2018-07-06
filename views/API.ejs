@@ -1236,6 +1236,32 @@
 			}
 
 
+		<b>Get a discount</b>
+		--------------
+		The following API enables you to view the discount for a specified amount.
+
+		POST api.pointup.io/balances/
+
+		<i>Arguments:</i>
+		---------
+		- amount: A valid number containing the balance held between the Merchant and User. Ex. 500. This is in terms of cents. Must be positive.
+
+			Request
+			-------
+			Authorization: Bearer AToken
+			{
+				"amount": 15000
+			}
+
+
+			Response
+			--------
+			HTTP Status Code: 201
+			{
+				"discountedAmount": 12900
+			}
+
+
 		<b>Issue a balance</b>
 		---------------
 		The following API enables you to issue a balance.
