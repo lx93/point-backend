@@ -560,6 +560,7 @@ async function userGetTransactions(req, res, next) {
           phone: transaction[i].phone,
           merchantId: transaction[i].merchantId,
           amount: transaction[i].amount,
+          discountFactor: transaction[i].discountFactor,
           saleMethod: transaction[i].saleMethod,
           timestamp: transaction[i].timestamp
         }
@@ -967,6 +968,7 @@ async function merchantGetTransactions(req, res, next) {
           phone: transaction[i].phone,
           merchantId: transaction[i].merchantId,
           amount: transaction[i].amount,
+          discountFactor: transaction[i].discountFactor,
           saleMethod: transaction[i].saleMethod,
           timestamp: transaction[i].timestamp
         }
