@@ -17,6 +17,7 @@ function paymentValid(req, res, next) {
           message: "Invalid stripe token!"
         });
       }
+      const validMerchantName = req.merchant.name;
       //Token is created using Checkout or Elements!
       //Get the payment token ID submitted by the form:
       const token = req.body.stripeToken;     //Using Express
@@ -24,7 +25,7 @@ function paymentValid(req, res, next) {
       const charge = stripe.charges.create({
         amount: validAmount,
         currency: 'usd',
-        description: 'Example charge',
+        description: 'Pointup.io-' + validMerchantName,
         source: token,
       }, (err, charge) => {
         if (err) {
