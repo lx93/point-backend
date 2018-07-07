@@ -404,7 +404,8 @@ async function getMerchantAll(req, res, next) {
       merchants[i] = {
         merchantId: merchant[i]._id,
         name: merchant[i].name,
-        image: merchant[i].image
+        image: merchant[i].image,
+        discount: merchant[i].discount
       }
     }
     console.log('\n'+JSON.stringify(merchants, ",", " ")+'\n');
