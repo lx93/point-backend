@@ -1,3 +1,5 @@
+const Merchant = require('../models/merchants');
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const getDiscount = require('../utils/getDiscount');
@@ -23,9 +25,15 @@ async function paymentValid(req, res, next) {
           const validMerchantId = req.balance.merchantId;
           req.merchant = await Merchant.findOne({ _id: validMerchantId }).exec();
         }
+
         const validMerchantName = req.merchant.name;
-        const discount = getDiscount.calculate(validAmount);
-        validAmount = parseInt(validAmount * discount);
+        var discount;
+        if (req.merchant.discount) {
+          discount = getDiscount.calculate(validAmount);
+          validAmount = parseInt(validAmount * discount);
+        } else {
+          discount = 1;
+        }
         //Token is created using Checkout or Elements!
         //Get the payment token ID submitted by the form:
         const token = req.body.stripeToken;     //Using Express
