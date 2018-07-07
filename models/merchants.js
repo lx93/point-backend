@@ -8,6 +8,7 @@ const merchantSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   image: { type: String, required: true },
+  discount: { type: Boolean, require: true },
   isActive: { type: Boolean, required: true },
   lastLoginAt: { type: Date },
   createdAt: { type: Date, required: true },
