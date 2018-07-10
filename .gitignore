@@ -1,9 +1,3 @@
 node_modules
 .gitignore
-.elasticbeanstalk/
 nodemon.json
-
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml

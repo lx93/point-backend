@@ -30,7 +30,8 @@ async function getMerchant(req, res, next) {
       email: merchant.email,
       lastLoginAt: merchant.lastLoginAt,
       createdAt: merchant.createdAt,
-      updatedAt: merchant.updatedAt
+      updatedAt: merchant.updatedAt,
+      discount: merchant.discount
     });
   } catch (err) {
     throwErr(res, err);
